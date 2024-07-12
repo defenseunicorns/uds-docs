@@ -1,0 +1,70 @@
+---
+title: Basic Requirements (~10m)
+type: docs
+sidebar:
+  order: 1
+---
+
+## System Requirements
+
+In order to start using UDS, you'll need three things at a minimum:
+
+- Docker, with at least 16GB of memory allocated for resources
+- A working Kubernetes distribution and cluster
+- A code editor of your choice
+
+Optional, but recommended are the following, as they're used in other examples and tutorials:
+- A package manager, such as [Homebrew](https://brew.sh/) for macOS
+- [Helm](https://helm.sh/)
+- A graphical Kubernetes cluster management tool, such as:
+- [K9s](https://k9scli.io/)
+- [Kubernetes for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-kubernetes-tools.vscode-kubernetes-tools)
+- [Lens](https://k8slens.dev/) (non-free at companies over $10m in revenue)
+
+If you don't have any of these, you can continue with the following setup guides to install these tools or verify that you have everything you need.
+
+## Setup Guides
+
+### macOS
+
+**_Strongly Recommended: Install Homebrew_**
+
+[Homebrew](https://brew.sh/) is a widely used package manager for macOS. You can install it via the following terminal command:
+
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+**1. Install Docker**
+
+If you've done development with Docker in the past, you may already have it installed. If you do, you can likely skip the rest of this step. However,  please ensure that you have at least 16GB of memory allocated for resources.
+
+If you don't have Docker installed, [Docker Desktop](https://www.docker.com/products/docker-desktop/) is provided by Docker themselves and the easiest way to get started. The installation file is somewhat large (411MB for Apple Silicon and 479MB for Windows), so the download may take some time depending on your connection.
+
+> **Important Note:** Use of Docker Desktop at a company with greater than 250 employees or $10 million in annual revenue requires a paid subscription. If you don't wish to use Docker Desktop as a result, we would recommend an alternative platform such as [colima](https://github.com/abiosoft/colima), which is free and open-source.
+
+After installing Docker Desktop, please ensure that you allocate 16GB of memory. You can do this under the `Resources` pane in the application's settings. While Docker Desktop also provides an option to use Kubernetes in those settings, we suggest you utilize an alternative solution, as discussed below.
+
+**2. Install Kubernetes and create a cluster**
+
+For getting started quickly, we recommend using [k3d](https://k3d.io/), a lightweight wrapper for [k3s](https://github.com/rancher/k3s), which is Rancher Lab's minimal Kubernetes distribution. k3d's site contains detailed installation instructions, but if you're using Homebrew, you can easily install it with a simple command:
+
+```
+brew install k3d
+```
+
+Afterwards, you can create a cluster just as easily:
+
+```
+k3d create cluster
+```
+
+**3. Optional: Install a cluster management tool**
+
+A great way to monitor and debug your cluster is using one of the various tools in the Kubernetes ecosystem. One of the most popular is [K9s](https://k9scli.io/), an open-source, terminal-based tool for interacting with clusters. We recommend using this if you're comfortable working in the terminal and prefer free and open-source software. This is easily installable via Homebrew:
+
+```
+brew install k9s
+```
+
+If you're prefer traditional GUIs, there are alternatives such as [Kubernetes for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-kubernetes-tools.vscode-kubernetes-tools), if you use it as your editor.
