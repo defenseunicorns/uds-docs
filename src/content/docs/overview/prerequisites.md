@@ -1,6 +1,6 @@
 ---
 title: Prerequisite Knowledge
-type: docs
+
 sidebar:
   order: 6
 ---

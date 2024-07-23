@@ -1,6 +1,6 @@
 ---
 title: Mission & Technical Relevance
-type: docs
+
 sidebar:
   order: 2
 ---

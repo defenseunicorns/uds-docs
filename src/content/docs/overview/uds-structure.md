@@ -1,6 +1,6 @@
 ---
 title: UDS Technical Structure
-type: docs
+
 sidebar:
   order: 3
 ---

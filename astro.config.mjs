@@ -1,16 +1,32 @@
 import {defineConfig} from 'astro/config';
 import starlight from '@astrojs/starlight';
-
 import tailwind from "@astrojs/tailwind";
-
 
 // https://astro.build/config
 export default defineConfig({
+    i18n: {
+        defaultLocale: 'en',
+        locales: ['en'],
+        routing: {
+            prefixDefaultLocale: false
+        }
+    },
     integrations: [starlight({
         title: 'UDS',
+        customCss: [
+            './src/tailwind.css',
+        ],
+        favicon: './src/assets/logo.svg',
+        head: [
+            {
+                tag: 'script',
+                attrs: {src: "https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"}
+            },
+        ],
         logo: {
             src: './src/assets/logo.svg'
         },
+        pagination: false,
         social: {
             github: 'https://github.com/withastro/starlight'
         },
@@ -20,7 +36,7 @@ export default defineConfig({
                 autogenerate: {
                     directory: 'getting-started'
                 },
-                collapsed: true
+                collapsed: false
             },
             {
                 label: 'Overview',
@@ -98,6 +114,13 @@ export default defineConfig({
                 label: 'Reference',
                 items: [
                     {
+                        label: 'UDS Common',
+                        autogenerate: {
+                            directory: 'reference/uds-common'
+                        },
+                        collapsed: true
+                    },
+                    {
                         label: 'Bundles',
                         autogenerate: {
                             directory: 'reference/bundles'
@@ -108,6 +131,13 @@ export default defineConfig({
                         label: 'CLI Commands',
                         autogenerate: {
                             directory: 'reference/cli'
+                        },
+                        collapsed: true
+                    },
+                    {
+                        label: 'Configuration',
+                        autogenerate: {
+                            directory: 'reference/configuration'
                         },
                         collapsed: true
                     },
@@ -142,9 +172,19 @@ export default defineConfig({
                     directory: 'tutorials'
                 },
                 collapsed: true
+            },
+            {
+                label: 'Troubleshooting',
+                autogenerate: {
+                    directory: 'troubleshooting'
+                },
+                collapsed: true
             }
-        ]
-    }), tailwind()],
+        ],
+    }), tailwind({
+            applyBaseStyles: false
+        }
+    )],
     markdown: {
         // Applied to .md and .mdx files
     },

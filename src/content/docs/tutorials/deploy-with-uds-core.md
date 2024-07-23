@@ -1,6 +1,6 @@
 ---
 title: Deploy with UDS Core
-type: docs
+
 sidebar:
   order: 1
 ---

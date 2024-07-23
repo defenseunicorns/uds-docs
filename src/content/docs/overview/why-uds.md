@@ -1,6 +1,6 @@
 ---
 title: Why UDS?
-type: docs
+
 sidebar:
   order: 1
 ---

@@ -1,6 +1,6 @@
 ---
 title: Bundles
-type: docs
+
 sidebar:
   order: 4
 ---

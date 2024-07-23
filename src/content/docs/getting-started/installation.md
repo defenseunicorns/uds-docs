@@ -1,7 +1,8 @@
 ---
 title: Installation (<5m)
-type: docs
+
 sidebar:
+  badge: new
   order: 2
 ---
 

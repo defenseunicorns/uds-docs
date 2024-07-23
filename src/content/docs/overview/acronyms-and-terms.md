@@ -1,6 +1,6 @@
 ---
 title: Acronyms & Key Terminology
-type: docs
+
 sidebar:
   order: 4
 ---
