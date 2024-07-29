@@ -5,19 +5,19 @@ title: UDS Package Practices
 
 This document describes the practices that a UDS package **must**, **should** and **may** follow to be considered officially supported as a UDS package and to be able to display the "Made for UDS" badge on its GitHub repository README.md file :
 
-[<img alt="Made for UDS" src="./made-for-uds.svg" height="20px"/>](https://github.com/defenseunicorns/uds-core)
-
-> [!NOTE]
+[<img alt="Made for UDS" src="/src/assets/made-for-uds.svg" height="20px"/>](https://github.com/defenseunicorns/uds-core)
+:::tip
 > This badge should link to the `uds-core` repo and should match the height of any other badges (i.e. `20px`).
+:::
 
-> [!TIP]
+:::tip
 > This document follows [RFC-2119](https://datatracker.ietf.org/doc/html/rfc2119) for definitions of requirement levels (e.g. **must**, **should** and **may**)
+:::
 
 ## Integrations
 
 Below are the minimal services that a UDS package **must** integrate with, using the [UDS `Package` custom resource](https://github.com/defenseunicorns/uds-core/blob/main/src/pepr/operator/README.md#example-uds-package-cr).  These integrations **must** be declarative and automated without requiring click-ops from the person deploying the package.  Packages also **should** consider integrations with any additional UDS services that are relevant to that application.
 
-> [!NOTE]
 > Additional services will be added and integration requirements will change as `uds-core` continues to evolve.  UDS Package implementers **should** keep up with `uds-core` releases and changes to this document.  The "Made for UDS" badge **may** be requested to be removed if a package is not updated in a timely fashion.
 
 ### Istio
