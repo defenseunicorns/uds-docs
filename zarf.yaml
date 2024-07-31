@@ -4,7 +4,6 @@ metadata:
   version: 0.0.1
 components:
   - name: uds-docs
-    namespace: uds-docs
     required: true
     images:
       - pauldipietro/uds-docs:latest
