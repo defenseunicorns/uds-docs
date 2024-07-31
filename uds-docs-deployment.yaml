@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uds-docs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: uds-docs
+      app.kubernetes.io/name: uds-docs
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: uds-docs
+        app.kubernetes.io/name: uds-docs
+    spec:
+      containers:
+        - name: uds-docs
+          image: pauldipietro/uds-docs:latest
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
