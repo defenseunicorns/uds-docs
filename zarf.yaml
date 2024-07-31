@@ -6,7 +6,7 @@ components:
   - name: uds-docs
     required: true
     images:
-      - pauldipietro/uds-docs:latest
+      - uds-docs:latest
     manifests:
       - name: uds-docs-deployment
         namespace: uds-docs
