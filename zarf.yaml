@@ -1,0 +1,19 @@
+kind: ZarfPackageConfig
+metadata:
+  name: uds-docs
+  version: 0.0.1
+components:
+  - name: uds-docs
+    namespace: uds-docs
+    required: true
+    images:
+      - pauldipietro/uds-docs:latest
+    manifests:
+      - name: uds-docs-deployment
+        namespace: uds-docs
+        files:
+          - uds-docs-deployment.yaml
+      - name: connect-services
+        namespace: uds-docs
+        files:
+          - connect-services.yaml
