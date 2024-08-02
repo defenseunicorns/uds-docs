@@ -2,7 +2,6 @@
 title: Installation (<5m)
 
 sidebar:
-  badge: new
   order: 2
 ---
 

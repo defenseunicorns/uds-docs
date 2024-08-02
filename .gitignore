@@ -23,3 +23,6 @@ pnpm-debug.log*
 *.tar.zst
 
 zarf-sbom/
+
+.vscode
+.idea
