@@ -126,16 +126,23 @@ export default defineConfig({
                         collapsed: true
                     },
                     {
-                        label: 'Bundles',
+                        label: 'CLI',
                         autogenerate: {
-                            directory: 'reference/bundles'
+                            directory: 'reference/cli'
                         },
                         collapsed: true
                     },
                     {
                         label: 'CLI Commands',
                         autogenerate: {
-                            directory: 'reference/cli'
+                            directory: 'reference/cli-commands'
+                        },
+                        collapsed: true
+                    },
+                    {
+                        label: 'Bundles',
+                        autogenerate: {
+                            directory: 'reference/bundles'
                         },
                         collapsed: true
                     },
@@ -148,6 +155,8 @@ export default defineConfig({
                     },
                     'reference/core-integration',
                     'reference/zarf-packages',
+                    'reference/published-flavors',
+                    'reference/flavor-specific-development-notes'
                 ],
                 collapsed: true
             },

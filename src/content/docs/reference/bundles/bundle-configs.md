@@ -1,5 +1,6 @@
 ---
 title: Creating Configs
 
-sidebar:: 3
+sidebar:
+  order: 3
 ---
