@@ -1,0 +1,25 @@
+---
+expose:
+  type: clusterIP  # Required so an internal IP exists for Istio to target.
+  tls:
+    enabled: false  # b/c Istio does all TLS
+  clusterIP:
+    # The name of ClusterIP service
+    name: harbor
+
+# A K3D cluster setup by UDS defaults to the 'uds.dev' domain and will set
+# itself up such that you can reach apps at the given URLs in your browser.
+externalURL: "https://harbor.uds.dev"
+
+database:
+  # if external database is used, set "type" to "external"
+  # and fill the connection information in "external" section
+  type: internal
+  external:
+    # This particular ssl mode is essential. The postgres operator demands that
+    # it speak in TLS. The postgres operator however is using a locally signed
+    # cert and with Istio providing mTLS cluster wide there's no need for
+    # postgres' TLS. Therefore, the `require` mode is what we need.
+    # It will tell Harbor to speak with TLS but not to care about who signed
+    # the cert postgres presents.
+    sslmode: "require"

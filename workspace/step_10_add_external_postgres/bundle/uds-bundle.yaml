@@ -1,0 +1,65 @@
+---
+# filename: bundle/uds-bundle.yaml
+kind: UDSBundle
+metadata:
+  name: harbor-bundle  # Pick any name you like
+  description: A UDS bundle for deploying Harbor and an external Postgres  # Describe it clearly
+  version: 0.0.1-uds.0  # Increment this as you update the bundle
+
+# Two packages, Harbor and the Postgres-Operator
+packages:
+  # We list the postgres operator first because the packages will be installed in order, and the DB
+  # must be up before Harbor can succesfully install.
+  
+  # Determine the name, repository, and ref by inspecting the packages in the UDS Package repository:
+  # https://github.com/defenseunicorns/uds-package-postgres-operator/pkgs/container/packages%2Fuds%2Fpostgres-operator
+  - name: postgres-operator
+    repository: ghcr.io/defenseunicorns/packages/uds/postgres-operator
+    # Update this to be the latest postgres-operator release. Note the final part '-upstream' or '-registry1' selects the
+    # image flavor. For simplicity, we recommend selecting upstream (i.e. the default image set).
+    ref: 1.12.2-uds.2-upstream
+    # These overrides are the preferred way to configure packages in a bundle.
+    overrides:
+      postgres-operator:  # the name of the UDS package
+        uds-postgres-config:  # name of Helm chart in UDS Package
+          values:
+            # See https://github.com/defenseunicorns/uds-package-postgres-operator/blob/main/docs/configuration.md
+            # for information on what these configuration values do.
+            - path: postgresql
+              value:
+                enabled: true  # Set to false to not create the PostgreSQL resource
+                teamId: "uds"
+                volume:
+                  size: "10Gi"
+                numberOfInstances: 2
+                users:
+                  harbor.harbor: []  # database owner
+                databases:
+                  harbordb: harbor.harbor
+                version: "14"
+                ingress:
+                  - remoteNamespace: harbor
+  # Because we're in the Harbor UDS Package repository, we reference it by path instead of pulling it pre-built from an OCI registry
+  - name: harbor
+    path: ../  # This goes from `bundle/` to `.`
+    ref: 0.0.1  # This must match the version in the ../zarf.yaml file
+    overrides:
+      harbor:  # name of UDS Package
+        harbor:  # name of Helm chart in UDS Package
+          values:
+            # inspect the upstream Harbor values.yaml file to follow along with the custom values below
+            # https://github.com/goharbor/harbor-helm/blob/main/values.yaml
+            - path: "database.type"
+              value: "external"
+            - path: "database.external.host"
+              value: "pg-cluster.postgres.svc.cluster.local"
+            - path: "database.external.port"
+              value: 5432
+            - path: "database.external.username"
+              value: harbor.harbor
+            - path: "database.external.existingSecret"
+              # we know this value from deploying the postgres-operator previously. Details on how this secret
+              # name is formed may be available online but out of scope, we just know this is the name by inspection.
+              value: "harbor.harbor.pg-cluster.credentials.postgresql.acid.zalan.do"
+            - path: "database.external.coreDatabase"
+              value: "harbordb"

@@ -1,0 +1,4 @@
+---
+# This file will be very empty for now. It's actually recommended that as little as possible is done via uds-config Zarf variables.
+# The config file is supplied at install time, and should only include values which can change by environment.
+variables: {}

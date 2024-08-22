@@ -1,0 +1,29 @@
+---
+kind: ZarfPackageConfig
+metadata:
+  name: harbor
+  version: 0.0.1
+  architecture: amd64
+
+components:
+  - name: harbor
+    required: true
+    only:
+      cluster:
+        architecture: amd64
+    charts:
+      - name: harbor
+        version: 1.15.0
+        namespace: harbor
+        url: https://helm.goharbor.io
+        valuesFiles:
+          - values.yaml
+    images:
+      - goharbor/harbor-portal:v2.11.0
+      - goharbor/harbor-core:v2.11.0
+      - goharbor/harbor-jobservice:v2.11.0
+      - goharbor/registry-photon:v2.11.0
+      - goharbor/harbor-registryctl:v2.11.0
+      - goharbor/trivy-adapter-photon:v2.11.0
+      - goharbor/redis-photon:v2.11.0
+      - goharbor/harbor-exporter:v2.11.0
