@@ -104,22 +104,6 @@ packages:
   - name: uds-k3d
     repository: ghcr.io/defenseunicorns/packages/uds-k3d
     ref: 0.8.0
-    overrides:
-      uds-dev-stack:
-        minio:
-          variables:
-            - name: buckets
-              description: "Set Minio Buckets"
-              path: buckets
-            - name: svcaccts
-              description: "Minio Service Accounts"
-              path: svcaccts
-            - name: users
-              description: "Minio Users"
-              path: users
-            - name: policies
-              description: "Minio policies"
-              path: policies
 
   - name: init
     repository: oci://ghcr.io/defenseunicorns/packages/init
@@ -141,6 +125,94 @@ This process will take a few minutes while UDS CLI pulls down the images that wi
 ```bash
 uds create --confirm
 ```
+
+#### Deploy
+
+You can now deploy the bundle to create the k3d cluster in order to deploy UDS Core and `harbor`. This process can take a long time (over 30 minutes) to complete depending on available system resources:
+
+```bash
+uds deploy uds-bundle-harbor-bundle-amd64-0.0.1.tar.zst --confirm
+```
+
+#### Interact with Cluster (Optional)
+
+Once successfully deployed, you have the option interact with the deployed cluster and applications using [kubectl](https://kubernetes.io/docs/tasks/tools/) or [k9s](https://k9scli.io/topics/install/). Please note that the output for your `harbor` pods will likely have a different name. Additionally, it is normal for some of the pods, especially core and jobservice, to have some restarts as they wait for other pods to complete their startup process:
+
+```bash
+kubectl get pods -n harbor
+NAME                                 READY   STATUS    RESTARTS        AGE
+harbor-core-7f6448f746-txzhf         1/1     Running   1 (8m15s ago)   11m
+harbor-database-0                    1/1     Running   0               11m
+harbor-jobservice-6679dfbb7f-x5kr7   1/1     Running   5 (7m39s ago)   11m
+harbor-portal-7c5d84cbb8-qg4mb       1/1     Running   0               11m
+harbor-redis-0                       1/1     Running   0               11m
+harbor-registry-745ccc6bf4-65r5r     2/2     Running   0               11m
+harbor-trivy-0                       1/1     Running   0               11m
+```
+
+Connect to `harbor` using `kubectl port-forward`:
+
+```bash
+kubectl port-forward -n harbor svc/harbor-portal <local_port>>:80
+```
+
+You can now use a web browser to naviage to `http://localhost:<local_port>` to interact with `harbor`.
+
+#### Clean up
+
+Execute the following command to clean up your cluster:
+
+```bash
+k3d cluster delete uds
+```
+
+#### Troubleshooting
+
+Occasionally, some components of the deployment may require additional resources in order to launch successfully.  By using overrides, cpu and memory limits can be adjusted:
+
+```yaml
+kind: UDSBundle
+metadata:
+  name: harbor-bundle
+  description: Bundle with k3d, Zarf init, UDS Core, and harbor.
+  architecture: amd64
+  version: 0.0.1
+
+packages:
+  - name: uds-k3d
+    repository: ghcr.io/defenseunicorns/packages/uds-k3d
+    ref: 0.8.0
+
+  - name: init
+    repository: oci://ghcr.io/defenseunicorns/packages/init
+    ref: v0.36.1
+
+  - name: core
+    repository: oci://ghcr.io/defenseunicorns/packages/uds/core
+    ref: 0.26.0-upstream
+    overrides:
+      pepr-uds-core:
+        module:
+          values:
+            - path: "watcher.resources.limits.cpu"
+              value: "1000m"
+            - path: "admission.resources.limits.cpu"
+              value: "1000m"
+      keycloak:
+        keycloak:
+          values:
+            - path: "resources.limits.cpu"
+              value: "2000m"
+            - path: "resources.limits.memory"
+              value: "2Gi"
+
+  - name: harbor
+    path: ./package/
+    ref: 0.0.1
+```
+
+Refer to the documentation for the respective helm charts for value paths and defaults
+
 
 ### Create UDS Package to Deploy Harbor
 
