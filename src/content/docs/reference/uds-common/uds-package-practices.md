@@ -1,17 +1,16 @@
 ---
 title: UDS Package Practices
 ---
-# UDS Package Practices
+
+:::note
+This document follows [RFC-2119](https://datatracker.ietf.org/doc/html/rfc2119) for definitions of requirement levels (e.g. **must**, **should** and **may**)
+:::
 
 This document describes the practices that a UDS package **must**, **should** and **may** follow to be considered officially supported as a UDS package and to be able to display the "Made for UDS" badge on its GitHub repository README.md file :
 
 [<img alt="Made for UDS" src="/src/assets/made-for-uds.svg" height="20px"/>](https://github.com/defenseunicorns/uds-core)
 :::tip
 > This badge should link to the `uds-core` repo and should match the height of any other badges (i.e. `20px`).
-:::
-
-:::tip
-> This document follows [RFC-2119](https://datatracker.ietf.org/doc/html/rfc2119) for definitions of requirement levels (e.g. **must**, **should** and **may**)
 :::
 
 ## Integrations

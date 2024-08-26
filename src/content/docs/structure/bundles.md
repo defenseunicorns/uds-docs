@@ -62,5 +62,3 @@ UDS Bundles incorporate OSCAL (Open Security Controls Assessment Language) valid
 within the bundle. These controls encompass a range of functionalities, including security measures and configuration
 requirements. The documentation ensures the proper configuration of applications and facilitates the inheritance of
 controls within the UDS Bundle.
-
-## Zarf and UDS Bundles: What's the Difference?

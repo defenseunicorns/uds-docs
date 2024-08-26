@@ -3,6 +3,5 @@ title: Prerequisite Knowledge
 
 sidebar:
   order: 6
+  hidden: true
 ---
-
-## What you need to know
