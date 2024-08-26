@@ -22,7 +22,7 @@ These UDS Bundles are designed specifically for development and testing environm
 
 For additional information on UDS Bundles, please see the [UDS Bundles](/structure/bundles/) page.
 
-## Development and Test Environments
+## Deploy UDS Core
 
 In this section, you will deploy UDS Core for the first time.
 
