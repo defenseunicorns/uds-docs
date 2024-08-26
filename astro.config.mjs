@@ -57,64 +57,64 @@ export default defineConfig({
                 },
                 collapsed: true
             },
-            {
-                label: 'Technical Concepts',
-                items: [
-                    'concepts/kubernetes',
-                    'concepts/helm',
-                    'concepts/zarf',
-                    {
-                        label: 'Service Mesh',
-                        autogenerate: {
-                            directory: 'concepts/service-mesh'
-                        },
-                        collapsed: true
-                    },
-                    {
-                        label: 'Monitoring',
-                        autogenerate: {
-                            directory: 'concepts/monitoring'
-                        },
-                        collapsed: true
-                    },
-                    {
-                        label: 'Logging',
-                        autogenerate: {
-                            directory: 'concepts/logging'
-                        },
-                        collapsed: true
-                    },
-                    {
-                        label: 'Security & Compliance',
-                        autogenerate: {
-                            directory: 'concepts/security'
-                        },
-                        collapsed: true
-                    },
-                    {
-                        label: 'Identity & Access (IAM)',
-                        autogenerate: {
-                            directory: 'concepts/iam'
-                        },
-                        collapsed: true
-                    },
-                    {
-                        label: 'Backup & Restore',
-                        autogenerate: {
-                            directory: 'concepts/backup'
-                        },
-                        collapsed: true
-                    },
-                    {
-                        label: 'Authorization',
-                        autogenerate: {
-                            directory: 'concepts/authorization'
-                        },
-                        collapsed: true
-                    },
-                ],
-                collapsed: true
-            },
+            // {
+            //     label: 'Technical Concepts',
+            //     items: [
+            //         'concepts/kubernetes',
+            //         'concepts/helm',
+            //         'concepts/zarf',
+            //         {
+            //             label: 'Service Mesh',
+            //             autogenerate: {
+            //                 directory: 'concepts/service-mesh'
+            //             },
+            //             collapsed: true
+            //         },
+            //         {
+            //             label: 'Monitoring',
+            //             autogenerate: {
+            //                 directory: 'concepts/monitoring'
+            //             },
+            //             collapsed: true
+            //         },
+            //         {
+            //             label: 'Logging',
+            //             autogenerate: {
+            //                 directory: 'concepts/logging'
+            //             },
+            //             collapsed: true
+            //         },
+            //         {
+            //             label: 'Security & Compliance',
+            //             autogenerate: {
+            //                 directory: 'concepts/security'
+            //             },
+            //             collapsed: true
+            //         },
+            //         {
+            //             label: 'Identity & Access (IAM)',
+            //             autogenerate: {
+            //                 directory: 'concepts/iam'
+            //             },
+            //             collapsed: true
+            //         },
+            //         {
+            //             label: 'Backup & Restore',
+            //             autogenerate: {
+            //                 directory: 'concepts/backup'
+            //             },
+            //             collapsed: true
+            //         },
+            //         {
+            //             label: 'Authorization',
+            //             autogenerate: {
+            //                 directory: 'concepts/authorization'
+            //             },
+            //             collapsed: true
+            //         },
+            //     ],
+            //     collapsed: true
+            // },
             {
                 label: 'Reference',
                 items: [
@@ -153,30 +153,10 @@ export default defineConfig({
                         },
                         collapsed: true
                     },
-                    'reference/core-integration',
-                    'reference/zarf-packages',
+                    // 'reference/core-integration',
+                    // 'reference/zarf-packages',
                     'reference/published-flavors',
                     'reference/flavor-specific-development-notes'
-                ],
-                collapsed: true
-            },
-            {
-                label: 'Security',
-                items: [
-                    {
-                        label: 'Example Bundles',
-                        autogenerate: {
-                            directory: 'security/example-bundles'
-                        },
-                        collapsed: true
-                    },
-                    {
-                        label: 'Example Packages',
-                        autogenerate: {
-                            directory: 'security/example-packages'
-                        },
-                        collapsed: true
-                    }
                 ],
                 collapsed: true
             },
@@ -187,13 +167,13 @@ export default defineConfig({
                 },
                 collapsed: true
             },
-            {
-                label: 'Troubleshooting',
-                autogenerate: {
-                    directory: 'troubleshooting'
-                },
-                collapsed: true
-            }
+            // {
+            //     label: 'Troubleshooting',
+            //     autogenerate: {
+            //         directory: 'troubleshooting'
+            //     },
+            //     collapsed: true
+            // }
         ],
     }), tailwind({
             applyBaseStyles: false
