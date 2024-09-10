@@ -144,9 +144,9 @@ spec:
         app: httpbin
 ```
 
-{{% alert-note %}}
+:::note
 The UDS Operator uses the first `redirectUris` to populate the `match.prefix` hostname and `callback_uri` in the authservice chain.
-{{% /alert-note %}}
+:::
 
 For a complete example, see [app-authservice-tenant.yaml](https://github.com/defenseunicorns/uds-core/blob/main/src/test/app-authservice-tenant.yaml)
 
