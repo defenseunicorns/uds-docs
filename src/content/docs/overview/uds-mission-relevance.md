@@ -43,28 +43,6 @@ At a high level, UDS bundles infrastructure, platform, and mission applications 
 different mission systems and environments. It is an end-to-end solution that establishes and leverages a secure and declarative baseline
 to streamline software delivery. UDS tightly integrates and leverages Defense Unicorns' open source projects: Zarf, Pepr, Lula, and LeapfrogAI. The UDS CLI serves as the interaction point connecting these components, facilitating seamless deployment and security of infrastructure within the UDS platform.
 
-### Zarf
-
-Zarf is the generic bundler and installer for UDS. It plays a critical role in the UDS platform by simplifying the packaging and delivery of applications. Zarf delivers platform infrastructure and applications in a declarative state via a collection of Zarf Packages while reducing the need for mission personnel in constrained or classified environments to be Kubernetes or platform experts.
-
-Zarf enables the deployment of Big Bang and other DevSecOps tools, platforms, or infrastructure across security boundaries and classification levels. Zarf also simplifies the installation, updating, and maintenance of DevSecOps capabilities such as Kubernetes clusters, logging, and Software Bill of Materials (SBOM) compliance out of the box. Most importantly, Zarf keeps applications and systems running even when disconnected. For more information, see the [Zarf documentation](https://docs.zarf.dev/docs/zarf-overview) or [Zarf GitHub page](https://github.com/defenseunicorns/zarf#readme).
-
-### Pepr
-
-Pepr automates the integration of applications with runtime capabilities within an environment. This is the core project that will enable the agnostic runtime of applications into any UDS environment as Pepr will adjust the application configuration to be compatible with the target environment. Pepr seamlessly integrates UDS Bundles and Zarf Components, forming a growing library of bundles and components. It streamlines the integration process, enabling application teams to leverage a wide range of pre-built bundles and packages without the need for extensive manual configuration. For additional information, please see the [Pepr GitHub page](https://github.com/defenseunicorns/pepr#readme).
-
-### Lula
-
-Lula is the compliance bridge that leverages the NIST OSCAL framework to automate and simplify compliance in a Kubernetes environment. Lula will demonstrate control inheritance and validation for each UDS Package within the UDS environment. Lula documents and validates controls satisfied by applications, expediting the accreditation process and generating real-time reports for authorizing officials, reducing the burden on the site reliability engeneering team and other individuals involved in manually providing control mapping and responses. For additional information, please see the [Lula GitHub page](https://github.com/defenseunicorns/lula#readme).
-
-## UDS CLI
-
-The UDS CLI serves as the primary interface for users to interact with various components within the UDS platform. The UDS CLI streamlines the deployment process of mission applications and secure infrastructure. The UDS CLI simplifies the tasks involved in running mission applications while maintaining regulatory compliance in a unified and efficient manner.
-
-UDS CLI simplifies deployment by bundling multiple Zarf Packages into a single deployable artifact. This process ensures that UDS Bundles, which encompass infrastructure, platform, and mission applications, can be efficiently deployed within any Mission Hero's system environment. Additionally, the UDS CLI extends its capabilities to Pepr, where multiple Pepr applications are bundled and deployed as a single Pepr Module to support UDS Bundles during runtime.
-
-The UDS CLI is the interaction point for the entire UDS platform and combines and deploys various UDS products. This unified interface allows users to interact with UDS as a comprehensive platform, simplifying the management of mission-critical applications and components.
-
 ## Environments Supported by UDS
 
 UDS Bundles are designed to be deployed across various environments, providing flexibility and adaptability for your mission needs. UDS is adaptable to the requirements of different software applications and missions, ensuring successful deployment in diverse environments. Below are the environments where bundles can be deployed:
