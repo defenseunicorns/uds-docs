@@ -5,10 +5,6 @@ import node from "@astrojs/node";
 
 // https://astro.build/config
 export default defineConfig({
-    output: 'server',
-    adapter: node({
-        mode: 'standalone',
-    }),
     i18n: {
         defaultLocale: 'en',
         locales: ['en'],
@@ -33,7 +29,7 @@ export default defineConfig({
         },
         pagination: false,
         social: {
-            github: 'https://github.com/withastro/starlight'
+            github: 'https://github.com/defenseunicorns'
         },
         sidebar: [
             {
