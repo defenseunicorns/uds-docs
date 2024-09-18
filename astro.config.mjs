@@ -13,7 +13,12 @@ export default defineConfig({
         }
     },
     integrations: [starlight({
-        title: 'UDS',
+        // The title is set to '' because otherwise it shows in the top navigation which is redundant with the logo.
+        // However, if this is done, the title delimiter has no text after it, which affects what you see in the
+        // page title (e.g. Basic Requirements | [title]). We can fix this by changing the delimiter value and
+        // ensure the logo has alternative text for accessibility purposes.
+        title: '',
+        titleDelimiter: '| UDS',
         customCss: [
             './src/tailwind.css',
         ],
@@ -25,7 +30,9 @@ export default defineConfig({
             },
         ],
         logo: {
-            src: './src/assets/logo.svg'
+            light: './src/assets/light-logo.svg',
+            dark: './src/assets/dark-logo.svg',
+            alt: 'Unicorn Delivery Service'
         },
         pagination: false,
         social: {
