@@ -158,6 +158,7 @@ export default defineConfig({
                     },
                     // 'reference/core-integration',
                     // 'reference/zarf-packages',
+                    'reference/distribution-support',
                     'reference/published-flavors',
                     'reference/flavor-specific-development-notes'
                 ],
