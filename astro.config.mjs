@@ -19,6 +19,7 @@ export default defineConfig({
         // ensure the logo has alternative text for accessibility purposes.
         title: '',
         titleDelimiter: '| UDS',
+        lastUpdated: true,
         customCss: [
             './src/tailwind.css',
         ],
