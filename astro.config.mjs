@@ -122,6 +122,12 @@ export default defineConfig({
                 label: 'Reference',
                 items: [
                     {
+                        label: 'Test',
+                        autogenerate: {
+                            directory: 'reference/temp'
+                        }
+                    },
+                    {
                         label: 'UDS Common',
                         autogenerate: {
                             directory: 'reference/uds-common'
