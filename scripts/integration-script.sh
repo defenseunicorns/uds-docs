@@ -1,12 +1,27 @@
 #!/bin/bash
 
-TARGET_DIR="src/content/docs/reference/temp"
+TARGET_DIR="src/content/docs/"
 
 repos=(
-    "https://github.com/defenseunicorns/uds-core v0.27.3 ./temp/uds-core"
+    "/Users/paul/source/defenseunicorns/uds-core/ docs-refresh-integration ./temp/uds-core"
 #    "https://github.com/defenseunicorns/uds-identity-config v0.6.3 ./repo-docs/uds-identity-config"
-    "https://github.com/defenseunicorns/uds-cli v0.16.0 ./repo-docs/cli"
+    "/Users/paul/source/defenseunicorns/uds-identity-config docs-refresh-integration ./temp/uds-identity-config"
+#    "https://github.com/defenseunicorns/uds-cli v0.16.0 cli"
+    "/Users/paul/source/defenseunicorns/uds-cli/ docs-refresh-integration ./temp/cli"
 )
+
+mkdir temp
+
+REFERENCE_DIR="${TARGET_DIR}/reference"
+TROUBLESHOOTING_DIR="${TARGET_DIR}/troubleshooting"
+
+echo "Cleaning reference and troubleshooting directories..."
+
+# find "$TARGET_DIR" -type d -regex ".*/[a-zA-Z]{2,4}/reference" -exec sh -c 'rm -rf "{}"/*' \;
+# find "$TARGET_DIR" -type d -regex ".*/[a-zA-Z]{2,4}/troubleshooting" -exec sh -c 'rm -rf "{}"/*' \;
+
+find "$TARGET_DIR" -type d \( -name "reference" -o -name "troubleshooting" \) -exec rm -rf {} +
+mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
 
 # Function to clone a repository
 clone_repo() {
