@@ -7,23 +7,24 @@ The UDS Operator plays a pivotal role in managing the lifecycle of UDS Package C
 ## Package
 
 - **Enabling Istio Sidecar Injection:**
-    - The operator facilitates the activation of Istio sidecar injection within namespaces where the CR is deployed.
+  - The operator facilitates the activation of Istio sidecar injection within namespaces where the CR is deployed.
 - **Establishing Default-Deny Ingress/Egress Network Policies:**
-    - It sets up default-deny network policies for both ingress and egress, creating a foundational security posture.
+  - It sets up default-deny network policies for both ingress and egress, creating a foundational security posture.
 - **Implementing Layered Allow-List Approach:**
-    - A layered allow-list approach is applied on top of default-deny network policies. This includes essential defaults like Istio requirements and DNS egress.
+  - A layered allow-list approach is applied on top of default-deny network policies. This includes essential defaults like Istio requirements and DNS egress.
 - **Providing Targeted Remote Endpoints Network Policies:**
-    - The operator creates targeted network policies for remote endpoints, such as `KubeAPI` and `CloudMetadata`. This approach aims to enhance policy management by reducing redundancy (DRY) and facilitating dynamic bindings in scenarios where static definitions are impractical.
+  - The operator creates targeted network policies for remote endpoints, such as `KubeAPI` and `CloudMetadata`. This approach aims to enhance policy management by reducing redundancy (DRY) and facilitating dynamic bindings in scenarios where static definitions are impractical.
 - **Creating Istio Virtual Services and Related Ingress Gateway Network Policies:**
-    - In addition, the operator is responsible for generating Istio Virtual Services and the associated network policies for the ingress gateway.
+  - In addition, the operator is responsible for generating Istio Virtual Services and the associated network policies for the ingress gateway.
 - **SSO Group Authentication:**
-    - Group authentication determines who can access the application based on keycloak group membership.
-    - At this time `anyOf` allows defining a list of groups, a user must belong to at least one of them.
+  - Group authentication determines who can access the application based on keycloak group membership.
+  - At this time `anyOf` allows defining a list of groups, a user must belong to at least one of them.
+  - Custom client `protocolMapper`'s that will be created alongside the client and added to the client's dedicated scope.
 - **Authservice Protection:**
-    - Authservice authentication provides application agnostic SSO for applications that opt-in.
-      {{% alert-caution %}}
-      Warning: **Authservice Protection** and **SSO Group Authentication** are in Alpha and may not be stable. Avoid using in production. Feedback is appreciated to improve reliability.
-      {{% /alert-caution %}}
+  - Authservice authentication provides application agnostic SSO for applications that opt-in.
+  {{% alert-caution %}}
+  Warning: **Authservice Protection** and **SSO Group Authentication** are in Alpha and may not be stable. Avoid using in production. Feedback is appreciated to improve reliability.
+  {{% /alert-caution %}}
 
 ### Example UDS Package CR
 
@@ -59,7 +60,7 @@ spec:
         port: 9411
         description: "Tempo"
 
-  # SSO allows for the creation of Keycloak clients and with automatic secret generation
+  # SSO allows for the creation of Keycloak clients and with automatic secret generation and protocolMappers
   sso:
     - name: Grafana Dashboard
       clientId: uds-core-admin-grafana
@@ -68,6 +69,22 @@ spec:
       groups:
         anyOf:
           - /UDS Core/Admin
+      # Define protocolMappers to be created as dedicated scopes for the client
+      protocolMappers:
+        - name: username
+          protocol: "openid-connect"
+          protocolMapper: "oidc-usermodel-property-mapper"
+          config:
+            user.attribute: "username"
+            claim.name: "username"
+            userinfo.token.claim: "true"
+        - name: email
+          protocol: "openid-connect"
+          protocolMapper: "oidc-usermodel-property-mapper"
+          config:
+            user.attribute: "email"
+            claim.name: "email"
+            userinfo.token.claim: "true"
 ```
 
 ### Example UDS Package CR with SSO Templating
@@ -166,12 +183,51 @@ variables:
 
 See [configuring Istio Ingress](https://uds.defenseunicorns.com/core/configuration/istio/ingress/#configure-domain-name-and-tls-for-istio-gateways) for the relevant documentation on configuring ingress certificates.
 
+### Creating a UDS Package with a Device Flow client
+
+Some applications may not have a web UI / server component to login to and may instead grant OAuth tokens to devices.  This flow is known as the [OAuth 2.0 Device Authorization Grant](https://oauth.net/2/device-flow/) and is supported in a UDS Package with the following configuration:
+
+```yaml
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  name: fulcio
+  namespace: fulcio-system
+spec:
+  sso:
+    - name: Sigstore Login
+      clientId: sigstore
+      standardFlowEnabled: false
+      publicClient: true
+      attributes:
+        oauth2.device.authorization.grant.enabled: "true"
+```
+
+This configuration does not create a secret in the cluster and instead tells the UDS Operator to create a public client (one that requires no auth secret) that enables the `oauth2.device.authorization.grant.enabled` flow and disables the standard redirect auth flow.  Because this creates a public client configuration that deviates from this is limited - if your application requires both the Device Authorization Grant and the standard flow this is currently not supported without creating two separate clients.
+
+### SSO Client Attribute Validation
+
+The SSO spec supports a subset of the Keycloak attributes for clients, but does not support all of them. The current supported attributes are:
+- oidc.ciba.grant.enabled
+- backchannel.logout.session.required
+- backchannel.logout.revoke.offline.tokens
+- post.logout.redirect.uris
+- oauth2.device.authorization.grant.enabled
+- pkce.code.challenge.method
+- client.session.idle.timeout
+- saml.assertion.signature
+- saml.client.signature
+- saml_assertion_consumer_url_post
+- saml_assertion_consumer_url_redirect
+- saml_single_logout_service_url_post
+- saml_single_logout_service_url_redirect
+
 ## Exemption
 
 - **Exemption Scope:**
-    - Granting exemption for custom resources is restricted to the `uds-policy-exemptions` namespace by default, unless specifically configured to allow exemptions across all namespaces.
+  - Granting exemption for custom resources is restricted to the `uds-policy-exemptions` namespace by default, unless specifically configured to allow exemptions across all namespaces.
 - **Policy Updates:**
-    - Updating the policies Pepr store with registered exemptions.
+  - Updating the policies Pepr store with registered exemptions.
 
 ### Example UDS Exemption CR
 
@@ -216,11 +272,11 @@ spec:
 Default [policy exemptions](https://github.com/defenseunicorns/uds-core/blob/main/src/pepr/operator/crd/generated/exemption-v1alpha1.ts) are confined to a singular namespace: `uds-policy-exemptions`. We find this to be an optimal approach for UDS due to the following reasons:
 
 - **Emphasis on Security Impact:**
-    - An exemption has the potential to diminish the overall security stance of the cluster. By isolating these exemptions within a designated namespace, administrators can readily recognize and assess the security implications associated with each exemption.
+  - An exemption has the potential to diminish the overall security stance of the cluster. By isolating these exemptions within a designated namespace, administrators can readily recognize and assess the security implications associated with each exemption.
 - **Simplified RBAC Maintenance:**
-    - Adopting this pattern streamlines the management of Role-Based Access Control (RBAC) for overseeing exemptions. Placing all UDS exemptions within a dedicated namespace simplifies the task of configuring and maintaining RBAC policies, enhancing overall control and transparency.
+  - Adopting this pattern streamlines the management of Role-Based Access Control (RBAC) for overseeing exemptions. Placing all UDS exemptions within a dedicated namespace simplifies the task of configuring and maintaining RBAC policies, enhancing overall control and transparency.
 - **Mitigation of Configuration Risks:**
-    - By restricting exemptions to a specific namespace, the risk of unintentional misconfigurations in RBAC is significantly reduced. This ensures that cluster exemptions are only granted intentionally and within the confines of the designated namespace, minimizing the potential for security vulnerabilities resulting from misconfigured permissions.
+  - By restricting exemptions to a specific namespace, the risk of unintentional misconfigurations in RBAC is significantly reduced. This ensures that cluster exemptions are only granted intentionally and within the confines of the designated namespace, minimizing the potential for security vulnerabilities resulting from misconfigured permissions.
 
 ### Allow All Namespaces
 
@@ -253,8 +309,8 @@ src/pepr/operator/
 ├── crd
 │   ├── generated           # Type files generated by `uds run -f src/pepr/tasks.yaml gen-crds`
 │   ├── sources             # CRD source files
-│   ├── migrate.ts          # Migrates older versions of UDS Package CRs to new version
-│   ├── register.ts         # Registers the UDS Package CRD with the Kubernetes API
+│   ├── migrate.ts          # Migrates older versions of UDS Package CRs to new version
+│   ├── register.ts         # Registers the UDS Package CRD with the Kubernetes API
 │   └── validators          # Validates Custom Resources with Pepr
 ├── index.ts                # Entrypoint for the UDS Operator
 └── reconcilers             # Reconciles Custom Resources via the controllers
