@@ -35,7 +35,6 @@ export default defineConfig({
             dark: './src/assets/dark-logo.svg',
             alt: 'Unicorn Delivery Service'
         },
-        pagination: false,
         social: {
             github: 'https://github.com/defenseunicorns'
         },

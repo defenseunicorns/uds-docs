@@ -31,7 +31,7 @@ In this section, you will deploy UDS Core for the first time.
 The very first step is installation of the UDS CLI. Having installed Homebrew previously, you can do so with the
 following command:
 
-```git
+```bash
 brew tap defenseunicorns/tap && brew install uds
 ```
 
@@ -50,7 +50,7 @@ To deploy this bundle, run the `uds deploy k3d-core-demo:X.X.X` command in the t
 current release. 
 For example, if the current release is `0.26.0`:
 
-```cli
+```bash
 uds deploy k3d-core-demo:0.26.0
 
 # deploy this bundle?
@@ -66,7 +66,7 @@ You can view all versions of the package
 
 Use the following command to visualize resources in the cluster via [k9s:](https://k9scli.io/)
 
-```git
+```bash
 uds zarf tools monitor
 ```
 
@@ -74,13 +74,13 @@ uds zarf tools monitor
 
 Use the following command to tear down the k3d cluster:
 
-```git
+```bash
 k3d cluster delete uds
 ```
 
 If you opted to use Colima, use the following command to tear down the virtual machine that the cluster was running on:
 
-```git
+```bash
 colima delete -f
 ```
 
@@ -95,7 +95,7 @@ Again, be sure to specify the version. The latest version as of this writing is 
 package [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-slim-dev).
 :::
 
-```cli
+```bash
 uds deploy k3d-core-slim-dev:X.X.X
 ```
 
@@ -105,7 +105,7 @@ UDS Core development leverages the `uds zarf dev deploy` command. To simplify th
 
 Below is an example of the workflow developing the [metrics-server package](https://github.com/defenseunicorns/uds-core/tree/main/src/metrics-server):
 
-```cli
+```bash
 # Create the dev environment
 uds run dev-setup
 
@@ -123,7 +123,7 @@ uds run dev-deploy --set PKG=metrics-server
 
 You can perform a complete test of UDS Core by running the following command:
 
-```cli
+```bash
 uds run test-uds-core
 ```
 
@@ -131,7 +131,7 @@ This command initiates the creation of a local k3d cluster, installs UDS Core, a
 
 The example below runs tests against the metrics-server package:
 
-```cli
+```bash
 UDS_PKG=metrics-server uds run test-single-package
 ```
 
