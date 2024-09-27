@@ -76,7 +76,7 @@ After installation, you can follow OS-specific steps below.
         [Homebrew](https://brew.sh/) is a widely used package manager for macOS which also works with Linux. You can
         install it via the following terminal command:
 
-        ```
+        ```bash
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         ```
 
@@ -87,7 +87,7 @@ After installation, you can follow OS-specific steps below.
         contains detailed installation instructions, but if you're using Homebrew, you can easily install it with a
         simple command:
 
-        ```
+        ```bash
         brew install k3d
         ```
 
@@ -98,7 +98,7 @@ After installation, you can follow OS-specific steps below.
         clusters. We recommend using this if you're comfortable working in the terminal and prefer free and open-source
         software. This is easily installable via Homebrew:
 
-        ```
+        ```bash
         brew install k9s
         ```
 
@@ -112,23 +112,28 @@ After installation, you can follow OS-specific steps below.
         [Homebrew](https://brew.sh/) is a widely used package manager for macOS, although it  also works with Linux.
         You can install it via the following terminal command:
 
-        `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-
-        Then, add it to your PATH using these two commands:
-
+        ```bash
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         ```
-        (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/unicorn/.bashrc
 
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        After installation, you'll need to ensure the `brew` command is added to your PATH. The installer should tell
+        you how to do this, and the command should look similar to the following:
+
+        ```bash
+        `(echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/[USERNAME]/.bashrc`
         ```
 
         You will also need to install Homebrew's dependencies:
 
-        `sudo apt-get install build-essential`
+        ```bash
+        sudo apt-get install build-essential
+        ```
 
         Lastly, it's recommended to install GCC:
 
-        `brew install gcc`
+        ```bash
+        brew install gcc
+        ```
 
         **2. Install k3d**
 
@@ -137,7 +142,7 @@ After installation, you can follow OS-specific steps below.
         contains detailed installation instructions, but if you're using Homebrew, you can easily install it with a
         simple command:
 
-        ```
+        ```bash
         brew install k3d
         ```
 
@@ -148,7 +153,7 @@ After installation, you can follow OS-specific steps below.
         clusters. We recommend using this if you're comfortable working in the terminal and prefer free and open-source
         software. This is easily installable via Homebrew:
 
-        ```
+        ```bash
         brew install k9s
         ```
 
