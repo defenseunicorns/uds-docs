@@ -124,7 +124,7 @@ uds run dev-deploy --set PKG=metrics-server
 You can perform a complete test of UDS Core by running the following command:
 
 ```bash
-uds run test-UDS core
+uds run test-uds-core
 ```
 
 This command initiates the creation of a local k3d cluster, installs UDS Core, and executes a set of tests identical to those performed in CI. If you wish to run tests targeting a specific package, you can utilize the `PKG` environment variable.
