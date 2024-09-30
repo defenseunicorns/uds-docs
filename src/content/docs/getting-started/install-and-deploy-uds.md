@@ -26,7 +26,7 @@ For additional information on UDS Bundles, please see the [UDS Bundles](/structu
 
 In this section, you will deploy UDS Core for the first time.
 
-**Step 1: Install the [UDS CLI](https://uds.defenseunicorns.com/cli/)**
+### Step 1: Install the [UDS CLI](https://uds.defenseunicorns.com/cli/)
 
 The very first step is installation of the UDS CLI. Having installed Homebrew previously, you can do so with the
 following command:
@@ -40,7 +40,7 @@ You can see all releases of the UDS CLI on the
 [UDS CLI GitHub repository](https://github.com/defenseunicorns/uds-cli/releases)
 :::
 
-**Step 2: Deploy the UDS Bundle**
+### Step 2: Deploy the UDS Bundle
 
 The UDS Bundle being deployed in this example is the 
 [`k3d-core-demo`](https://github.com/defenseunicorns/uds-core/blob/main/bundles/k3d-standard/README.md) bundle, which 
@@ -70,7 +70,7 @@ Use the following command to visualize resources in the cluster via [k9s:](https
 uds zarf tools monitor
 ```
 
-**Step 3: Clean Up**
+### Step 3: Clean Up
 
 Use the following command to tear down the k3d cluster:
 

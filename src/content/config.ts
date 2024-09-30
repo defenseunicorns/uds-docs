@@ -4,7 +4,7 @@ import { docsSchema } from '@astrojs/starlight/schema';
 // This is a universal banner for beta testing purposes.
 // See: https://github.com/withastro/starlight/discussions/1535
 //
-// Revert to the original code after the bannner is no longer needed!
+// Revert to the original code after the banner is no longer needed!
 
 // export const collections = {
 // 	docs: defineCollection({ schema: docsSchema() }),
