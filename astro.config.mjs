@@ -27,6 +27,9 @@ export default defineConfig({
             dark: './src/assets/dark-logo.svg',
             alt: 'Unicorn Delivery Service'
         },
+        components: {
+            ThemeProvider: './src/components/ThemeProvider.astro'
+        },
         social: {
             github: 'https://github.com/defenseunicorns'
         },
