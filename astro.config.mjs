@@ -21,13 +21,15 @@ export default defineConfig({
         customCss: [
             './src/tailwind.css',
         ],
-        favicon: './src/assets/logo.svg',
+        favicon: 'public/favicon.png',
         logo: {
             light: './src/assets/light-logo.svg',
             dark: './src/assets/dark-logo.svg',
             alt: 'Unicorn Delivery Service'
         },
         components: {
+            Footer: './src/components/Footer.astro',
+            Head: './src/components/Head.astro',
             ThemeProvider: './src/components/ThemeProvider.astro'
         },
         social: {
@@ -71,7 +73,7 @@ export default defineConfig({
             }
         ],
     }), tailwind({
-        applyBaseStyles: false
-    }
+            applyBaseStyles: false
+        }
     )]
 });
