@@ -1,0 +1,17 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+---
+<Default {...Astro.props}><slot />
+</Default>
+<br/>
+
+<h1>
+    Give us Feedback
+</h1>
+<feedback-button
+        project="60mqhfppvi"
+        button-position="bottom-left"
+        modal-position="sidebar-right"
+        button-style="dark">
+    Was this page helpful?
+</feedback-button>
