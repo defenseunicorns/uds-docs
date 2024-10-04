@@ -26,3 +26,6 @@ zarf-sbom/
 
 .vscode
 .idea
+
+# reference folder
+src/content/docs/reference/
