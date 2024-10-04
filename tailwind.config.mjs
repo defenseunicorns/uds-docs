@@ -1,18 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 import starlightPlugin from '@astrojs/starlight-tailwind';
 
-export default {
+module.exports = {
 	content: [
 		'./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
-		"./node_modules/flowbite/**/*.js"
+		'./node_modules/flowbite/**/*.js'
 	],
 	theme: {
 		extend: {},
 	},
-	darkMode: 'media',
+	darkMode: ['selector', '[data-theme="dark"]'],
 	plugins: [
-		// Some styling currently breaks if this is enabled
+		// Todo: potentially resolve issues with flowbite
+		// require('flowbite-typography'),
 		// require('flowbite/plugin'),
 		starlightPlugin()
-	]
+	],
 }
