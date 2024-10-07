@@ -4,6 +4,7 @@ import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
+    site: 'https://uds.defenseunicorns.com/docs/',
     integrations: [starlight({
         defaultLocale: 'en',
         locales: {
@@ -22,6 +23,24 @@ export default defineConfig({
             './src/tailwind.css',
         ],
         favicon: 'public/favicon.png',
+        head: [
+            {
+                tag: 'script',
+                attrs: {
+                    src: 'https://www.googletagmanager.com/gtag/js?id=G-57TRKPHZXN',
+                    async: true,
+                }
+            },
+            {
+                tag: 'script',
+                content: `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-57TRKPHZXN');
+`
+            }
+        ],
         logo: {
             light: './src/assets/light-logo.svg',
             dark: './src/assets/dark-logo.svg',

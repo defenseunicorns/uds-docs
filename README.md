@@ -1,16 +1,10 @@
-## UDS Docs Refresh
+## UDS Documentation Site
 
-This is an experimental refresh of the UDS documentation, built in [Starlight](https://starlight.astro.build).
-
-Currently, the project migrates most of the existing UDS documentation into an information architecture which aims to be
-more conducive to both learning and discovery.
-
-> [!WARNING]
-> As this is a work in progress, things will frequently change and this README may be out of date at times.
+This is the UDS documentation site, built in [Starlight](https://starlight.astro.build).
 
 In order to get started with local development, the simplest way to do so is by utilizing your usual `npm install` and 
-`npm run dev` commands, as described below. You may also build this project as a Zarf package/UDS bundle to be deployed. 
-Please ensure you build and tag the image as `uds-docs`:
+`npm run dev` commands, as described below. You may also build this project as a Zarf package/UDS bundle. Please ensure 
+you build and tag the image as `uds-docs`:
 
 `docker build -t uds-docs:latest .`
 
@@ -49,6 +43,13 @@ its file name.
 Images can be added to `src/assets/` and embedded in Markdown with a relative link.
 
 Static assets, like favicons, can be placed in the `public/` directory.
+
+### Document Sourcing
+
+High-level docs are hosted within this repository (e.g. `content/docs/getting-started`). Reference and troubleshooting 
+docs are sourced from other repositories such as [uds-core](https://github.com/defenseunicorns/uds-core) using the 
+`scripts/integration-script.sh` file. These files are copied into those respective folders and their paths within the
+sidebar navigation are automatically generated using Starlight's configuration file (`astro.config.mjs`).
 
 ### Commands
 
