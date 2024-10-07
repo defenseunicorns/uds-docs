@@ -23,6 +23,24 @@ export default defineConfig({
             './src/tailwind.css',
         ],
         favicon: 'public/favicon.png',
+        head: [
+            {
+                tag: 'script',
+                attrs: {
+                    src: 'https://www.googletagmanager.com/gtag/js?id=G-57TRKPHZXN',
+                    async: true,
+                }
+            },
+            {
+                tag: 'script',
+                content: `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-57TRKPHZXN');
+`
+            }
+        ],
         logo: {
             light: './src/assets/light-logo.svg',
             dark: './src/assets/dark-logo.svg',
