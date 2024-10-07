@@ -22,7 +22,6 @@ export default defineConfig({
         customCss: [
             './src/tailwind.css',
         ],
-        favicon: 'public/favicon.png',
         head: [
             {
                 tag: 'script',
