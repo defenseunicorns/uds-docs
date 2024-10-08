@@ -7,7 +7,7 @@
 }
 
 :root {
-	--sl-content-width: 80rem;
+	--sl-content-width: 50rem;
     color-scheme: dark;
 
     --feedback-primary-color: #1C64F2;
