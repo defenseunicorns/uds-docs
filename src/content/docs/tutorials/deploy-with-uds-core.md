@@ -12,7 +12,7 @@ This tutorial uses UDS CLI to deploy an example application, [podinfo](https://g
 ### Prerequisites
 
 - [Zarf](https://docs.zarf.dev/getting-started/)
-- [UDS CLI](https://uds.defenseunicorns.com/cli/)
+- [UDS CLI](https://uds.defenseunicorns.com/reference/cli/overview/)
 - [Docker](https://www.docker.com/)
 - [k3d](https://k3d.io/v5.6.0/)
 
