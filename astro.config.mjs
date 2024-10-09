@@ -5,6 +5,11 @@ import tailwind from "@astrojs/tailwind";
 // https://astro.build/config
 export default defineConfig({
     site: 'https://uds.defenseunicorns.com/docs/',
+    redirects:
+    {
+        '/docs': '/',
+        '/en': '/'
+    },
     integrations: [starlight({
         defaultLocale: 'en',
         locales: {
