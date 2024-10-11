@@ -9,6 +9,8 @@ export default defineConfig({
     {
         '/docs': '/',
         '/en': '/',
+        '/mission-capabilities/': '/mission-capabilities/overview/',
+        '/mission-capabilities/swf/': '/mission-capabilities/swf/overview',
         '/cli/command-reference/uds/': '/reference/cli/commands/uds',
         '/cli/command-reference/uds_completion/': '/reference/cli/commands/uds_completion',
         '/cli/command-reference/uds_completion_bash/': '/reference/cli/commands/uds_completion_bash',
