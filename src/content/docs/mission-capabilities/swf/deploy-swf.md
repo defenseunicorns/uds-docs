@@ -57,7 +57,7 @@ sudo sysctl -p
 
 ## Quickstart
 
-**Step 1: Install [UDS CLI](https://uds.defenseunicorns.com/cli/)
+**Step 1: Install [UDS CLI](https://uds.defenseunicorns.com/reference/cli/overview/)
 
 ```bash
 brew tap defenseunicorns/tap && brew install uds
@@ -116,7 +116,7 @@ You can then configure keycloak. Use zarf connect to establish a connection to t
 uds zarf connect keycloak
 ```
 
-Refer to the UDS Core [documentation](https://uds.defenseunicorns.com/core/configuration/) for more details on how to configure keycloak users and groups.
+Refer to the UDS Core [documentation](https://uds.defenseunicorns.com/reference/uds-core/overview/) for more details on how to configure keycloak users and groups.
 
 ### Source
 
