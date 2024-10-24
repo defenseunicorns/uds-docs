@@ -7,7 +7,7 @@ sidebar:
 
 ## Getting Started with UDS Bundles
 
-UDS Core provides published [bundles](https://uds.defenseunicorns.com/bundles/) that serve multiple purposes: you can 
+UDS Core provides published [bundles](https://uds.defenseunicorns.com/reference/bundles/overview/) that serve multiple purposes: you can 
 utilize them for experimenting with UDS Core or for UDS Package development when you only require specific components 
 of UDS Core. These bundles leverage [UDS K3d](https://github.com/defenseunicorns/uds-k3d) to establish a local k3d 
 cluster.
@@ -87,7 +87,7 @@ colima delete -f
 ## UDS Bundle Development
 
 In addition to the demo bundle, there is also a 
-[`k3d-slim-dev bundle`](https://github.com/defenseunicorns/uds-core/tree/main/bundles/k3d-istio) designed specifically 
+[`k3d-slim-dev bundle`](hhttps://github.com/defenseunicorns/uds-core/tree/main/bundles/k3d-slim-dev) designed specifically 
 for working with UDS Core with *only* Istio, Keycloak, and Pepr installed. To use it, execute the following command:
 
 :::note
