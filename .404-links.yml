@@ -1,0 +1,8 @@
+# This file is used with the 404 checking action
+# https://github.com/marketplace/actions/404-links
+
+folder: src/content/docs/
+httpsOnly: true
+pullRequestReview: true
+delay:
+  'https://uds.defenseunicorns.com/': 200

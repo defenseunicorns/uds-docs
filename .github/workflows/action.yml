@@ -1,0 +1,31 @@
+name: Markdown Link Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [assigned, opened, synchronize, reopened]
+
+jobs:
+  build_and_check_404s:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run integration script
+        run: bash scripts/integration-script.sh
+
+      - uses: actions/checkout@v4
+      - name: Test .md links
+        uses: atalent-labs/404-links@3.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
