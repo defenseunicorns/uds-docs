@@ -114,7 +114,12 @@ gtag('config', 'G-57TRKPHZXN');
                     directory: 'tutorials'
                 },
                 collapsed: true
-            }
+            },
+            {
+                label: 'Airgap App Store',
+                link: '/airgap-app-store/overview',
+                badge: { text: 'New', variant: 'success' }
+            },
         ],
     }), tailwind({
             applyBaseStyles: false
