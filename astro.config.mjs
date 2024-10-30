@@ -73,6 +73,10 @@ export default defineConfig({
         },
         sidebar: [
             {
+                label: 'Home',
+                link: '/',
+            },
+            {
                 label: 'Getting Started',
                 autogenerate: {
                     directory: 'getting-started'
@@ -92,6 +96,13 @@ export default defineConfig({
                     directory: 'structure'
                 },
                 collapsed: true
+            },
+            {
+                label: 'Security',
+                autogenerate: {
+                    directory: 'security'
+                },
+                collapsed: true,
             },
             {
                 label: 'Reference',
