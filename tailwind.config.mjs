@@ -11,8 +11,6 @@ module.exports = {
 	},
 	darkMode: ['selector', '[data-theme="dark"]'],
 	plugins: [
-		// Todo: potentially resolve issues with flowbite
-		// require('flowbite/plugin'),
 		starlightPlugin()
 	],
 }
