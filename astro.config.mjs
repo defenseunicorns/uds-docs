@@ -102,6 +102,13 @@ gtag('config', 'G-57TRKPHZXN');
                 collapsed: true
             },
             {
+                label: 'Mission Capabilities',
+                autogenerate: {
+                    directory: 'mission-capabilities'
+                },
+                collapsed: true
+            },
+            {
                 label: 'Reference',
                 autogenerate: {
                     directory: 'reference'
