@@ -5,8 +5,6 @@ sidebar:
   order: 3
 ---
 
-# UDS Packages
-
 A UDS Package is a [Zarf Package](https://docs.zarf.dev/ref/packages/) with two additions:
 
 1. It is meant to be deployed on top of [UDS Core](core.md).
