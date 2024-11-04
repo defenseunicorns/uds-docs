@@ -42,6 +42,16 @@ A Software Bill of Materials (SBOM) is a comprehensive list of components used i
 ### Open Security Controls Assessment Language
 NIST Open Security Controls Assessment Language (OSCAL) simplifies the process of implementing, assessing, and documenting security controls, promoting consistency and efficiency in security management and compliance activities. It provides a common framework for expressing security requirements, controls, and assessment procedures, facilitating interoperability and automation across security tools and platforms.
 
+### Flavor (as in UDS Package or Bundle flavor)
+
+UDS Packages and so bundles include docker images from someone's registries. Per mission-hero preference we can typically pull from one of three sources:
+
+1. [Chainguard](https://www.chainguard.dev/). They are the best option when available, with the fastest response time to new CVEs, lowest CVE counts, and _the_ leader in the field. This flavor is denoted in source code as `unicorn` because we are proud offer their images as the best unicorn-level images that are.
+2. Platform One's Ironbank. This image source is often required on DoD contracts. The flavor is denoted in source code as `registry1`.
+3. The vendor's image registry. We refer to the vendor-flavor as `upstream`.
+
+This builds off of [Zarf's package-flavors](https://docs.zarf.dev/ref/examples/package-flavors/#_top).
+
 ## How UDS Works
 
 The UDS workflow is a systematic approach that enables Mission Heroes achieve mission objectives by deploying mission applications effectively and securely. UDS simplifies the deployment process while ensuring the delivery of secure and mission-critical applications. From establishing secure runtimes with a UDS Bundle to enhancing deployment efficiency with UDS Packages and deploying tailored mission capabilities, UDS empowers Mission Heroes to achieve successful and secure deployments across various environments. UDS supports your team at every step, from building foundational environments to deploying mission-specific applications that drive impactful outcomes.

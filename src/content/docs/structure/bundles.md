@@ -1,5 +1,5 @@
 ---
-title: Bundles
+title: UDS Bundles
 
 sidebar:
   order: 4
@@ -7,9 +7,8 @@ sidebar:
 
 ## What is a UDS Bundle?
 
-A UDS Bundle is a collection of capabilities designed to facilitate the delivery of software solutions for specific
-missions or software delivery processes. Each bundle serves as a collection of capabilities grouped together to enable
-a particular aspect of the mission's objectives. With UDS Bundles, teams can efficiently adapt to the unique
+A UDS Bundle is a collection of [UDS Packages](package.md) designed to facilitate the delivery of software solutions for specific
+missions or software delivery processes. With UDS Bundles, teams can efficiently adapt to the unique
 requirements of each mission without sacrificing the reliability and security of the software delivery process.
 
 UDS Bundles enable:
