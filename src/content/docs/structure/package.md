@@ -1,5 +1,5 @@
 ---
-title: UDS Package
+title: UDS Packages
 
 sidebar:
   order: 3
@@ -7,9 +7,16 @@ sidebar:
 
 # UDS Packages
 
-A UDS Package is a [Zarf Package](https://docs.zarf.dev/ref/packages/) which is meant to deploy on top of UDS Core, and has Kubernetes UDS Package resource definition (it is a CRD). The package includes all the [OCI images](), [Helm charts](), [supplamental Kubernetes manifests]() and, importantly, the [UDS package definition]() which communicates with UDS core to auto-configure network settings, security policies, and prevent configuration drift. A UDS package _does not_ include dependencies like databases or object storage*. To deploy other applications with an application see [UDS Bundles](bundles.md).
+A UDS Package is a [Zarf Package](https://docs.zarf.dev/ref/packages/) with two additions:
 
-## Anatomy of a UDS Package
+1. It is meant to be deployed on top of [UDS Core](core.md).
+2. It contains the UDS Package Kubernetes custom resource.
+
+These packages include all the [OCI images](https://opencontainers.org/) (docker containers), [Helm charts](https://circleci.com/blog/what-is-helm/#:~:text=A%20Helm%20chart%20is%20a,up%20your%20application%20as%20needed.), and supplemental Kubernetes manifests required for the app to communicate with UDS core. The UDS Operator in turn auto-applies appropriate security and network policies to assure a secure and compliant running environment. A UDS package _does not_ include dependencies like databases or object storage*. These external dependencies are deployed next to a UDS Package inside a [UDS Bundles](bundles.md).
+
+To move from the theoretical to the concrete, see the next section on the Anatomy of a UDS Package Repo.
+
+## Anatomy of a UDS Package Repo
 
 _Disclaimer: the exact file structure of UDS Packages is subject to change. This document will fall out of date but should retain conceptual accuracy. After understanding this point-in-time snapshot of how a UDS package is built, it should be fairly trivial to extend that knowledge to grasp UDS packages as improved in the interim. To aid in it's utility as a teaching tool, links to source code are pinned to ensure a 1:1 match between code referenced here, and code visible to the reader._
 
@@ -21,17 +28,17 @@ For an in-depth developer-focused treatment of UDS Packages, see [the documentat
 
 | Directory / Top-level file | Role | Function |
 | :--- | :------------------------- | :------- |
-| .github/ | CI/CD | Directives to GitLab, primarily it contains the build, test, and release pipeline(s). |
-| adr/ | Docs | `adr` stands for Architectural Decision Records. These documents record key architectural decisions and their reasoning. |
-| bundle/ | Testing & Development | When you're testing a UDS Package, you need to be able to deploy it with other applications such as databases in order to test your configuration. The `bundle/` directories in a UDS Package repo (they never enter the package itself) are for just that. They deploy light-weight databases, key-value stores, and object stores as needed alongside the application to permit testing. They also serve as an example of how to use the UDS Package in a bundle. |
-| charts/ | UDS Package Component | This is for helm charts which are created supplementally to the application. This includes at minimum the UDS Package manifest and the SAML/OIDC configuration for automatic integration with our Keycloak SSO application (which is part of UDS-core). Not infrequently it will also include another resource or two as needed to fully integrate into the UDS ecosystem on an app-specific basis.
-| common/ | UDS Package Component | This directory holds a single `zarf.yaml` file which is the base Zarf package definition. It is imported by the top-level `zarf.yaml`. You can think of it like the parent-class object in an object-oriented-programming model. This generally pulls the charts from the `charts/` directory and the main application's helm chart into the Zarf package but leaves [flavor]() specific details out. |
-| docs/ | Docs | Documentation about the UDS Package. |
-| src/ | Testing & Development | This contains plain kubernetes resource manifests with a zarf.yaml package in each leaf-directory. These are never made into a part of the UDS Package. Rather, they are included in the test bundle to help glue the application to the larger ecosystem.
-| tasks/ | Testing & Development | These tasks run via the [UDS CLI](https://github.com/defenseunicorns/uds-cli) which uses the [maru task runner](https://github.com/defenseunicorns/maru-runner) under the surface to perform workflows like "build, deploy, test" (normally called `dev`) or "publish built artifact". These tasks are a mixture of bespoke repo-specific tasks and included tasks from the [uds-common repo](https://github.com/defenseunicorns/uds-common/tree/main/tasks). The entrypoint to these tasks is the top-level `tasks.yaml` file which is to the UDS CLI what a [Makefile](https://www.gnu.org/software/make/manual/make.html#Simple-Makefile) is to [GNU make](https://www.gnu.org/software/make/manual/make.html). These tasks are also called as part of the CI/CD pipeline defined under `.github/`.
-| tests/ | Testing & Development | This contains files related to the playbook tests which are used to verify that the application in a UDS Package appears to be working as configured in the test bundle (in `bundle/`). These tests are integration-level tests focused on validating connections between the application and the UDS ecosystem.
-| values/ | UDS Package Component | This directory typicaly contains four helm `values.yaml` files which are fed into the main application's helm chart to configure it. Of note, the `common-values.yaml` file typically contains all typical values and the `<flavor>-values.yaml` files contain the image URLs for the given value and any configuration changes required to make it work with this specific [flavor](../overview/acronyms-and-terms.md#flavor-as-in-uds-package-or-bundle-flavor) of images. |
-| misc top-level files | Licensing, tool configurations, etc. | Most of the top-level files are self-explanatory or largely irrelevant to most users. The remainder of this table will include only the most important ones. |
+| `.github/` | CI/CD | Directives to GitLab, primarily it contains the build, test, and release pipeline(s). |
+| `adr/` | Docs | `adr` stands for Architectural Decision Records. These documents record key architectural decisions and their reasoning. |
+| `bundle/` | Testing & Development | When you're testing a UDS Package, you need to be able to deploy it with other applications such as databases in order to test your configuration. The `bundle/` directories in a UDS Package repo (they never enter the package itself) are for just that. They deploy light-weight databases, key-value stores, and object stores as needed alongside the application to permit testing. They also serve as an example of how to use the UDS Package in a bundle. |
+| `charts/` | UDS Package Component | This is for helm charts which are created supplementally to the application. This includes at minimum the UDS Package manifest and the SAML/OIDC configuration for automatic integration with our Keycloak SSO application (which is part of UDS-core). Not infrequently it will also include another resource or two as needed to fully integrate into the UDS ecosystem on an app-specific basis.
+| `common/` | UDS Package Component | This directory holds a single `zarf.yaml` file which is the base Zarf package definition. It is imported by the top-level `zarf.yaml`. You can think of it like the parent-class object in an object-oriented-programming model. This generally pulls the charts from the `charts/` directory and the main application's helm chart into the Zarf package but leaves [flavor]() specific details out. |
+| `docs/` | Docs | Documentation about the UDS Package. |
+| `src/` | Testing & Development | This contains plain kubernetes resource manifests with a zarf.yaml package in each leaf-directory. These are never made into a part of the UDS Package. Rather, they are included in the test bundle to help glue the application to the larger ecosystem.
+| `tasks/` | Testing & Development | These tasks run via the [UDS CLI](https://github.com/defenseunicorns/uds-cli) which uses the [maru task runner](https://github.com/defenseunicorns/maru-runner) under the surface to perform workflows like "build, deploy, test" (normally called `dev`) or "publish built artifact". These tasks are a mixture of bespoke repo-specific tasks and included tasks from the [uds-common repo](https://github.com/defenseunicorns/uds-common/tree/main/tasks). The entrypoint to these tasks is the top-level `tasks.yaml` file which is to the UDS CLI what a [Makefile](https://www.gnu.org/software/make/manual/make.html#Simple-Makefile) is to [GNU make](https://www.gnu.org/software/make/manual/make.html). These tasks are also called as part of the CI/CD pipeline defined under `.github/`.
+| `tests/` | Testing & Development | This contains files related to the playbook tests which are used to verify that the application in a UDS Package appears to be working as configured in the test bundle (in `bundle/`). These tests are integration-level tests focused on validating connections between the application and the UDS ecosystem.
+| `values/` | UDS Package Component | This directory typicaly contains four helm `values.yaml` files which are fed into the main application's helm chart to configure it. Of note, the `common-values.yaml` file typically contains all typical values and the `<flavor>-values.yaml` files contain the image URLs for the given value and any configuration changes required to make it work with this specific [flavor](../overview/acronyms-and-terms.md#flavor-as-in-uds-package-or-bundle-flavor) of images. |
+| _misc top-level files_ | Licensing, tool configurations, etc. | Most of the top-level files are self-explanatory or largely irrelevant to most users. The remainder of this table will include only the most important ones. |
 | `tasks.yaml` | Testing & Development | As mentioned when discussing the `tasks/` directory. This file defines all tasks accessible to the command `uds run <task>`. View them by running `uds run --list`. |
 | `uds-config.yaml` | Testing & Development | This uds-config file is fed into the test bundle at deploy time to set Zarf and UDS variables. |
 | `zarf.yaml` | UDS Package Component | This is _the_ Zarf package which is in this case also a UDS Package. If this were a code repository, this file would be the `main` function. It defines all top-level Zarf variables, and then includes one component per flavor, each component importing the `common/zarf.yaml` package. Each component (which stands for a package flavor) adds the `values/<flavor>-values.yaml` file to set the images to the desired flavor in the helm chart and lists the needed images so Zarf can pull them down and add them to the package at build time. These components are turned on or off by the "flavor" variable value at build time producing only one of the components at any time in the final UDS Package.
@@ -257,19 +264,21 @@ packages:
           values:
             - path: postgresql
               value:
-                enabled: true  # Set to false to not create the PostgreSQL resource
+                enabled: true
                 teamId: "uds"
                 volume:
                   size: "10Gi"
                 numberOfInstances: 2
                 users:
-                  gitlab.gitlab: []  # database owner
+                  gitlab.gitlab: []  # heads up, usernames are always namespace.app
                 databases:
                   gitlabdb: gitlab.gitlab
                 version: "14"
                 ingress:
                   - remoteNamespace: gitlab
 
+  # This is our Redis replacement because it's totally open source.
+  # Repo behind the package: https://github.com/defenseunicorns/uds-package-valkey
   - name: valkey
     repository: ghcr.io/defenseunicorns/packages/uds/valkey
     ref: 7.2.7-uds.0-upstream
@@ -285,24 +294,37 @@ packages:
                   remoteNamespace: gitlab
                   port: 6379
                   description: "Ingress from GitLab"
-            - path: copyPassword
+            - path: copyPassword  # Note this is how we get the access secret where GitLab expects it.
               value:
                 enabled: true
                 namespace: gitlab
                 secretName: gitlab-redis
                 secretKey: password
 
+  # This puts a secret in the gitlab namespace containing access information for MinIO (S3 mimic)
+  # It's in src/dev-secrets in the GitLab repo.
   - name: dev-secrets
     path: ../
     ref: 0.1.0
-
+  
+  # This is where we add the GitLab UDS Package to the bundle. Recall that it had two charts included:
+  # - https://github.com/defenseunicorns/uds-package-gitlab/tree/v17.3.6-uds.1/charts
+  # - https://github.com/defenseunicorns/uds-package-gitlab/blob/v17.3.6-uds.1/common/zarf.yaml#L14
+  # - https://github.com/defenseunicorns/uds-package-gitlab/blob/v17.3.6-uds.1/common/zarf.yaml#L25
   - name: gitlab
-    path: ../
-    # x-release-please-start-version
-    ref: 17.3.6-uds.1
-    # x-release-please-end
+    # Note that the path for the GitLab Zarf package (which is a UDS package) is '../' same as for
+    # the dev-secret package because all zarf packages are built before the bundle is built, and put
+    # in the repo's root dir.
+    path: ../ 
+    ref: 17.3.6-uds.1  # FYI: versions tend to be <application version>-uds.<uds release of that version>
     overrides:
       gitlab:
+        # This is the chart in `charts/` which we're configuring here.
+        # Notice how we can hardcode a value to a path (under values:) OR we can add a variable and assign
+        # it to a path (everything under variables). These variables can be overriden at deploy-time via entries
+        # in the uds-config.yaml. Creating variables in your bundle is a super powerful way to expose parts of
+        # the underlying helm chart for deploy-time configuration. Full lists and dictionaries can be given as
+        # a variable value too, so it's very maleable.
         uds-gitlab-config:
           values:
             - path: ssh.enabled
@@ -313,12 +335,7 @@ packages:
             - name: GITLAB_SSO_ENABLED
               description: "Boolean to enable or disable sso things"
               path: "sso.enabled"
-            - name: GITLAB_SSO_PROTOCOL
-              description: "Protocol to use. Valid values are 'openid_connect' and 'saml'. Default value is 'saml'"
-              path: "sso.protocol"
-            - name: GITLAB_ADMIN_GROUPS
-              description: "Array of group names that grant admin role gitlab when saml protocol is active."
-              path: "sso.adminGroups"
+              ...
             - name: GITLAB_REQUIRED_GROUPS
               description: "Array of group names that are required for GitLab acess."
               path: "sso.requiredGroups"
@@ -328,49 +345,33 @@ packages:
               value: true
             - path: global.shell.port
               value: 2223
+            # The hostname is known after deploying it once and from knowing the namespace we're
+            # putting the operator in.
             - path: global.psql.host
               value: pg-cluster.postgres.svc.cluster.local
+            # The username is known from the yaml above. As warned there too, don't try to get
+            # away from the app.app usernames, or, if you're having problems, try app.namespace.
+            # See postgre operator package docs for more here, if you can avoid changing it, you'll
+            # avoid a set of problems.
             - path: "global.psql.username"
               value: "gitlab.gitlab"
-            - path: "global.psql.password.secret"
+            # These hard-coded values are known via experience combined with what's given to the
+            # postgres operator above. The name of the secret the operator creates is predictable.
+            - path: "global.psql.password.secret" 
               value: "gitlab.gitlab.pg-cluster.credentials.postgresql.acid.zalan.do"
+            # This hostname is known based on experience (deploying once and seeing what the service
+            # name was) and knowing the namespace the valkey package is deploying too.
             - path: global.redis.host
               value: valkey-master.valkey.svc.cluster.local
           variables:
             - name: GITLAB_SSO_ENABLED
               description: "Boolean to enable or disable sso things"
               path: "global.appConfig.omniauth.enabled"
-            - name: GITLAB_SSO_PROTOCOL
-              description: "Protocol to use. Valid values are 'openid_connect' and 'saml'. Default value is 'saml'"
-              path: "global.appConfig.omniauth.autoSignInWithProvider"
-            - name: MIGRATIONS_RESOURCES
-              description: "Gitlab Migrations Resources"
-              path: "gitlab.migrations.resources"
-            - name: WEBSERVICE_REPLICAS
-              description: "Gitlab Webservice Min Replicas"
-              path: "gitlab.webservice.minReplicas"
-            - name: WEBSERVICE_RESOURCES
-              description: "Gitlab Webservice Resources"
-              path: "gitlab.webservice.resources"
-            - name: WORKHORSE_RESOURCES
-              description: "Gitlab Workhorse Resources"
-              path: "gitlab.webservice.workhorse.resources"
-            - name: SIDEKIQ_REPLICAS
-              description: "Gitlab Sidekiq Min Replicas"
-              path: "gitlab.sidekiq.minReplicas"
-            - name: SIDEKIQ_RESOURCES
-              description: "Gitlab Sidekiq Resources"
-              path: "gitlab.sidekiq.resources"
-            - name: PAGES_RESOURCES
-              description: "GitLab Pages Resources"
-              path: "gitlab.gitlab-pages.resources"
-            - name: REGISTRY_REPLICAS
-              description: "Gitlab Registry Min Replicas"
-              path: "registry.hpa.minReplicas"
+              ...
             - name: SHELL_REPLICAS
               description: "Gitlab Shell Min Replicas"
               path: "gitlab.gitlab-shell.minReplicas"
-        uds-gitlab-settings:
+        uds-gitlab-settings:  
           values:
             - path: settingsJob.application.enabled_git_access_protocol
               value: all
@@ -379,8 +380,6 @@ packages:
               description: "Bot Accounts to Create"
               path: "botAccounts"
 ```
-
-#### GitLab's Docs
 
 ## Footnotes
 
