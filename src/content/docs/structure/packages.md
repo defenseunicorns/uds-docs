@@ -8,7 +8,7 @@ sidebar:
 A UDS Package is a [Zarf Package](https://docs.zarf.dev/ref/packages/) with two additions:
 
 1. It is meant to be deployed on top of [UDS Core](core.md).
-2. It contains the UDS Package Kubernetes custom resource.
+2. It contains the [UDS Package Kubernetes custom resource](https://github.com/defenseunicorns/uds-core/blob/main/docs/reference/configuration/custom%20resources/packages-v1alpha1-cr.md).
 
 These packages include all the [OCI images](https://opencontainers.org/) (docker containers), [Helm charts](https://circleci.com/blog/what-is-helm/#:~:text=A%20Helm%20chart%20is%20a,up%20your%20application%20as%20needed.), and supplemental Kubernetes manifests required for the app to communicate with UDS Core. The UDS Operator in turn auto-applies appropriate security and network policies to assure a secure and compliant running environment. A UDS package _does not_ include dependencies like databases or object storage*. These external dependencies are deployed next to a UDS Package inside a [UDS Bundle](bundles.md).
 
