@@ -244,7 +244,7 @@ metadata:
   description: A UDS bundle for deploying Gitlab and it's dependencies on a development cluster
   version: 17.3.6-uds.1
 
-# A UDS Bbundle contains many UDS Packages. UDS Bundles never contain other bundles.
+# A UDS Bundle contains many UDS Packages. UDS Bundles never contain other bundles.
 packages:
   # This provides object storage with the AWS S3 API in-cluster. While useful for development
   # and testing, this service is often provided by an off-cluster service in large deployments.
