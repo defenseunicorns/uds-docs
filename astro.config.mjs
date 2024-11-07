@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import tailwind from "@astrojs/tailwind";
+import starlightDocSearch from '@astrojs/starlight-docsearch';
 
 // https://astro.build/config
 export default defineConfig({
@@ -32,10 +33,19 @@ export default defineConfig({
         '/cli/command-reference/uds_version/': '/reference/cli/commands/uds_version',
     },
     integrations: [starlight({
-        defaultLocale: 'en',
+        plugins: [
+            starlightDocSearch({
+                appId: '4RA2E2XHYT',
+                apiKey: 'f3cce33f634f204c0a97446f7c241e03',
+                indexName: 'uds-defenseunicorns',
+                insights: true
+            })
+        ],
+        defaultLocale: 'root',
         locales: {
-            en: {
+            root: {
                 label: 'English',
+                lang: 'en',
             }
         },
         // The title is set to '' because otherwise it shows in the top navigation which is redundant with the logo.
