@@ -348,7 +348,7 @@ packages:
               path: "sso.enabled"
               ...
             - name: GITLAB_REQUIRED_GROUPS
-              description: "Array of group names that are required for GitLab acess."
+              description: "Array of group names that are required for GitLab access."
               path: "sso.requiredGroups"
         gitlab:
           values:

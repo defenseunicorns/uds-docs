@@ -87,7 +87,7 @@ colima delete -f
 ## UDS Bundle Development
 
 In addition to the demo bundle, there is also a 
-[`k3d-slim-dev bundle`](hhttps://github.com/defenseunicorns/uds-core/tree/main/bundles/k3d-slim-dev) designed specifically 
+[`k3d-slim-dev bundle`](https://github.com/defenseunicorns/uds-core/tree/main/bundles/k3d-slim-dev) designed specifically 
 for working with UDS Core with *only* Istio, Keycloak, and Pepr installed. To use it, execute the following command:
 
 :::note

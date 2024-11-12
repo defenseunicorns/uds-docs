@@ -24,7 +24,7 @@ includes:
 
 ### Integrate Podinfo with UDS Core
 
-You can think of the UDS Operator as the "glue" between your application and the services that are provided by UDS Core. It is the smart cluster operator that has working knowledge of UDS Core services in the cluster and takes care of integrating your app with those services for you. To register your application with the UDS Operator, you need to create a `Package` Kubernetes Custom Resource. Within the specification of the `Package` resoure, you can specify different parameters that dictate how the UDS Operator should integrate your app per its unique requirements. The sections below cover creating a `Package` resouce for `podinfo` and integrating `podinfo` with several UDS Core services.
+You can think of the UDS Operator as the "glue" between your application and the services that are provided by UDS Core. It is the smart cluster operator that has working knowledge of UDS Core services in the cluster and takes care of integrating your app with those services for you. To register your application with the UDS Operator, you need to create a `Package` Kubernetes Custom Resource. Within the specification of the `Package` resource, you can specify different parameters that dictate how the UDS Operator should integrate your app per its unique requirements. The sections below cover creating a `Package` resource for `podinfo` and integrating `podinfo` with several UDS Core services.
 
 :::note
 The `Package` Custom Kubernetes Resource is different from a [UDS Package](https://uds.defenseunicorns.com/structure/packages/), which is a collection of the Zarf Package for your application and the Kubernetes `Package` Custom Resource.
@@ -72,7 +72,7 @@ spec:
 
 This change will allow us to interact with `podinfo` without having to use `kubectl port-forward`. 
 
-Save your chanages and apply the file:
+Save your changes and apply the file:
 
 ```bash
 kubectl apply -f podinfo-package.yaml
@@ -94,7 +94,7 @@ NAME                                  GATEWAYS                                  
 podinfo-tenant-podinfo-9898-podinfo   ["istio-tenant-gateway/tenant-gateway"]   ["podinfo.uds.dev"]   60s
 ```
 
-You will also notice that the UDS Operator automically generated a set of Kubernetes `NetworkPolicies` that restrict access to your application to only required services:
+You will also notice that the UDS Operator automatically generated a set of Kubernetes `NetworkPolicies` that restrict access to your application to only required services:
 
 ```bash
 kubectl get networkpolicy -n podinfo
@@ -112,7 +112,7 @@ Navigate to `podinfo.uds.dev` from your browser to interact with `podinfo`.
 
 #### Integrate with Single Sign On
 
-At this stage, anyone can access the `podinfo` application. You may wish to protect your application by only allowing authenticated users to access it. As part of UDS Core, the Keycloak Identity and Acess Management Solution is included. Add the configuration under the `spec.sso` field below to integrate the `podinfo` application with Keycloak.
+At this stage, anyone can access the `podinfo` application. You may wish to protect your application by only allowing authenticated users to access it. As part of UDS Core, the Keycloak Identity and Access Management Solution is included. Add the configuration under the `spec.sso` field below to integrate the `podinfo` application with Keycloak.
 
 ```yaml
 apiVersion: uds.dev/v1alpha1
@@ -242,7 +242,7 @@ servicemonitor.monitoring.coreos.com/podinfo-svcmonitor   7m46s
 Hint: All resources created by the UDS Operator for `podinfo` will have a `uds/package=podinfo` label applied to it.
 :::
 
-Now you have successfully intergrated your application with UDS Core!
+Now you have successfully integrated your application with UDS Core!
 
 #### Next Steps
 

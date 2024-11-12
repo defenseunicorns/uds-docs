@@ -13,7 +13,7 @@ application nuances.
 With UDS, mission teams can:
 
 - Orchestrate applications into any supported environment with a secure runtime platform.
-- Streamline application deployment, management, accredidation, and scalability across developer and production environments.
+- Streamline application deployment, management, accreditation, and scalability across developer and production environments.
 - Facilitate obtaining an Authority to Operate (ATO) with documentation evidence to support that controls are met.
 - Leverage open-source tools.
 

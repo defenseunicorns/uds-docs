@@ -29,7 +29,7 @@ Pepr automates the integration of applications with runtime capabilities within 
 
 ### Lula
 
-Lula is the compliance bridge that leverages the NIST OSCAL framework to automate and simplify compliance in a Kubernetes environment. Lula will demonstrate control inheritance and validation for each UDS Package within the UDS environment. Lula documents and validates controls satisfied by applications, expediting the accreditation process and generating real-time reports for authorizing officials, reducing the burden on the site reliability engeneering team and other individuals involved in manually providing control mapping and responses. For additional information, please see the [Lula GitHub page](https://github.com/defenseunicorns/lula#readme).
+Lula is the compliance bridge that leverages the NIST OSCAL framework to automate and simplify compliance in a Kubernetes environment. Lula will demonstrate control inheritance and validation for each UDS Package within the UDS environment. Lula documents and validates controls satisfied by applications, expediting the accreditation process and generating real-time reports for authorizing officials, reducing the burden on the site reliability engineering team and other individuals involved in manually providing control mapping and responses. For additional information, please see the [Lula GitHub page](https://github.com/defenseunicorns/lula#readme).
 
 ## UDS CLI
 
