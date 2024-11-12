@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-To consider `podinfo` as a fully integrated [UDS Package](https://uds.defenseunicorns.com/structure/packages/), the `Package` Custom Resource for the UDS Operator must be included as part of the Zarf Package for `podinfo`. In this section, we will cover adding the `podinfo-package.yaml` to the sample UDS Bundle that we created in the first tutorial. 
+To consider `podinfo` as a fully integrated [UDS Package](https://uds.defenseunicorns.com/structure/packages/), the `Package` Custom Resource for the UDS Operator must be included as part of the Zarf Package for `podinfo`. In this section, we will cover adding the `podinfo-package.yaml` to the sample UDS Bundle that we created in the [first](/tutorials/deploy-with-uds-core) tutorial. 
 
 ### Prerequisites
 This guide assumes that you created the UDS `Package` Custom Resource in the [previous](/tutorials/create-uds-package) tutorial. 
