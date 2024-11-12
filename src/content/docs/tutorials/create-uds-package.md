@@ -242,6 +242,8 @@ NAME                                                      AGE
 servicemonitor.monitoring.coreos.com/podinfo-svcmonitor   7m46s
 ```
 
+Logs and Metrics for `podinfo` can now be viewed in Grafana, which is deployed with UDS Core. Navigate to `grafana.admin.uds.dev` and login using the same credentials from the previous step.
+
 Now you have successfully integrated `podinfo` with UDS Core!
 
 #### Next Steps
