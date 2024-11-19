@@ -3,9 +3,31 @@ import type { Props } from "@astrojs/starlight/props";
 import Default from '@astrojs/starlight/components/Footer.astro';
 import CookieConsent from "./CookieConsent.astro";
 const isHomepage = Astro.props.slug == '';
+import PostHog from './PostHog.astro';
+
+// apparently you have to do this to get it to work
+// see: https://stackoverflow.com/questions/56457935/typescript-error-property-x-does-not-exist-on-type-window
+declare global {
+    interface Window {
+        posthog: any;
+    }
+}
 ---
 
 <Default {...Astro.props}><slot /></Default>
+
+
+
+<h1>Home</h1>
+<button class="main">Great site!</button>
+<script>
+    const button = document.querySelector('.main');
+    if (button != null) {
+        button.addEventListener('click', () => {
+            window.posthog.capture('praise_received')
+        });
+    }
+</script>
 
 { !isHomepage ? (
     <br/>

@@ -7,7 +7,15 @@
         'phc_HZll2EMtS5EOmzfHYYrox4gtJZIBnChVC3JMEB5XR7u',
         {
             api_host:'https://eu.i.posthog.com',
-            person_profiles: 'identified_only'
+            person_profiles: 'identified_only',
+            loaded: (posthog) => {
+                posthog.onFeatureFlags(() => {
+                    const button = document.querySelector('.main');
+                    if (posthog.isFeatureEnabled('new-button')) {
+                        button.innerText = 'The best site ever!';
+                    }
+                });
+            }
         }
-    )
+    );
 </script>
