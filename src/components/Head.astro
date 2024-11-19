@@ -1,6 +1,7 @@
 ---
 import type { Props } from "@astrojs/starlight/props";
 import Default from '@astrojs/starlight/components/Head.astro';
+import PostHog from './PostHog.astro';
 ---
 
 <!-- Initialize the PushFeedback widget -->
@@ -16,16 +17,6 @@ import Default from '@astrojs/starlight/components/Head.astro';
     gtag('config', 'G-57TRKPHZXN');
 </script>
 
-<!-- Hotjar Tracking Code -->
-<script type="text/plain"  data-category="analytics" data-service="Hotjar">
-    (function(h,o,t,j,a,r){
-        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-        h._hjSettings={hjid:5191768,hjsv:6};
-        a=o.getElementsByTagName('head')[0];
-        r=o.createElement('script');r.async=1;
-        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-        a.appendChild(r);
-    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-</script>
+<PostHog/>
 
 <Default {...Astro.props}><slot /></Default>
