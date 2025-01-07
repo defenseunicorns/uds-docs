@@ -14,8 +14,8 @@ maintain a trusted and resilient operational state.
 The tooling may change but UDS provides: Identity & Authorization, Metrics Server, Monitoring, Logging, Runtime Security, Backup and Restore. 
 
 ### Compliance Alignment: 
-* For the U.S. defense sector and other highly regulated enviornments UDS satisfies 94% of technical program office security controls for IL-4. All highly regulated programs have some technical and administrative controls by the very nature of their enviornments and operations. Defense Unicorn’s focuses on the areas that the typical DoD program find more difficult to implement. With your pre-existing security and our built-in security we fulfill 90% of security controls.
-* UDS aligns with NIST 800-53 Rev 5, ensuring deployments meet strict regulatory requirements for DoD and other government agencies. If you are still on Rev 4 baseline we have experts that can help with the translation between the documents since there is a large control group overlap.
+* For the U.S. defense sector and other highly regulated environments, UDS satisfies 94% of technical program office security controls for IL-4. All highly regulated programs have some technical and administrative controls due to the very nature of their environments and operations. Defense Unicorns focuses on the areas that the typical DoD program finds more difficult to implement. With your pre-existing security and our built-in security, we fulfill 90% of security controls.
+* UDS aligns with NIST 800-53 Rev 5, ensuring deployments meet strict regulatory requirements for DoD and other government agencies. If you are still on Rev 4 baseline, we have experts that can help with the translation between the documents since there is a large control group overlap.
 
 ### Air-Gap Compatibility: 
 * UDS supports secure, offline environments by ensuring all tools, from package managers to deployment tools like Zarf, operate seamlessly without internet access. UDS is designed from the ground up for airgapped systems to support disconnected, semi-disconnected, or highly secure environments. This is unique that UDS is built for air gap while typical industry products need adaption for airgapped systems.
@@ -23,7 +23,7 @@ The tooling may change but UDS provides: Identity & Authorization, Metrics Serve
   * UDS can operate without external network dependencies.
   
 ### Secure Baseline Configurations: 
-* UDS incorporates hardened configurations tailored for specific missions. These configurations include hardended images to meet DoD standards, further reducing vulnerabilities and ensuring compliance.
+* UDS incorporates hardened configurations tailored for specific missions. These configurations include hardened images to meet DoD standards, further reducing vulnerabilities and ensuring compliance.
 
 ### Network Security: 
 * The Istio Service Mesh enforces secure communication between services, providing mutual TLS (mTLS) encryption, traffic policies, and network segmentation. A dedicated admin gateway isolates all administrative services, so that they are unreachable by a standard user.
