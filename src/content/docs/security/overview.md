@@ -5,54 +5,47 @@ prev: false
 next: false
 ---
 
-Defense Unicorns is committed to working on a 0 CVE posture with continuous monitoring, logging, and alerting across a
-multi-layered approach to cybersecurity. It ensures secure runtime by closely managing and monitoring software
-interactions within DoD environments, verifying software components, and mitigating vulnerabilities in real-time to
+Defense Unicorns is committed to defense in depth best practices with continuous monitoring, logging, and alerting across a
+multi-layered approach. UDS ensures secure runtime by closely managing and monitoring software
+interactions within environments, verifying software components, and mitigating vulnerabilities in real-time to
 maintain a trusted and resilient operational state.
 
-## What makes UDS Secure?
+## What makes UDS secure?
+The tooling may change but UDS provides: Identity & Authorization, Metrics Server, Monitoring, Logging, Runtime Security, Backup and Restore. 
 
-#### Compliance
-UDS satisfies up to 90% Technical NIST controls established by the program office security controls for IL-4 and 5
-environments.
+### Compliance Alignment: 
+* For the U.S. defense sector and other highly regulated enviornments UDS satisfies 94% of technical program office security controls for IL-4. All highly regulated programs have some technical and administrative controls by the very nature of their enviornments and operations. Defense Unicorn’s focuses on the areas that the typical DoD program find more difficult to implement. With your pre-existing security and our built-in security we fulfill 90% of security controls.
+* UDS aligns with NIST 800-53 Rev 5, ensuring deployments meet strict regulatory requirements for DoD and other government agencies. If you are still on Rev 4 baseline we have experts that can help with the translation between the documents since there is a large control group overlap.
 
-#### Airgap Native
-UDS is designed from the ground up for airgapped systems to support disconnected, semi-disconnected, or highly
-secure environments.
+### Air-Gap Compatibility: 
+* UDS supports secure, offline environments by ensuring all tools, from package managers to deployment tools like Zarf, operate seamlessly without internet access. UDS is designed from the ground up for airgapped systems to support disconnected, semi-disconnected, or highly secure environments. This is unique that UDS is built for air gap while typical industry products need adaption for airgapped systems.
+  * UDS can operate without the internet.
+  * UDS can operate without external network dependencies.
+  
+### Secure Baseline Configurations: 
+* UDS incorporates hardened configurations tailored for specific missions. These configurations include hardended images to meet DoD standards, further reducing vulnerabilities and ensuring compliance.
 
-#### Secure Baseline Configurations
-Customizable "Unicorn Flavors" of UDS incorporate hardened configurations tailored for specific missions. These
-configurations include Chainguard images and additional security layers to meet DoD standards, further reducing
-vulnerabilities and ensuring compliance.
+### Network Security: 
+* The Istio Service Mesh enforces secure communication between services, providing mutual TLS (mTLS) encryption, traffic policies, and network segmentation. A dedicated admin gateway isolates all administrative services, so that they are unreachable by a standard user.
 
-#### Network Security with Istio
-Network Security with Istio: The Istio Service Mesh enforces secure communication between services, providing mutual
-TLS (mTLS) encryption, traffic policies, and network segmentation.
+### Istio-Authservice: 
+* Provides automatic authentication and group based authorization to any workload, including custom mission applications.
 
-#### Continuous Monitoring and Logging
-Continuous Monitoring and Logging: UDS leverages tools like Prometheus and Grafana to monitor system health,
-performance, and security in real time. Alerts are triggered for any unusual activity or potential breaches.
+### Continuous Monitoring and Logging: 
+* UDS leverages tools like Prometheus and Grafana to monitor system health, performance, and security in real time. Alerts are triggered for any unusual activity or potential breaches.
 
-#### Software Composition Analysis
-With Chainguard’s hardened images, UDS continuously monitors the software supply chain, ensuring only verified
-components are deployed.
+### Runtime Security: 
+* UDS integrates NeuVector to monitor container runtime behavior, detect and block anomalies, and enforce runtime application security policies.
 
-#### Runtime Security with NeuVector
-UDS integrates NeuVector to monitor container runtime behavior, detect and block anomalies, and enforce runtime
-application security policies.
+### Identity and Access Management (IdAM): 
+* Keycloak provides centralized authentication, enabling single sign-on (SSO) and role-based access control (RBAC) to restrict access to authorized users.
 
-#### Identity and Access Management (IdAM)
-Keycloak provides centralized authentication, enabling single sign-on (SSO) and role-based access control (RBAC) to
-restrict access to authorized users.
-
-#### Custom Resource Policies with Pepr
-[Pepr](https://pepr.dev/) enables the creation of type-safe policies and operators, ensuring security baselines are
+### Custom Resource Policies:
+* [Pepr](https://pepr.dev/) enables the creation of type-safe policies and operators, ensuring security baselines are
 enforced automatically within Kubernetes clusters.
 
-#### Trust on First Use (ToFu) Integration
-UDS secures initial trust relationships between services and users, leveraging ToFu to establish trusted connections
-without manual setup.
+### Software Composition Analysis:
+* UDS continuously monitors the software supply chain, ensuring only verified components are deployed.
 
-## What does a Zero CVE posture mean?
-This means that UDS is designed and maintained to eliminate all critical/high vulnerabilities (CVEs, or Common
-Vulnerabilities and Exposures) from the software it uses.
+### Backup and Restore 
+* Velero: Provides backup and restore functionality for Kubernetes resources and persistent data. This provides protectection of data and configurations, allowing for quick recovery in case of accidental deletion, data corruption, or system failures.*
