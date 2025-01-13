@@ -1,6 +1,6 @@
 ## UDS Documentation Site
 
-This is the UDS documentation site, built in [Starlight](https://starlight.astro.build).
+This is the UDS documentation site, built with [Starlight](https://starlight.astro.build).
 
 In order to get started with local development, the simplest way to do so is by utilizing your usual `npm install` and 
 `npm run dev` commands, as described below. You may also build this project as a Zarf package/UDS bundle. Please ensure 
@@ -30,7 +30,7 @@ In this project, you'll see the following folders and files:
 │   ├── assets/
 │   ├── content/
 │   │   ├── docs/
-│   │   └── config.ts
+│   ├── content.config.ts
 │   └── env.d.ts
 ├── astro.config.mjs
 ├── package.json
