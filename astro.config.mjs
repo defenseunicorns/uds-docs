@@ -32,6 +32,7 @@ export default defineConfig({
         '/cli/command-reference/uds_run/': '/reference/cli/commands/uds_run',
         '/cli/command-reference/uds_ui/': '/reference/cli/commands/uds_ui',
         '/cli/command-reference/uds_version/': '/reference/cli/commands/uds_version',
+        '/reference/configuration/uds-operator/': '/reference/configuration/uds-operator/overview/',
     },
     integrations: [starlight({
         plugins: [
