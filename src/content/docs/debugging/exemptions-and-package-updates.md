@@ -72,3 +72,4 @@ Kubernetes Watch is a mechanism used to monitor resource changes in real-time. F
 - [Packages Specification](https://github.com/defenseunicorns/uds-core/blob/main/docs/reference/configuration/custom%20resources/packages-v1alpha1-cr.md)
 - [Exemptions Specification](https://github.com/defenseunicorns/uds-core/blob/main/docs/reference/configuration/custom%20resources/exemptions-v1alpha1-cr.md)
 - [Kubernetes Watch](https://kubernetes.io/docs/reference/using-api/api-concepts/#efficient-detection-of-changes)
+
