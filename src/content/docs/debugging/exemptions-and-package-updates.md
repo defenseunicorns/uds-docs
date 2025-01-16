@@ -63,9 +63,6 @@ Kubernetes Watch is a mechanism used to monitor resource changes in real-time. F
      {"...":"...","msg":"Processing Package authservice-test-app/mouse, status.phase: Ready, observedGeneration: 1, retryAttempt: 0"}
      ```
 
-3. **Common Watch Issues**:
-   - If no logs are produced:
-     - Check for Kubernetes API Server for throttling or timeouts in the logs.
 
 ## Related Links
 
