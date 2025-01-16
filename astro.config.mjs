@@ -121,6 +121,13 @@ export default defineConfig({
                 collapsed: true
             },
             {
+                label: 'Debugging',
+                autogenerate: {
+                    directory: 'debugging'
+                },
+                collapsed: true
+            },
+            {
                 label: 'Airgap App Store',
                 link: '/airgap-app-store/overview',
                 badge: { text: 'New!', variant: 'tip' }
