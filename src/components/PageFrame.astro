@@ -3,14 +3,15 @@ import type { Props } from "@astrojs/starlight/props";
 import Default from "@astrojs/starlight/components/PageFrame.astro";
 ---
 
-<style>
-@import "@beoe/pan-zoom/css/PanZoomUi.css";
-</style>
-
 <Default {...Astro.props}>
   <slot name="header" slot="header" />
   <slot name="sidebar" slot="sidebar" />
   <slot />
 </Default>
 
-<script type="module" src="/src/components/ImagePanZoom.ts"></script>
+<script type="module">
+  import { setupZoomAndPan } from '/src/components/ImagePanZoom.ts';
+  window.addEventListener('load', () => {
+    setupZoomAndPan();
+  });
+</script>

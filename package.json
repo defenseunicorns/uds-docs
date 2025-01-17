@@ -17,7 +17,6 @@
     "@astrojs/starlight-docsearch": "^0.4.0",
     "@astrojs/starlight-tailwind": "^3.0.0",
     "@astrojs/tailwind": "^5.1.4",
-    "@beoe/pan-zoom": "^0.0.3",
     "@docsearch/js": "^3.8.2",
     "@fontsource/teko": "^5.1.1",
     "astro": "^5.1.3",
