@@ -3,6 +3,7 @@ import starlight from '@astrojs/starlight';
 import tailwind from "@astrojs/tailwind";
 import starlightDocSearch from '@astrojs/starlight-docsearch';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightImageZoom from 'starlight-image-zoom';
 
 // https://astro.build/config
 export default defineConfig({
@@ -42,7 +43,8 @@ export default defineConfig({
                 apiKey: 'f3cce33f634f204c0a97446f7c241e03',
                 indexName: 'uds-defenseunicorns',
                 insights: true
-            })
+            }),
+            starlightImageZoom()
         ],
         defaultLocale: 'root',
         locales: {
