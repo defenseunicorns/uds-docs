@@ -16,7 +16,7 @@
     "@astrojs/starlight": "^0.31.0",
     "@astrojs/starlight-docsearch": "^0.4.0",
     "@astrojs/starlight-tailwind": "^3.0.0",
-    "@astrojs/tailwind": "^5.1.4",
+    "@astrojs/tailwind": "^6.0.0",
     "@docsearch/js": "^3.8.2",
     "@fontsource/teko": "^5.1.1",
     "astro": "^5.1.3",
