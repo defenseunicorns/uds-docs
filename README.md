@@ -8,14 +8,11 @@ you build and tag the image as `uds-docs`:
 
 `docker build -t uds-docs:latest .`
 
-`docker tag uds-docs uds-docs:latest`
-
 > [!NOTE]
 > The above image is based on [node:lts](https://hub.docker.com/_/node) and 
 [nginx-unprivileged](https://hub.docker.com/r/nginxinc/nginx-unprivileged).
 
-This project has support for Tailwind and Flowbite, but the latter is currently not enabled as it causes some minor 
-styling issues which need to be resolved.
+This project uses TailwindCSS.
 
 ## Starlight Basics
 
