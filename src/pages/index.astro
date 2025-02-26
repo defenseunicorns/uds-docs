@@ -14,7 +14,7 @@ const frontmatter = {
     hero: {
         title: "Unicorn Delivery Service",
         tagline:
-            "A secure software delivery platform built for National Security missions.",
+            "A secure software delivery product built for National Security missions.",
         image: {
             dark: doug,
             light: doug,
@@ -31,8 +31,19 @@ const sections = [
             {title: 'Why UDS?', href: 'overview/why-uds'},
             {title: 'Basic Requirements', href: 'getting-started/basic-requirements'},
             {title: 'Install & Deploy UDS', href: 'getting-started/install-and-deploy-uds'},
-            {title: 'What is a UDS Bundle?', href: '/structure/bundles/'}
+            {title: 'What is a UDS Bundle?', href: '/structure/bundles/'},
+            {title: 'Quickstart', href: '/reference/cli/quickstart-and-usage/'},
+            {title: 'Command Reference', href: '/reference/cli/commands/uds/'},
         ]
+    },
+    {
+        title: 'Product Capabilities',
+        links: [
+            {title: 'Secure Runtime' - UDS Core, href: ''},
+            {title: 'Registry - Applications', href: ''},
+            {title: 'Oberservability - UI & UX', href: ''},
+            {title: 'Edge - Mobile Deployments', href: 'defenseunicorns/uds-docs/src/content/docs/edge-mobile-deployment'},
+        ]   
     },
     {
         title: 'Working with UDS Core',
@@ -51,15 +62,6 @@ const sections = [
             {title: 'Pepr Policies', href: '/reference/configuration/pepr-policies'},
             {title: 'UDS Operator', href: '/reference/configuration/uds-operator/overview/'},
             {title: 'DNS Configuration', href: '/reference/uds-core/dns/'},
-        ]
-    },
-    {
-        title: 'UDS CLI',
-        links: [
-            {title: 'Quickstart', href: '/reference/cli/quickstart-and-usage/'},
-            {title: 'Command Reference', href: '/reference/cli/commands/uds/'},
-            {title: 'Schema Validation', href: '/reference/cli/schema-validation/'},
-            {title: 'UDS Runner', href: '/reference/cli/uds-runner/'},
         ]
     },
     {
@@ -188,27 +190,40 @@ const sections = [
                 ))
             }
         </Cardgrid>
+  <h2 class="text-left">Pre-integrated, ready-to-deploy solutions</h2>
+---
+import Image1 from '../../assets/airgap-app-store.png'; // Updated path for image 1
+import Image2 from '../../assets/UDS Deployment (1).png'; // Updated path for image 2
+---
 
-        <div class="pt-8 pb-8">
-            <hr/>
-        </div>
+<h2 class="text-left text-3xl font-bold text-blue-400">
+    Pre-integrated, ready-to-deploy solutions
+</h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-16 items-center">
-            <div class="md:col-span-4">
-                <h2 class="text-left">Pre-integrated, ready-to-deploy solutions</h2>
-                <Image src={airgapAppStore} alt="Airgap App Store"/>
-            </div>
-            <div class="md:col-span-2">
-                <p>
-                    The <a href="https://apps.defenseunicorns.com/" target="_blank">Airgap App Store</a> provides
-                    pre-integrated applications that have been fully configured, tested and validated to work
-                    seamlessly on UDS. These applications are configured to take advantage of UDS's built-in
-                    capabilities which reduce the time and effort required for deployment. This minimizes the need
-                    for customization and ensure that mission-critical applications can be deployed quickly and
-                    securely, to any infrastructure.
-                </p>
-            </div>
-        </div>
+<!-- Two-column layout -->
+<div class="grid md:grid-cols-2 grid-cols-1 gap-8 items-center pt-6">
+    <!-- Column 1 -->
+    <div>
+        <img src={Image1} alt="Pre-integrated applications on UDS" class="w-full max-w-md mx-auto rounded-lg shadow-lg">
+        <p class="mt-4 text-gray-300">
+            Pre-integrated applications that have been fully configured, tested, and validated to work seamlessly on UDS. These applications take advantage of UDS's built-in capabilities, reducing deployment time and effort. This minimizes customization needs and ensures that mission-critical applications can be deployed quickly and securely to any infrastructure.
+        </p>
+    </div>
+
+    <!-- Column 2 -->
+    <div>
+        <img src={Image2} alt="UDS scalability to edge locations" class="w-full max-w-md mx-auto rounded-lg shadow-lg">
+        <p class="mt-4 text-gray-300">
+            Using pre-integrated applications, UDS is scalable to bring your applications to edge locations that are fully and semi-disconnected. You no longer need to be in a data center to leverage cloud container technology—simply click, deploy, and run containers anywhere, even in fully disconnected environments.
+        </p>
+    </div>
+</div>
+
+<!-- Horizontal line for separation -->
+<div class="pt-8 pb-8">
+    <hr/>
+</div>
+              
         <LinkCard title="Learn more about the Airgap App Store" href="/airgap-app-store/overview"/>
     </div>
     <div class="pt-8 pb-8">
