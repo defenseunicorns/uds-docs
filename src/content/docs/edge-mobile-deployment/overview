@@ -4,7 +4,7 @@ title: "Edge Product Overview"
 
 # UDS Edge
 
-We built UDS to power the tactical edge, enabling mission-critical platforms—like jets, tanks, helicopters, and weapon systems—to operate seamlessly in resource-constrained and low-connectivity environments. This is the Tactical Edge.
+We built UDS to operate in edge environments where resources, connectivity, and time are limited.
 
 <!-- Replace VIDEO_ID with your actual YouTube video ID -->
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
@@ -25,8 +25,8 @@ We built UDS to power the tactical edge, enabling mission-critical platforms—l
     <td width="60%">
       <ul>
         <li>Warfighters face risks managing outdated assets—eliminate danger and wasted resources with seamless updates.</li>
-        <li>Securely manage your platforms remotely, eliminating resource overhead.</li>
-        <li>Reduce total cost of ownership with seamless, remote updates and management.</li>
+        <li>Securely manage your platforms remotely, reducing the need for physical site visits and management.</li>
+        <li>Complex software maintenance drains time and resources—reduce your total cost of ownership with seamless, remote updates and management.</li>
       </ul>
     </td>
   </tr>
