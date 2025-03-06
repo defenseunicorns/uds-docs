@@ -3,14 +3,51 @@
 @tailwind utilities;
 
 :root {
-	--sl-content-width: 50rem;
+    /* Responsive content width with a max limit */
+    --sl-content-width: min(90vw, 1500px);
+    --sl-sidebar-width: 350px;
     color-scheme: dark;
 
+    /* Remove default link underline */
     a, a:hover {
         text-decoration: none;
     }
 
+    /* Ensure sidebar labels are capitalized */
     .sidebar-content .group-label {
-         text-transform: capitalize;
-     }
+        text-transform: capitalize;
+    }
+}
+
+/* Override problematic content margin */
+[data-has-sidebar][data-has-toc] .main-pane {
+    --sl-content-margin-inline: unset !important;
+}
+
+/* Use a grid layout to properly space main content and right sidebar */
+.page-layout {
+    display: grid;
+    grid-template-columns: 1fr var(--sl-content-width) var(--sl-sidebar-width);
+    gap: 2rem;
+    justify-content: center;
+}
+
+/* Ensure the main content adapts dynamically */
+.main-pane {
+    width: 100%;
+    max-width: var(--sl-content-width);
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .main-pane {
+        padding: 2rem;
+    }
+}
+
+/* Fix right sidebar width so it doesn’t depend on main content */
+.right-sidebar-container {
+    width: var(--sl-sidebar-width);
+    max-width: 350px;
 }
