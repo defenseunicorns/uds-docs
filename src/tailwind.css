@@ -85,11 +85,3 @@
     overflow: hidden;
 }
 
-/* Fix deeply nested TOC items */
-.right-sidebar-container .astro-g2bywc46 {
-    max-width: calc(100% - 15px); /* Prevents content from being too wide */
-    word-wrap: break-word;
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
