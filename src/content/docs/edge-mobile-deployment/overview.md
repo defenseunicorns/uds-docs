@@ -41,8 +41,8 @@ UDS deploys and manages applications that run within a Kubernetes cluster hosted
     </td>
     <td width="60%">
       <ul>
-        <li>Fragmented environments create delays—integrate once and deploy across cloud, on-prem, edge, and classified environments without rework.</li>
-        <li>Save critical time and get your platforms back in the fight with our integrate once, deploy anywhere framework.</li>
+        <li>Fragmented environments create delays and inconsistencies—seamlessly integrate once and deploy across cloud, on-prem, and tactical edge environments without rework.</li>
+        <li>UDS dynamically configures applications to fit their environment without extra effort. UDS will automatically configure your application via the UDS Operator.</li>
       </ul>
     </td>
   </tr>
