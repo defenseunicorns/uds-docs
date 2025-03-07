@@ -6,13 +6,13 @@ title: "Edge Mobile Deployment Overview"
 
 We built UDS to operate in edge environments where resources, connectivity, and time are limited.
 
-## 📺 Embedded Product Video  
+## Embedded Product Video  
 <!-- Replace VIDEO_ID with your actual YouTube video ID -->
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
 
 ---
 
-## 🛠 Fleet and Asset Management  
+## Fleet and Asset Management  
 <table>
   <tr>
     <td width="40%">
@@ -30,7 +30,7 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 
 ---
 
-## 🌍 Integrate Once, Deploy Anywhere  
+## Integrate Once, Deploy Anywhere  
 <table>
   <tr>
     <td width="40%">
@@ -47,7 +47,7 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 
 ---
 
-## 🎯 Built for Combat Operations  
+## Built for Combat Operations  
 <table>
   <tr>
     <td width="40%">
@@ -64,7 +64,7 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 
 ---
 
-## 🔒 Airgapped, Mission Applications  
+## Airgapped, Mission Applications  
 <table>
   <tr>
     <td width="40%">
@@ -81,7 +81,7 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 
 ---
 
-## 🌎 Real-World Applications  
+## Real-World Applications  
 
 | **Domain** | **Problem** | **Solution** |
 |------------|------------|-------------|
@@ -97,5 +97,5 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 
 ---
 
-📩 **For a 1:1 consultation, contact:**  
+**For a 1:1 consultation, contact:**  
 [hello@defenseunicorns.com](mailto:hello@defenseunicorns.com)
