@@ -15,7 +15,7 @@ While these services may not be exclusive to UDS Tactical Edge, this implementat
 
 ## **Diagram of UDS Product Architecture**
 
-<img src="defenseunicorns/uds-docs/src/assets/diagram%20of%20uds.png" alt="UDS Product Architecture" style="width:100%; max-width:900px; display:block; margin:auto;">
+<img src="defenseunicorns/uds-docs/src/assets/diagram%20of%20uds.png" alt="UDS Product Architecture" style="width:100vw; height:auto; display:block; margin:auto;">
 
 ## UDS Technical Features
 
