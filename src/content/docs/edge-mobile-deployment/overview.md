@@ -100,5 +100,9 @@ UDS deploys and manages applications that run within a Kubernetes cluster hosted
 
 ---
 
-**For a 1:1 consultation, contact:**  
-[hello@defenseunicorns.com](mailto:hello@defenseunicorns.com)
+<div align="center">
+    <strong>For a 1:1 consultation, contact:</strong><br>
+    <a href="mailto:hello@defenseunicorns.com">hello@defenseunicorns.com</a>
+</div>
+
+```
