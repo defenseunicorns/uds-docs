@@ -16,7 +16,7 @@ UDS deploys and manages applications that run within a Kubernetes cluster hosted
 
 ---
 
-## Fleet and Asset Management  
+## One-to-Many Fleet Management  
 <table>
   <tr>
     <td width="40%">
@@ -24,9 +24,8 @@ UDS deploys and manages applications that run within a Kubernetes cluster hosted
     </td>
     <td width="60%">
       <ul>
-        <li>Warfighters face risks managing outdated assets—eliminate danger and wasted resources with seamless updates.</li>
-        <li>Securely manage your platforms remotely, eliminating resource overhead.</li>
-        <li>Reduce total cost of ownership with seamless, remote updates and management.</li>
+        <li>Warfighters risk their safety and efficiency when managing outdated systems—reduce exposure and streamline updates with bundled packages that deliver seamless, all-in-one application and platform upgrades, eliminating the need for fragile, patchwork scripts.</li>
+        <li>Certified system administrators aren’t always available to perform software updates, which delays critical operations. UDS enables warfighters to deploy updates themselves, decentralizing software management and keeping assets in the fight.</li>
       </ul>
     </td>
   </tr>
