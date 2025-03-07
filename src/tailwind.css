@@ -24,20 +24,31 @@
     --sl-content-margin-inline: unset !important;
 }
 
-/* Use a grid layout to properly space main content and right sidebar */
-.page-layout {
-    display: grid;
-    grid-template-columns: 1fr var(--sl-content-width) var(--sl-sidebar-width);
-    gap: 2rem;
-    justify-content: center;
-}
-
-/* Ensure the main content adapts dynamically */
+/* Ensure the main content container does not stretch */
 .main-pane {
     width: 100%;
     max-width: var(--sl-content-width);
     margin: 0 auto;
+    padding: 2rem;
+    overflow: hidden; /* Prevents child elements (code blocks) from affecting the container */
+}
+
+/* Fix Code Block Overflow */
+.main-pane pre {
+    display: block;
+    max-width: 100%; /* Ensure it never exceeds the parent width */
+    overflow-x: auto; /* Add horizontal scrolling if necessary */
+    white-space: pre; /* Ensures proper formatting */
+    background-color: #1e1e1e; /* Adjust for dark theme readability */
     padding: 1rem;
+    border-radius: 4px;
+}
+
+/* Optional: Ensure inline code does not break layout */
+.main-pane code {
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 @media (min-width: 768px) {
@@ -46,8 +57,39 @@
     }
 }
 
-/* Fix right sidebar width so it doesn’t depend on main content */
+/* Ensure the right sidebar has a fixed max-width and padding */
 .right-sidebar-container {
     width: var(--sl-sidebar-width);
-    max-width: 350px;
+    max-width: 350px; /* Ensures it doesn't stretch too much */
+    min-width: 250px; /* Prevents shrinking too much */
+    padding-right: 10px; /* Leaves space for a scrollbar */
+    margin-left: 10px; /* Ensures a gap between content and sidebar */
+    overflow-y: auto; /* Enables scrolling inside sidebar */
+}
+
+/* Ensure content inside the right sidebar does not overflow */
+.right-sidebar-container li,
+.right-sidebar-container a,
+.right-sidebar-container span {
+    display: block;
+    max-width: calc(100% - 15px); /* Account for scrollbar space */
+    white-space: normal; /* Allows text wrapping */
+    word-wrap: break-word; /* Ensures long words wrap */
+    overflow-wrap: break-word; /* Alternative for better wrapping */
+    text-overflow: ellipsis; /* Adds "..." if needed */
+}
+
+/* Ensure the right sidebar panel is constrained properly */
+.right-sidebar-panel {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Fix deeply nested TOC items */
+.right-sidebar-container .astro-g2bywc46 {
+    max-width: calc(100% - 15px); /* Prevents content from being too wide */
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
