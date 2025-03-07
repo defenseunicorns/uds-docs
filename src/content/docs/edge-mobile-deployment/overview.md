@@ -2,11 +2,10 @@
 title: "Edge Mobile Deployment Overview"
 ---
 
-# Edge Product Overview
+# UDS Tactical Edge Product Overview
 
 We built UDS to operate in edge environments where resources, connectivity, and time are limited.
-
-## Embedded Product Video  
+  
 <!-- Replace VIDEO_ID with your actual YouTube video ID -->
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
 
