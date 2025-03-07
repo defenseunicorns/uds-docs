@@ -1,5 +1,5 @@
 ---
-title: "Edge Product Overview"
+title: "Edge Mobile Deployment Overview"
 ---
 
 # Edge Product Overview
