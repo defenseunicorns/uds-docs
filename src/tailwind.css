@@ -84,3 +84,17 @@
     max-width: 100%;
     overflow: hidden;
 }
+
+/* Center images inside zoomable wrapper */
+starlight-image-zoom-zoomable {
+    display: flex;
+    justify-content: center;
+    width: 100%; /* Ensures it spans the full content width */
+}
+
+/* Ensure the image itself does not exceed its container */
+starlight-image-zoom-zoomable img {
+    max-width: 100%;
+    height: auto;
+    display: block; /* Removes extra space below inline images */
+}
