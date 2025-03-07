@@ -3,7 +3,6 @@ title: "Edge Mobile Deployment Overview"
 ---
 
 # UDS Tactical Edge Technical Features
-## How UDS Edge Fits into UDS
 
 UDS as a platform was built to be scalable and flexible to accommodate a variety of deployment scenarios. UDS Tactical is the specific implementation of the UDS Core platform along with additional UDS services tailored for tactical edge deployments. 
 
@@ -14,7 +13,9 @@ This is achieved through:
 
 While these services may not be exclusive to UDS Tactical Edge, this implementation serves as their primary use case in the near term, ensuring lightweight, efficient, and flexible deployment models tailored for tactical edge missions.
 
+## **Diagram of UDS Product Architecture**
 
+<img src="defenseunicorns/uds-docs/src/assets/diagram%20of%20uds.png" alt="UDS Product Architecture" style="width:100%; max-width:900px; display:block; margin:auto;">
 
 ## UDS Technical Features
 
