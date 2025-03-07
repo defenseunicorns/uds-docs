@@ -10,6 +10,10 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 <!-- Replace VIDEO_ID with your actual YouTube video ID -->
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
 
+UDS is a secure software delivery product purpose-built for National Security missions—proven in data center environments and now expanded to the tactical edge. While UDS excels in the enterprise setting, the newly introduced component of UDS brings that same dependable platform to remote, resource-constrained, and low-connectivity locations. Designed to support critical operations anywhere from forward operating bases to on-board vehicles, UDS Tactical Edge ensures continuous, secure, and efficient software delivery, regardless of the environment.
+
+UDS deploys and manages applications that run within a Kubernetes cluster hosted on a Linux server and as such most UDS services, including UDS Core, operate within the cluster. UDS also includes client applications that allow a variety of devices to interact with these UDS services and to deploy and manage UDS applications. These clients operate on their respective devices such as tablets and smartphones for the UDS mobile application and macOS and Linux laptops and desktops for UDS CLI.
+
 ---
 
 ## Fleet and Asset Management  
