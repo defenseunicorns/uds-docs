@@ -14,6 +14,8 @@ This is achieved through:
 
 While these services may not be exclusive to UDS Tactical Edge, this implementation serves as their primary use case in the near term, ensuring lightweight, efficient, and flexible deployment models tailored for tactical edge missions.
 
+
+
 ## UDS Technical Features
 
 ### **1. Distributed Software and Asset Management**
