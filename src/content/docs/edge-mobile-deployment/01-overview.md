@@ -80,7 +80,7 @@ UDS Tactical Edge ensures your critical operations have the same secure and effi
     <td width="60%">
       <ul>
         <li>Whether in a cockpit, fighting hole, submarine or data center, UDS can deliver software applications.</li>
-        <li>Avoiding detection is survival on the battlefield—airgapped operations give our forces the advantage in maneuver warfare.</li>
+        <li>Continued operations in contested, degraded and denied environments gives our forces the advantage in maneuver warfare.</li>
       </ul>
     </td>
   </tr>
