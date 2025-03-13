@@ -4,7 +4,7 @@
 
 :root {
     /* Responsive content width with a max limit */
-    --sl-content-width: min(90vw, 1500px);
+    --sl-content-width: min(90vw, 1200px);
     --sl-sidebar-width: 350px;
     color-scheme: dark;
 
