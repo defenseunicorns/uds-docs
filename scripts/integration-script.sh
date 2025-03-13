@@ -31,7 +31,7 @@ clone_repo() {
     fi
 
     # Clone the repository with specific branch/tag
-    git clone --branch "$branch" --single-branch "$repo_url" "$target_dir"
+    git clone --branch "$branch" --depth 1 --single-branch "$repo_url" "$target_dir"
 }
 
 # Loop through each repository and clone it
