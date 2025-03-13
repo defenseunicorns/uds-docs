@@ -11,9 +11,9 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 
 UDS Tactical Edge brings our proven secure software delivery platform, UDS, to the most challenging operational environments. Deploy Kubernetes directly to any weapon or platform  from small remote devices with resource constraints to the DoD’s next-generation weapon systems and platforms.
 
-<li>Small resources needed (2GB RAM, such as a Raspberry Pi 5)
-<li>Applications can run without or without connectivity - a fully airgapped solution
-<li>Control deployments using a mobile app (tablets/smartphones) or CLI tools (laptops/desktops).
+- Small resources needed (2GB RAM, such as a Raspberry Pi 5)
+- Applications can run without or without connectivity - a fully airgapped solution
+- Control deployments using a mobile app (tablets/smartphones) or CLI tools (laptops/desktops).
 
 UDS Tactical Edge ensures your critical operations have the same secure and efficient software delivery capabilities in the field that you expect in enterprise environments.
 
