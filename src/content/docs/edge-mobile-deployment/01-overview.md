@@ -9,9 +9,14 @@ We built UDS to operate in edge environments where resources, connectivity, and 
 <!-- Replace VIDEO_ID with your actual YouTube video ID -->
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
 
-UDS is a secure software delivery product purpose-built for National Security missions—proven in data center environments and now expanded to the tactical edge. While UDS excels in the enterprise setting, the newly introduced component of UDS brings that same dependable platform to remote, resource-constrained, and low-connectivity locations. Designed to support critical operations anywhere from forward operating bases to on-board vehicles, UDS Tactical Edge ensures continuous, secure, and efficient software delivery, regardless of the environment.
+UDS Tactical Edge brings our proven secure software delivery platform, UDS, to the most challenging operational environments. Deploy Kubernetes directly to any weapon or platform  from small remote devices with resource constraints to the DoD’s next-generation weapon systems and platforms.
 
-UDS deploys and manages applications that run within a Kubernetes cluster hosted on a Linux server and as such most UDS services, including UDS Core, operate within the cluster. UDS also includes client applications that allow a variety of devices to interact with these UDS services and to deploy and manage UDS applications. These clients operate on their respective devices such as tablets and smartphones for the UDS mobile application and macOS and Linux laptops and desktops for UDS CLI.
+<li>Small resources needed (2GB RAM, such as a Raspberry Pi 5)
+<li>Applications can run without or without connectivity - a fully airgapped solution
+<li>Control deployments using a mobile app (tablets/smartphones) or CLI tools (laptops/desktops).
+
+UDS Tactical Edge ensures your critical operations have the same secure and efficient software delivery capabilities in the field that you expect in enterprise environments.
+
 
 ---
 
