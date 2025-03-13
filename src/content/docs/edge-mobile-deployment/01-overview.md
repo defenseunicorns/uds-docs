@@ -109,7 +109,7 @@ UDS Tactical Edge ensures your critical operations have the same secure and effi
 
 <div align="center">
     <strong>For a 1:1 consultation, contact:</strong><br>
-    <a href="mailto:hello@defenseunicorns.com">hello@defenseunicorns.com</a>
+    <a href="mailto:sales@defenseunicorns.com">hello@defenseunicorns.com</a>
 </div>
 
 ```
