@@ -4,7 +4,10 @@ title: "Edge Mobile Deployment Overview"
 
 # UDS Tactical Edge Technical Features
 
-UDS as a platform was built to be scalable and flexible to accommodate a variety of deployment scenarios. UDS Tactical is the specific implementation of the UDS Core platform along with additional UDS services tailored for tactical edge deployments. 
+UDS as a platform was built to be scalable and flexible to accommodate a variety of deployment scenarios. UDS Tactical Edge is the specific implementation of the UDS Core platform along with additional UDS services tailored for tactical edge deployments. 
+
+<img src="/assets/uds-flow-diagram.png" alt="UDS Flow Diagram" style="width:100%; height:auto; display:block; margin:0 auto;">
+
 
 This is achieved through:
 - **Functional Layer Paradigm**: UDS Core’s modular architecture allows unnecessary features to be omitted, optimizing for size, weight, and power (SWaP) constraints.
