@@ -89,6 +89,8 @@ UDS Tactical Edge ensures your critical operations have the same secure and effi
 ---
 
 ## Real-World Applications  
+<img src="/assets/operational-overview-of-uds.png" alt="Operational Overview of UDS" style="width:100%; height:auto;">
+
 
 | **Domain** | **Problem** | **Solution** |
 |------------|------------|-------------|
