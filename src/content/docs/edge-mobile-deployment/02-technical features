@@ -16,9 +16,7 @@ This is achieved through:
 
 While these services may not be exclusive to UDS Tactical Edge, this implementation serves as their primary use case in the near term, ensuring lightweight, efficient, and flexible deployment models tailored for tactical edge missions.
 
-## **Diagram of UDS Product Architecture**
-
-<img src="defenseunicorns/uds-docs/src/assets/diagram%20of%20uds.png" alt="UDS Product Architecture" style="width:100vw; height:auto; display:block; margin:auto;">
+## Walkthrough Demo
 
 ## UDS Technical Features
 
