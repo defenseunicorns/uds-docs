@@ -62,9 +62,5 @@ While these services may not be exclusive to UDS Tactical Edge, this implementat
 
 With these features, UDS Edge provides a battlefield-ready platform that ensures operational efficiency, security, and adaptability for modern warfighting environments.
 
-<img src="/assets/uds-tac-edge-simple-diagram.png" 
-     alt="UDS Tactical Edge Simple Diagram" 
-     style="width:100vw; height:100vh; object-fit: contain; display: block;">
-
-
+![UDS Tac Edge Simple Diagram](https://github.com/defenseunicorns/uds/docs/blob/main/src/assets/uds-tac-edge-simple-diagram.png)
 ```
