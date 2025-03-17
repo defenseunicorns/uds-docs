@@ -3,9 +3,6 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
 import doug from '../assets/doug.svg';
-import airgapAppStore from '../assets/airgap-app-store.png';
-import Image1 from '../../assets/airgap-app-store.png';
-import Image2 from '../../assets/UDS Deployment (1).png';
 import '@fontsource/teko';
 
 const frontmatter = {
@@ -35,6 +32,7 @@ const sections = [
             { title: 'Quickstart', href: '/reference/cli/quickstart-and-usage/' },
             { title: 'Command Reference', href: '/reference/cli/commands/uds/' },
         ]
+    },
     {
         title: 'Product Capabilities',
         links: [
