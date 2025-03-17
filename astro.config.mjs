@@ -126,7 +126,10 @@ export default defineConfig({
             },
             {
                 label: 'Tactical Edge Deployments',
-                link: '/tactical-edge-deployments/overview',
+                autogenerate: {
+                    directory: 'tactical-edge-deployments'
+                },
+                collapsed: true,
                 badge: { text: 'New!', variant: 'tip' }
             },
         ],
