@@ -125,8 +125,8 @@ export default defineConfig({
                 collapsed: true
             },
             {
-                label: 'Airgap App Store',
-                link: '/airgap-app-store/overview',
+                label: 'Tactical Edge Deployments',
+                link: '/tactical-edge-deployments/overview',
                 badge: { text: 'New!', variant: 'tip' }
             },
         ],
