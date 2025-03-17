@@ -1,8 +1,8 @@
 ---
-title: "Edge Mobile Deployment Overview"
+title: Edge Mobile Deployment Overview
 ---
 
-# UDS Tactical Edge Product Overview
+## UDS Tactical Edge Product Overview
 
 UDS Tactical Edge brings our proven secure software delivery platform, UDS, to the most challenging operational environments. Deploy Kubernetes directly to any weapon or platform  from small remote devices with resource constraints to the DoD’s next-generation weapon systems and platforms.
 
