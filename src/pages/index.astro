@@ -41,7 +41,7 @@ const sections = [
         links: [
             { title: 'Secure Runtime - UDS Core', href: '/reference/uds-core/overview/' },
             { title: 'Tactical Edge - Deployments', href: '/defenseunicorns/uds-docs/src/content/docs/tactical-edge-deployments'  },
-        ]   
+        ]
     },
     {
         title: 'Working with UDS Core',
@@ -62,7 +62,23 @@ const sections = [
             { title: 'DNS Configuration', href: '/reference/uds-core/dns/' },
         ]
     },
-];
+    {
+        title: 'Security & Identity',
+        links: [
+            {title: 'UDS Security Overview', href: '/security/overview'},
+            {title: 'UDS Identity Config Overview', href: '/reference/uds-core/idam/uds-identity-config-overview'},
+            {title: 'Keycloak Plugin', href: '/reference/uds-core/idam/plugin'},
+        ]
+    },
+    {
+        title: 'Tutorials',
+        links: [
+            {title: 'Deploy a sample app with UDS Core', href: '/tutorials/deploy-with-uds-core/'},
+            {title: 'Integrate an App with UDS Core', href: '/tutorials/create-uds-package/'},
+            {title: 'Add UDS to a Zarf package', href: '/tutorials/add-package-to-bundle/'}
+        ]
+    }
+]
 ---
 <style>
     :root[data-theme='light'] {
