@@ -2,7 +2,7 @@
 title: "Edge Mobile Deployment Overview"
 ---
 
-# UDS Tactical Edge Technical Features
+## UDS Tactical Edge Technical Features
 
 UDS as a platform was built to be scalable and flexible to accommodate a variety of deployment scenarios. UDS Tactical Edge is the specific implementation of the UDS Core platform along with additional UDS services tailored for tactical edge deployments. 
 
