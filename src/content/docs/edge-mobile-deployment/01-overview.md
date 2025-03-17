@@ -94,8 +94,9 @@ To get a better idea of UDS Tactical Edge watch this real-world walkthrough of U
 ---
 
 ## Real-World Applications  
-<img src="/assets/operational-overview-of-uds.png" alt="Operational Overview of UDS" style="width:100%; height:auto;">
-
+<img src="/assets/op-overview-edge.png" 
+     alt="Operational Overview of UDS" 
+     style="width:100vw; height:100vh; object-fit: contain; display: block;">
 
 | **Domain** | **Problem** | **Solution** |
 |------------|------------|-------------|
