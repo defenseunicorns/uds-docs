@@ -1,5 +1,5 @@
 ---
-title: "Edge Mobile Deployment Overview"
+title: Tactical Edge FAQ
 ---
 
 ## Facts and Questions
