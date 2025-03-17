@@ -33,7 +33,7 @@ To get a better idea of UDS Tactical Edge watch this real-world walkthrough of U
     </td>
     <td width="60%">
       <ul>
-        <li>Warfighters risk their safety and efficiency when managing outdated systems—reduce exposure and streamline updates with bundled packages that deliver seamless, all-in-one application and platform upgrades, eliminating the need for fragile, patchwork scripts.</li>
+        <li>Warfighters risk their safety and efficiency when operating outdated systems—reduce exposure and streamline updates with bundled packages that deliver seamless, all-in-one application and platform upgrades, eliminating the need for fragile, patchwork scripts.</li>
         <li>Certified system administrators aren’t always available to perform software updates, which delays critical operations. UDS enables warfighters to deploy updates themselves, decentralizing software management and keeping assets in the fight.</li>
       </ul>
     </td>
