@@ -113,15 +113,6 @@ To get a better idea of UDS Tactical Edge watch this real-world walkthrough of U
 | **Expeditionary & Tactical Operation Centers** | Forward bases require self-sustaining software environments that can operate independently for extended periods. | UDS delivers hardened, containerized mission applications with automated sustainment capabilities, reducing dependency on external IT support. This approach enables supporting software factories at the enterprise level and applications at the edge level. |
 | **DevSecOps & CI/CD for Tactical Edge** | Traditional software updates are slow, manual, and expensive, increasing lifecycle costs and limiting adaptability. | UDS provides a declarative deployment model, ensuring that what you develop and test will behave consistently in a production environment. |
 
-<div style="text-align: center; margin-top: 40px;">
-    <a href="/docs/edge-mobile-deployment/02-technical-features" 
-       style="display: inline-block; padding: 12px 24px; font-size: 18px; 
-              background-color: #007BFF; color: white; text-decoration: none; 
-              border-radius: 5px;">
-        Next: Technical Features →
-    </a>
-</div>
-
 ---
 
 <div align="center">
