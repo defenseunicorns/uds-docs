@@ -14,8 +14,14 @@ UDS Tactical Edge ensures your critical operations have the same secure and effi
 
 To get a better idea of UDS Tactical Edge watch this real-world walkthrough of UDS being deployed onto a small drone utilizing a Raspberry Pi 4 (2GB RAM). 
 
-
-
+<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe 
+    src="https://www.youtube.com/embed/xZ3T9ePwa3U" 
+    frameborder="0" 
+    allowfullscreen 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+  </iframe>
+</div>
 
 ---
 
