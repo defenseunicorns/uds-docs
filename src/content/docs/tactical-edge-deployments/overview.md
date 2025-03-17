@@ -32,7 +32,7 @@ To get a better idea of UDS Tactical Edge watch this real-world walkthrough of U
 <table>
   <tr>
     <td width="40%">
-      <img src="../../assets/flight-line.jpeg" alt="Fleet and Asset Management" style="max-width: 100%; border-radius: 8px;">
+      <img src="https://raw.githubusercontent.com/defenseunicorns/uds-docs/2635e3f7bb6469ac5aedb161a98e2be0f5989825/src/assets/flight-line.jpeg?raw=true" alt="Fleet and Asset Management" style="max-width: 100%; border-radius: 8px;">
     </td>
     <td width="60%">
       <ul>
