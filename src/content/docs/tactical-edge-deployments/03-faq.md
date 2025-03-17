@@ -2,7 +2,7 @@
 title: "Edge Mobile Deployment Overview"
 ---
 
-# Facts and Questions
+## Facts and Questions
 
 ### **Is UDS Tactical Edge part of UDS?**
 - Yes, UDS Tactical Edge is a sub-set of UDS. UDS Tactical Edge has its own licensing.
