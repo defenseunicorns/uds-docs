@@ -62,7 +62,98 @@ const sections = [
         ]
     },
 ];
-        
+---
+<style>
+    :root[data-theme='light'] {
+        h1, h2 {
+            font-family: "Teko", sans-serif;
+            color: #122248;
+        }
+    }
+
+    :root[data-theme='dark'] {
+        h1, h2 {
+            font-family: "Teko", sans-serif;
+            color: rgba(36,176,255);
+        }
+
+        .card {
+            background-color: rgb(31 41 55);
+        }
+    }
+
+    html:not([data-has-sidebar]) {
+        --sl-content-width: 80rem;
+
+        .card > .body ul {
+            list-style: none outside none;
+            padding: 0;
+        }
+
+        .hero {
+            display: grid;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            padding-top: 1rem;
+        }
+
+        .hero > img,
+        .hero > .hero-html {
+            object-fit: contain;
+            width: min(60%, 20rem);
+            height: auto;
+            margin-inline: auto;
+        }
+
+        .stack {
+            text-align: center;
+            align-items: center;
+        }
+
+        .copy {
+            text-align: left;
+            font-family: "Teko", sans-serif;
+            gap: 0;
+        }
+
+        .copy > * {
+            max-width: 80ch;
+        }
+
+        .copy > .tagline {
+            font-size: 24px;
+            line-height: 2rem;
+        }
+
+        @media (min-width: 70rem) {
+            .card-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 50rem) {
+            .hero {
+                img {
+                    width: 10rem;
+                }
+            }
+
+            .copy {
+                font-size: 32px;
+                font-family: "Teko", sans-serif;
+                gap: 0;
+            }
+
+            .copy > .tagline {
+                font-size: 20px;
+                text-align: center;
+                line-height: 2rem;
+            }
+        }
+    }
+</style>        
         <div>
             <h2 class="text-left">Get involved</h2>
             <div>
