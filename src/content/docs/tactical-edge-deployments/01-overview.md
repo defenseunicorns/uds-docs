@@ -1,5 +1,8 @@
 ---
 title: Tactical Edge Overview
+
+sidebar:
+  order: 1
 ---
 
 ## UDS Tactical Edge Product Overview

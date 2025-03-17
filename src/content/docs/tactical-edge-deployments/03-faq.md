@@ -1,5 +1,8 @@
 ---
 title: Tactical Edge FAQ
+
+sidebar:
+  order: 3
 ---
 
 ## Facts and Questions

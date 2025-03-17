@@ -1,5 +1,8 @@
 ---
 title: Tactical Edge Technical Features
+
+sidebar:
+  order: 2
 ---
 
 ## UDS Tactical Edge Technical Features
