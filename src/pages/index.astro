@@ -155,23 +155,38 @@ const sections = [
         }
     }
 </style>
-<StarlightPage frontmatter={frontmatter} hasSidebar={false}> 
-    <div class="space-y-8">        
+
+<StarlightPage frontmatter={frontmatter} hasSidebar={false}>
+    <div class="space-y-8">
+        <CardGrid>
+            {
+                sections.map((section) => (
+                    <Card title={section.title}>
+                        <ul >
+                            {section.links.map((link) => (
+                                <li><a class="no-underline" href={link.href}>{link.title}</a></li>
+                            ))}
+                        </ul>
+                    </Card>
+                ))
+            }
+        </Cardgrid>
+    </div>
+    <div>
+        <h2 class="text-left">Get involved</h2>
         <div>
-            <h2 class="text-left">Get involved</h2>
-            <div>
-                <Card title="UDS Core">
-                    <p>
+            <Card title="UDS Core">
+                <p>
                         UDS Core provides a secure baseline for cloud-native systems and includes compliance documentation with strong support for airgap environments.
-                    </p>
+                </p>
                     <LinkCard title="Go to UDS Core on GitHub" href="https://github.com/defenseunicorns/uds-core" />
-                </Card>
-                <Card title="UDS CLI">
-                    <p>
+            </Card>
+            <Card title="UDS CLI">
+                <p>
                         UDS CLI allows bundling and deploying multiple independent Zarf packages efficiently.
-                    </p>
+                </p>
                     <LinkCard title="Go to UDS CLI on GitHub" href="https://github.com/defenseunicorns/uds-cli" target="_blank" />
-                </Card>
+            </Card>
             </div>
         </div>
     </div>
