@@ -1,5 +1,5 @@
 ---
-title: Edge Mobile Deployment Overview
+title: Tactical Edge Overview
 ---
 
 ## UDS Tactical Edge Product Overview
