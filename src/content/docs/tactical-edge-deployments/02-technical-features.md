@@ -66,8 +66,6 @@ With these features, UDS Edge provides a battlefield-ready platform that ensures
      alt="UDS Tactical Edge Simple Diagram" 
      style="width:100vw; height:100vh; object-fit: contain; display: block;">
 
-
-
 <div style="text-align: center; margin-top: 40px;">
     <a href="/docs/tactical-edge-deployments/03-faq
        style="display: inline-block; padding: 12px 24px; font-size: 18px; 
