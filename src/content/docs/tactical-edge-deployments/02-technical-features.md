@@ -1,5 +1,5 @@
 ---
-title: "Edge Mobile Deployment Overview"
+title: Tactical Edge Technical Features
 ---
 
 ## UDS Tactical Edge Technical Features
