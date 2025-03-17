@@ -66,7 +66,7 @@ With these features, UDS Edge provides a battlefield-ready platform that ensures
 
 
 <div style="text-align: center; margin-top: 40px;">
-    <a href="/docs/edge-mobile-deployment/03-FAQ" 
+    <a href="/docs/tactical-edge-deployments/03-faq
        style="display: inline-block; padding: 12px 24px; font-size: 18px; 
               background-color: #007BFF; color: white; text-decoration: none; 
               border-radius: 5px;">
