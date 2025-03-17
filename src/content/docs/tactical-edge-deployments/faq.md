@@ -40,5 +40,3 @@ If you stop paying for UDS Tactical Edge:
 - You will no longer receive updates for proprietary components, such as the Android application.
 - You will retain access to UDS Core and other open-source components.
 - You would revert to the AGPLv3 license for receiving updates for those open-source components.
-```
-

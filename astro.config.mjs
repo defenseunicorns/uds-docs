@@ -83,6 +83,14 @@ export default defineConfig({
                 link: '/',
             },
             {
+                label: 'Tactical Edge Deployments',
+                autogenerate: {
+                    directory: 'tactical-edge-deployments'
+                },
+                collapsed: true,
+                badge: { text: 'New!', variant: 'tip' }
+            },
+            {
                 label: 'Getting Started',
                 autogenerate: {
                     directory: 'getting-started'
@@ -123,14 +131,6 @@ export default defineConfig({
                     directory: 'tutorials'
                 },
                 collapsed: true
-            },
-            {
-                label: 'Tactical Edge Deployments',
-                autogenerate: {
-                    directory: 'tactical-edge-deployments'
-                },
-                collapsed: true,
-                badge: { text: 'New!', variant: 'tip' }
             },
         ],
     }), tailwind({

@@ -7,12 +7,12 @@ sidebar:
 
 ## UDS Tactical Edge Technical Features
 
-UDS as a platform was built to be scalable and flexible to accommodate a variety of deployment scenarios. UDS Tactical Edge is the specific implementation of the UDS Core platform along with additional UDS services tailored for tactical edge deployments. 
+UDS as a platform was built to be scalable and flexible to accommodate a variety of deployment scenarios. UDS Tactical Edge is the specific implementation of the UDS Core platform along with additional UDS services tailored for tactical edge deployments.
 
-<img src="/assets/uds-flow-diagram.png" 
-     alt="UDS Flow Diagram" 
-     style="width:100vw; height:100vh; object-fit: contain; display: block;">
-
+<img
+  src="/assets/uds-flow-diagram.png"
+  alt="UDS Flow Diagram"
+/>
 
 This is achieved through:
 - **Functional Layer Paradigm**: UDS Core’s modular architecture allows unnecessary features to be omitted, optimizing for size, weight, and power (SWaP) constraints.
@@ -23,10 +23,10 @@ While these services may not be exclusive to UDS Tactical Edge, this implementat
 
 ## Walkthrough Demo
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe 
-    src="https://www.youtube.com/embed/z1_Cgq7vnzM" 
-    frameborder="0" 
-    allowfullscreen 
+  <iframe
+    src="https://www.youtube.com/embed/z1_Cgq7vnzM"
+    frameborder="0"
+    allowfullscreen
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
   </iframe>
 </div>
@@ -62,5 +62,8 @@ While these services may not be exclusive to UDS Tactical Edge, this implementat
 
 With these features, UDS Edge provides a battlefield-ready platform that ensures operational efficiency, security, and adaptability for modern warfighting environments.
 
-![UDS Tac Edge Simple Diagram](https://github.com/defenseunicorns/uds-docs/blob/main/src/assets/uds-tac-edge-simple-diagram.png)
-```
+<img
+  src="/assets/uds-tac-edge-simple-diagram.png"
+  alt="UDS Tac Edge Simple Diagram"
+  style="max-width: 100%; border-radius: 8px;"
+/>
