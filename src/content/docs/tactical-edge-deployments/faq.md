@@ -15,7 +15,7 @@ sidebar:
 ### Has UDS been deployed successfully in resource-constrained environments (edge)?
 - Yes, Defense Unicorns has deployed UDS in resource-constrained environments. To discuss real-world applications, please contact [hello@defenseunicorns.com](mailto:hello@defenseunicorns.com) for more information.
 
-### What additional features come with UDS Edge?
+### What additional features come with UDS Tactical Edge?
 Defense Unicorns offers a variety of capabilities that can be bundled with your UDS Edge subscription. Some examples include:
 - Unicorn or Ironbank Hardened Images
 - Software Bill of Materials
