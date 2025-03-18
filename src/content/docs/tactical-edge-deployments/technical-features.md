@@ -60,7 +60,7 @@ While these services may not be exclusive to UDS Tactical Edge, this implementat
   - Compliance artifacts for security validation.
 - Ensures that UDS-deployed applications are self-contained, portable, and built on open standards, enabling seamless transport and deployment anywhere the mission requires.
 
-With these features, UDS Edge provides a battlefield-ready platform that ensures operational efficiency, security, and adaptability for modern warfighting environments.
+With these features, UDS Tactical Edge provides a battlefield-ready platform that ensures operational efficiency, security, and adaptability for modern warfighting environments.
 
 <img
   src="/assets/uds-tac-edge-simple-diagram.png"
