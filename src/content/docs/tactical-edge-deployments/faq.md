@@ -6,7 +6,7 @@ sidebar:
 ---
 
 ### Is UDS Tactical Edge part of UDS?
-- Yes, UDS Tactical Edge is a sub-set of UDS. UDS Tactical Edge has its own licensing.
+- Yes, UDS Tactical Edge is a part of UDS. UDS Tactical Edge is a UDS capability with its own licensing.
 
 ### Can you explain how UDS Tactical Edge is a sub-set of UDS?
 - It is a collection of UDS clients and services that simplifies the use of UDS in resource-constrained environments.
