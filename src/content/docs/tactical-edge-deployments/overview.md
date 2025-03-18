@@ -1,5 +1,5 @@
 ---
-title: UDS Tactical Edge Overview
+title: Tactical Edge Overview
 sidebar:
   order: 1
 ---
