@@ -31,7 +31,7 @@ While these services may not be exclusive to UDS Tactical Edge, this implementat
   </iframe>
 </div>
 
-## UDS Technical Features
+## Technical Features for UDS Tactical Edge
 
 ### **1. Distributed Software and Asset Management**
 - UDS enables declarative versioning of application states, ensuring consistent and reliable deployments across a distributed fleet.
