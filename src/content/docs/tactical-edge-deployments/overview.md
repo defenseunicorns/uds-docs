@@ -11,7 +11,7 @@ UDS Tactical Edge brings our proven secure software delivery platform, UDS, to t
 
 UDS Tactical Edge ensures your critical operations have the same secure and efficient software delivery capabilities in the field that you expect in enterprise environments.
 
-To get a better idea of UDS Tactical Edge watch this real-world walkthrough of UDS being deployed onto a small drone utilizing a Raspberry Pi 4 (2GB RAM).
+To get a better idea of UDS Tactical Edge watch this real-world demonstration. 
 
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
   <iframe
