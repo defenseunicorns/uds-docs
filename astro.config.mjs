@@ -83,7 +83,7 @@ export default defineConfig({
                 link: '/',
             },
             {
-                label: 'Tactical Edge Deployments',
+                label: 'Tactical Edge',
                 autogenerate: {
                     directory: 'tactical-edge-deployments'
                 },
