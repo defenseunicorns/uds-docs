@@ -27,14 +27,14 @@ Defense Unicorns offers a variety of capabilities that can be bundled with your 
 To discuss licensing options, please contact [hello@defenseunicorns.com](mailto:hello@defenseunicorns.com) for more information.
 
 ### Does UDS Tactical Edge come with 24/7 support?
-- Yes, UDS Tactical Edge includes  24/7  customer support with a email and phone number.
+- Yes, UDS Tactical Edge includes  24/7  customer support via business email and phone number.
 
 ### Can you explain what in UDS Tactical Edge is proprietary or open source?
 - UDS Tactical Edge is a paid stock-keeping unit (SKU) of products that includes the open-source UDS Core platform along with proprietary components that make application management easier while operating at the tactical edge.
 
 ### What happens if I stop paying for UDS Tactical Edge?
 If you stop paying for UDS Tactical Edge:
-- You will retain access to UDS Core and other open-source components.
+- You would retain access to UDS Core and other open-source components.
 - You would revert to the AGPLv3 license for receiving updates for those open-source components.
-- You will lose operational support from Defense Unicorns.
-- You will no longer receive updates for proprietary components, such as the Android application.
+- You would lose operational support from Defense Unicorns.
+- You would no longer receive updates for proprietary components, such as the Android application.
