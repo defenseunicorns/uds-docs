@@ -1,11 +1,8 @@
 ---
-title: Tactical Edge Overview
+title: UDS Tactical Edge Overview
 sidebar:
   order: 1
 ---
-
-## UDS Tactical Edge Product Overview
-
 UDS Tactical Edge brings our proven secure software delivery platform, UDS, to the most challenging operational environments. Deploy Kubernetes directly to any weapon or platform  from small remote devices with resource constraints to the DoD’s next-generation weapon systems and platforms.
 
 - Limited resources needed (2GB RAM, such as a Raspberry Pi 5)
