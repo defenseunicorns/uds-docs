@@ -15,7 +15,7 @@ To learn more watch this product explainer video.
 
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
   <iframe
-    src="https://youtu.be/qbv0fc5Zxec"
+    src="https://www.youtube.com/watch?v=qbv0fc5Zxec"
     frameborder="0"
     allowfullscreen
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
@@ -102,7 +102,7 @@ To learn more watch this product explainer video.
 To get a better idea of UDS Tactical Edge watch this real-world demonstration.
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
   <iframe
-    src="https://youtu.be/qbv0fc5Zxec"
+    src="https://www.youtube.com/watch?v=xZ3T9ePwa3U"
     frameborder="0"
     allowfullscreen
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
