@@ -99,11 +99,15 @@ To learn more watch this product explainer video.
 </table>
 
 ## Real-World Applications
-<img
-  src="/assets/op-overview-edge.png"
-  alt="Operational Overview of UDS"
-  style="max-width: 100%; border-radius: 8px;"
-/>
+To get a better idea of UDS Tactical Edge watch this real-world demonstration.
+<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe
+    src="https://youtu.be/qbv0fc5Zxec"
+    frameborder="0"
+    allowfullscreen
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+  </iframe>
+</div>
 
 | **Domain** | **Problem** | **Solution** |
 |------------|------------|-------------|
