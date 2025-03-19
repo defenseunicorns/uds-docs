@@ -11,11 +11,11 @@ UDS Tactical Edge brings our proven secure software delivery platform, UDS, to t
 
 UDS Tactical Edge ensures your critical operations have the same secure and efficient software delivery capabilities in the field that you expect in enterprise environments.
 
-To get a better idea of UDS Tactical Edge watch this real-world demonstration. 
+To learn more watch this product explainer video.
 
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
   <iframe
-    src="https://www.youtube.com/embed/xZ3T9ePwa3U"
+    src="https://youtu.be/qbv0fc5Zxec"
     frameborder="0"
     allowfullscreen
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
