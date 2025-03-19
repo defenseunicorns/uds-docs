@@ -11,7 +11,7 @@ UDS Tactical Edge brings our proven secure software delivery platform, UDS, to t
 
 UDS Tactical Edge ensures your critical operations have the same secure and efficient software delivery capabilities in the field that you expect in enterprise environments.
 
-To learn more watch this product explainer video. [Contact us](https://defenseunicorns.com/contactus) if you want to see how Tactical Edge can help your mission.
+To learn more watch this product explainer video. [**Contact us**](https://defenseunicorns.com/contactus) if you want to see how Tactical Edge can help your mission.
 
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
   <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/qbv0fc5Zxec?si=M_u3KjjTGHTm7Xqk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -117,5 +117,5 @@ To get a better idea of UDS Tactical Edge watch this real-world demonstration.
 | **DevSecOps & CI/CD for Tactical Edge** | Traditional software updates are slow, manual, and expensive, increasing lifecycle costs and limiting adaptability. | UDS provides a declarative deployment model, ensuring that what you develop and test will behave consistently in a production environment. |
 
 <div align="center">
-    <strong>For a 1:1 consultation, [contact us](https://defenseunicorns.com/contactus).</strong>
+    <strong>For a 1:1 consultation, <a href="https://defenseunicorns.com/contactus" target="_blank">contact us.</strong>
 </div>
