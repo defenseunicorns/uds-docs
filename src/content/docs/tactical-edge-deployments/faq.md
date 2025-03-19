@@ -5,6 +5,12 @@ sidebar:
   order: 3
 ---
 
+<img
+  src="/assets/uds-tac-edge-simple-diagram.png"
+  alt="UDS Tac Edge Simple Diagram"
+  style="max-width: 100%; border-radius: 8px;"
+/>
+
 ### Is UDS Tactical Edge part of UDS?
 - Yes, UDS Tactical Edge is a part of UDS. UDS Tactical Edge is a UDS capability with its own licensing.
 
