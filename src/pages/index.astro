@@ -1,20 +1,16 @@
 ---
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
-import { Image } from 'astro:assets';
 import doug from '../assets/doug.svg';
-import airgapAppStore from '../assets/airgap-app-store.png';
 import '@fontsource/teko';
 
 const frontmatter = {
     title: "Unicorn Delivery Service",
-    description:
-        "Explore guides and tutorials for the Unicorn Delivery Service platform",
+    description: "Explore guides and tutorials for the Unicorn Delivery Service platform",
     template: "splash",
     hero: {
         title: "Unicorn Delivery Service",
-        tagline:
-            "A secure software delivery platform built for National Security missions.",
+        tagline: "A secure software delivery product built for National Security missions.",
         image: {
             dark: doug,
             light: doug,
@@ -28,38 +24,38 @@ const sections = [
     {
         title: 'Get Started',
         links: [
-            {title: 'Why UDS?', href: 'overview/why-uds'},
-            {title: 'Basic Requirements', href: 'getting-started/basic-requirements'},
-            {title: 'Install & Deploy UDS', href: 'getting-started/install-and-deploy-uds'},
-            {title: 'What is a UDS Bundle?', href: '/structure/bundles/'}
+            { title: 'Why UDS?', href: 'overview/why-uds' },
+            { title: 'Basic Requirements', href: 'getting-started/basic-requirements' },
+            { title: 'Install & Deploy UDS', href: 'getting-started/install-and-deploy-uds' },
+            { title: 'What is a UDS Bundle?', href: '/structure/bundles/' },
+            { title: 'Quickstart', href: '/reference/cli/quickstart-and-usage/' },
+            { title: 'Command Reference', href: '/reference/cli/commands/uds/' },
+        ]
+    },
+    {
+        title: 'Product Capabilities',
+        links: [
+            { title: 'Secure Runtime with UDS Core', href: '/reference/uds-core/overview/' },
+            { title: 'Tactical Edge Deployments', badge: { text: 'New!', variant: 'tip' }, href: '/tactical-edge-deployments/overview' },
         ]
     },
     {
         title: 'Working with UDS Core',
         links: [
-            {title: 'Prerequisites', href: '/reference/uds-core/prerequisites'},
-            {title: 'Bundle Overrides', href: '/reference/bundles/overrides'},
-            {title: 'Distribution Support', href: '/reference/uds-core/distribution-support/'},
-            {title: 'Functional Layers', href: '/reference/uds-core/functional-layers/'},
-            {title: 'UDS Core Flavors', href: '/reference/uds-core/flavor-specific-development-notes/'}
+            { title: 'Prerequisites', href: '/reference/uds-core/prerequisites' },
+            { title: 'Bundle Overrides', href: '/reference/bundles/overrides' },
+            { title: 'Distribution Support', href: '/reference/uds-core/distribution-support/' },
+            { title: 'Functional Layers', href: '/reference/uds-core/functional-layers/' },
+            { title: 'UDS Core Flavors', href: '/reference/uds-core/flavor-specific-development-notes/' }
         ]
     },
     {
         title: 'Bundles & Configuration',
         links: [
-            {title: 'Istio Ingress', href: '/reference/configuration/ingress'},
-            {title: 'Pepr Policies', href: '/reference/configuration/pepr-policies'},
-            {title: 'UDS Operator', href: '/reference/configuration/uds-operator/overview/'},
-            {title: 'DNS Configuration', href: '/reference/uds-core/dns/'},
-        ]
-    },
-    {
-        title: 'UDS CLI',
-        links: [
-            {title: 'Quickstart', href: '/reference/cli/quickstart-and-usage/'},
-            {title: 'Command Reference', href: '/reference/cli/commands/uds/'},
-            {title: 'Schema Validation', href: '/reference/cli/schema-validation/'},
-            {title: 'UDS Runner', href: '/reference/cli/uds-runner/'},
+            { title: 'Istio Ingress', href: '/reference/configuration/ingress' },
+            { title: 'Pepr Policies', href: '/reference/configuration/pepr-policies' },
+            { title: 'UDS Operator', href: '/reference/configuration/uds-operator/overview/' },
+            { title: 'DNS Configuration', href: '/reference/uds-core/dns/' },
         ]
     },
     {
@@ -80,7 +76,6 @@ const sections = [
     }
 ]
 ---
-
 <style>
     :root[data-theme='light'] {
         h1, h2 {
@@ -171,6 +166,24 @@ const sections = [
             }
         }
     }
+    /* Badge styles added inline, matching Starlight's sidebar */
+    .sl-badge.tip {
+        display: inline-block;
+        border: 1px solid hsl(281, 82%, 63%); /* Exact border */
+        border-radius: 0.25rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        line-height: normal; /* Match sidebar line height */
+        color: #fff;
+        background-color: hsl(281, 39%, 22%);
+        overflow-wrap: anywhere;
+        font-size: 0.8125rem;
+        padding: 0.125rem 0.375rem;
+        margin-left: 0.5rem;
+    }
+
+    .sl-badge.small {
+        padding: 0.2rem 0.5rem; /* Adjusted padding */
+    }
 </style>
 
 <StarlightPage frontmatter={frontmatter} hasSidebar={false}>
@@ -181,58 +194,39 @@ const sections = [
                     <Card title={section.title}>
                         <ul >
                             {section.links.map((link) => (
-                                <li><a class="no-underline" href={link.href}>{link.title}</a></li>
+                                <li>
+                                    <a class="no-underline" href={link.href}>
+                                        {link.title}
+                                        {link.badge && (
+                                            <span class={`sl-badge tip small`}> 
+                                                {link.badge.text}
+                                            </span>
+                                        )}
+                                    </a>
+                                </li>
                             ))}
                         </ul>
                     </Card>
                 ))
             }
         </Cardgrid>
-
-        <div class="pt-8 pb-8">
-            <hr/>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-16 items-center">
-            <div class="md:col-span-4">
-                <h2 class="text-left">Pre-integrated, ready-to-deploy solutions</h2>
-                <Image src={airgapAppStore} alt="Airgap App Store"/>
-            </div>
-            <div class="md:col-span-2">
-                <p>
-                    The <a href="https://apps.defenseunicorns.com/" target="_blank">Airgap App Store</a> provides
-                    pre-integrated applications that have been fully configured, tested and validated to work
-                    seamlessly on UDS. These applications are configured to take advantage of UDS's built-in
-                    capabilities which reduce the time and effort required for deployment. This minimizes the need
-                    for customization and ensure that mission-critical applications can be deployed quickly and
-                    securely, to any infrastructure.
-                </p>
-            </div>
-        </div>
-        <LinkCard title="Learn more about the Airgap App Store" href="/airgap-app-store/overview"/>
-    </div>
-    <div class="pt-8 pb-8">
-        <hr/>
     </div>
     <div>
         <h2 class="text-left">Get involved</h2>
         <div>
             <Card title="UDS Core">
                 <p>
-                    UDS Core establishes a secure baseline for cloud-native systems and ships with compliance
-                    documentation and first-class support for airgap/egress-limited systems. UDS Core is a collection
-                    of several individual applications combined into a single Zarf package.
+                        UDS Core provides a secure baseline for cloud-native systems and includes compliance documentation with strong support for airgap environments.
                 </p>
-                <LinkCard title="Go to UDS Core on GitHub" href="https://github.com/defenseunicorns/uds-core"/>
+                    <LinkCard title="Go to UDS Core on GitHub" href="https://github.com/defenseunicorns/uds-core" />
             </Card>
             <Card title="UDS CLI">
                 <p>
-                    UDS CLI provides a mechanism to bundle and deploy multiple, independent Zarf packages.
+                        UDS CLI allows bundling and deploying multiple independent Zarf packages efficiently.
                 </p>
-                <LinkCard title="Go to UDS CLI on GitHub" href="https://github.com/defenseunicorns/uds-cli" target="_blank"/>
+                    <LinkCard title="Go to UDS CLI on GitHub" href="https://github.com/defenseunicorns/uds-cli" target="_blank" />
             </Card>
+            </div>
         </div>
     </div>
 </StarlightPage>
-
-
