@@ -69,7 +69,7 @@ UDS Registry delivers three key benefits:
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/package.tags.png"
+        src="/assets/registry.distribution.png"
         alt="Application/Package page - available version tags"
         style="max-width: 100%; border-radius: 8px;"
       />
@@ -77,7 +77,7 @@ UDS Registry delivers three key benefits:
     <td width="60%" style="vertical-align: top;">
       <ul>
         <li>**Mission Environment Control** - Install only the packages needed for specific scenarios.</li>
-        <li>**ACustomizable Deployments** - Tailor software configurations to mission requirements.</li>
+        <li>**Customizable Deployments** - Tailor software configurations to mission requirements.</li>
         <li>**Contract-Based Access** - Control package distribution based on user permissions/Organization level entitlementsy.</li>
         <li>**Bundle Creation** - Group packages for specific mission scenarios or deployments.</li>
       </ul>
@@ -90,7 +90,7 @@ UDS Registry delivers three key benefits:
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/package.tags.png"
+        src="/assets/on.prem.png"
         alt="Application/Package page - available version tags"
         style="max-width: 100%; border-radius: 8px;"
       />
@@ -100,6 +100,7 @@ UDS Registry delivers three key benefits:
         <li>**Single Source of Truth** - Access all available UDS packages from one secure location.</li>
         <li>**Version Control** - Track and manage multiple package versions with complete history.</li>
         <li>**Edge Environment Support** - Optimize for tactical edge operations.</li>
+        <li>**Reproducible Configurations** - Save and reuse deployment configurations.</li>
       </ul>
     </td>
   </tr>
