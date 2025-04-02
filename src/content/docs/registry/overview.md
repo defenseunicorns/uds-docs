@@ -3,7 +3,7 @@ title: Registry Overview
 sidebar:
   order: 1
 ---
-UDS Registry is an OCI-compliant registry specifically designed for the Department of Defense (DoD) to manage and deploy UDS packages to any mission environment. This centralized, security-focused system helps you discover, distribute, and deploy your team's mission applications onto our DoD-compliant platform UDS Core while preserving critical security metadata throughout the software delivery lifecycle.
+UDS Registry is an OCI-compliant registry specifically designed for the Department of Defense (DoD) to manage and deploy UDS packages to any mission environment. This centralized, security-focused system helps you discover, distribute, and deploy your team's mission applications onto our DoD-compliant platform [UDS Core](https://uds.defenseunicorns.com/reference/uds-core/overview/) while preserving critical security metadata throughout the software delivery lifecycle.
 
 **UDS Registry delivers three key benefits:**
 - Reduces time to deployment through streamlined package management
@@ -136,18 +136,17 @@ We offer two ways to begin using the UDS Registry:
 - See how the UDS Registry can enhance your deployment workflows
 
 ### Deploy Your Own Registry
-- Contact Our Team - Reach out to discuss adding UDS Registry to your environment without UDS Premium liscense.
-- Get personalized guidance on implementation options
-- Discover how a dedicated registry can address your specific mission needs
+- Discover how a dedicated registry can address your specific mission needs.
+- Discuss adding UDS Registry to your environment with UDS Premium.
 
-Contact our solutions team at hello@defenseunicorns.com to schedule a consultation.
+Contact our solutions team at hello@defenseunicorns.com to get personalized guidance on implementation options.
 
 ## Related Documentation
-Why UDS
-Mission and Technical Relevance
-UDS Packages
-UDS Security Overview
-Published Package Flavors
+[Why UDS](https://uds.defenseunicorns.com/overview/why-uds/)<br>
+[Mission and Technical Relevance](https://uds.defenseunicorns.com/overview/uds-mission-relevance/)<br>
+[UDS Packages](https://uds.defenseunicorns.com/structure/packages/)<br>
+[UDS Security Overview](https://uds.defenseunicorns.com/security/overview/)<br>
+[Published Package Flavors](https://uds.defenseunicorns.com/reference/deployment/flavors/)<br>
 
 ## Support
 For assistance with the UDS Registry, contact the UDS support team at hello@defenseunicorns.com or through the internal support channels.
