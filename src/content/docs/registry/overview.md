@@ -5,7 +5,7 @@ sidebar:
 ---
 UDS Registry is an OCI-compliant registry specifically designed for the Department of Defense (DoD) to manage and deploy UDS packages to any mission environment. This centralized, security-focused system helps you discover, distribute, and deploy your team's mission applications onto our DoD-compliant platform UDS Core while preserving critical security metadata throughout the software delivery lifecycle.
 
-UDS Registry delivers three key benefits:
+**UDS Registry delivers three key benefits:**
 - Reduces time to deployment through streamlined package management
 - Consolidates CVE & Software Bill of Materials (SBOM) data for comprehensive security & compliance visibility
 - Simplifies procurement by providing clear access and dissemination of authorized packages
@@ -32,12 +32,12 @@ UDS Registry delivers three key benefits:
     </td>
     <td width="60%" style="vertical-align: top;">
       <ul>
-        <li> **Single Source of Truth** - Access all available UDS packages from one secure location.</li>
-        <li> **Version Control** - Track and manage multiple package versions with complete history.</li>
-        <li> **Multiple Image Flavors** - Support for different image flavors (Upstream, Iron Bank, Unicorn)y.</li>
-        <li> **Cross-Architecture Support** - Full compatibility with both ARM64 and AMD64 architectures.</li>
-        <li> **Comprehensive Metadata** - Preserve security information, dependencies, and deployment requirements.</li>
-        <li> **Intuitive Search & Discovery** - Find relevant packages quickly with powerful filtering and search capabilities.</li>
+        <li> <strong>Single Source of Truth</strong> - Access all available UDS packages from one secure location.</li>
+        <li> <strong>Version Control</strong> - Track and manage multiple package versions with complete history.</li>
+        <li> <strong>Multiple Image Flavors</strong> - Support for different image flavors (Upstream, Iron Bank, Unicorn)y.</li>
+        <li> <strong>Cross-Architecture Support</strong> - Full compatibility with both ARM64 and AMD64 architectures.</li>
+        <li> <strong>Comprehensive Metadata</strong> - Preserve security information, dependencies, and deployment requirements.</li>
+        <li> <strong>Intuitive Search & Discovery</strong> - Find relevant packages quickly with powerful filtering and search capabilities.</li>
       </ul>
     </td>
   </tr>
@@ -55,10 +55,10 @@ UDS Registry delivers three key benefits:
     </td>
     <td width="60%" style="vertical-align: top;">
       <ul>
-        <li> **CVE Tracking** - Monitor security vulnerabilities across all packages.</li>
-        <li> **Metadata Preservation** - Maintain critical security information throughout deployment.</li>
-        <li> **Compliance Validation** - Verify packages against DoD security standards.</li>
-        <li> **Vulnerability Management** - Identify and address security risks proactively.</li>
+        <li> <strong>CVE Tracking</strong> - Monitor security vulnerabilities across all packages.</li>
+        <li> <strong>Metadata Preservation</strong> - Maintain critical security information throughout deployment.</li>
+        <li> <strong>Compliance Validation</strong> - Verify packages against DoD security standards.</li>
+        <li> <strong>Vulnerability Managemen</strong> - Identify and address security risks proactively.</li>
       </ul>
     </td>
   </tr>
@@ -76,10 +76,10 @@ UDS Registry delivers three key benefits:
     </td>
     <td width="60%" style="vertical-align: top;">
       <ul>
-        <li> **Mission Environment Control** - Install only the packages needed for specific scenarios.</li>
-        <li> **Customizable Deployments** - Tailor software configurations to mission requirements.</li>
-        <li> **Contract-Based Access** - Control package distribution based on user permissions/Organization level entitlementsy.</li>
-        <li> **Bundle Creation** - Group packages for specific mission scenarios or deployments.</li>
+        <li> <strong>Mission Environment Control</strong> - Install only the packages needed for specific scenarios.</li>
+        <li> <strong>Customizable Deployments</strong> - Tailor software configurations to mission requirements.</li>
+        <li> <strong>Contract-Based Access</strong> - Control package distribution based on user permissions/Organization level entitlementsy.</li>
+        <li> <strong>Bundle Creation</strong> - Group packages for specific mission scenarios or deployments.</li>
       </ul>
     </td>
   </tr>
@@ -97,10 +97,10 @@ UDS Registry delivers three key benefits:
     </td>
     <td width="60%" style="vertical-align: top;">
       <ul>
-        <li>**Single Source of Truth** - Access all available UDS packages from one secure location.</li>
-        <li>**Version Control** - Track and manage multiple package versions with complete history.</li>
-        <li>**Edge Environment Support** - Optimize for tactical edge operations.</li>
-        <li>**Reproducible Configurations** - Save and reuse deployment configurations.</li>
+        <li><strong>Single Source of Truth</strong> - Access all available UDS packages from one secure location.</li>
+        <li><strong>Version Control</strong> - Track and manage multiple package versions with complete history.</li>
+        <li><strong>Edge Environment Support</strong> - Optimize for tactical edge operations.</li>
+        <li><strong>Reproducible Configurations</strong> - Save and reuse deployment configurations.</li>
       </ul>
     </td>
   </tr>
