@@ -3,7 +3,7 @@
 TARGET_DIR="src/content/docs/"
 
 repos=(
-    "https://github.com/defenseunicorns/uds-core/ main ./temp/uds-core"
+    "https://github.com/defenseunicorns/uds-core/ 394-recovering_last_keycloak_admin_password ./temp/uds-core"
     "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config"
     "https://github.com/defenseunicorns/uds-cli main ./temp/cli"
 )
