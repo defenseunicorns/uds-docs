@@ -40,9 +40,8 @@ The tooling may change but UDS provides: Identity & Authorization, Metrics Serve
 ### Identity and Access Management (IdAM): 
 * Keycloak provides centralized authentication, enabling single sign-on (SSO) and role-based access control (RBAC) to restrict access to authorized users.
 
-### Custom Resource Policies:
-* [Pepr](https://pepr.dev/) enables the creation of type-safe policies and operators, ensuring security baselines are
-enforced automatically within Kubernetes clusters.
+### Workload Policies:
+* [Pepr](https://pepr.dev/) is used to enforce policies on cluster workloads, following best practices like the [Kubernetes Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) and [Big Bang's Kyverno Policies](https://docs-bigbang.dso.mil/latest/packages/kyverno-policies/docs/policies/). Pepr mutations are also used to force workloads into compliance where possible.
 
 ### Software Composition Analysis:
 * UDS continuously monitors the software supply chain, ensuring only verified components are deployed.
