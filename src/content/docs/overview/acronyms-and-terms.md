@@ -31,7 +31,7 @@ UDS Core is a collection of several individual applications combined into a sing
 A UDS Bundle is the fundamental building block of UDS. Each bundle is comprised of one or more UDS Applications or Packages that are grouped to enable a key part of the mission. These bundles provide a structured approach to assembling capabilities and enable the effective deployment of mission-oriented functionalities.
 
 ### Declarative Baseline
-A declarative baseline is an explicit specification of the desired configuration and deployment of software components. Users may use declarative baselines to create a Zarf Package or UDS Bundle in UDS to precisely define what is intended to be deployed. The term "baseline" is used to emphasize that this declaration serves as the foundation for the final configuration, ensuring that the end-state matches the stated intentions.
+A declarative baseline is an explicit specification of the desired configuration and deployment of software components. Users may use declarative baselines to create a Zarf Package or UDS Bundle to precisely define what is intended to be deployed. The term "baseline" is used to emphasize that this declaration serves as the foundation for the final configuration, ensuring that the end-state matches the stated intentions.
 
 ### Authority to Operate
 Authority to Operate (ATO) is a formal declaration that a system or application meets specific security requirements and is approved to operate in a given environment. Achieving ATO demonstrates compliance with regulations and standards, providing assurance that the system has undergone rigorous security testing and validation.
@@ -44,9 +44,9 @@ NIST Open Security Controls Assessment Language (OSCAL) simplifies the process o
 
 ### Flavor (as in UDS Package or Bundle flavor)
 
-UDS Packages and so bundles include docker images from someone's registries. Per mission-hero preference we can typically pull from one of three sources:
+UDS Packages and Bundles include docker images from someone's registries. Per mission-hero preference we can typically pull from one of three sources:
 
-1. [Chainguard](https://www.chainguard.dev/). They are the best option when available, with the fastest response time to new CVEs, lowest CVE counts, and _the_ leader in the field. This flavor is denoted in source code as `unicorn` because we are proud offer their images as the best unicorn-level images that are.
+1. [Chainguard](https://www.chainguard.dev/). They are the best option when available, with the fastest response time to new CVEs, lowest CVE counts, and _the_ leader in the field. This flavor is denoted in source code as `unicorn` because we are proud to offer their images as top-tier _unicorn-level_ quality.
 2. Platform One's Ironbank. This image source is often required on DoD contracts. The flavor is denoted in source code as `registry1`.
 3. The vendor's image registry. We refer to the vendor-flavor as `upstream`.
 
