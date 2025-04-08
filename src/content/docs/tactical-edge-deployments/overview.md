@@ -3,7 +3,8 @@ title: Tactical Edge Overview
 sidebar:
   order: 1
 ---
-UDS Tactical Edge brings our proven secure software delivery platform, UDS, to the most challenging operational environments. Deploy Kubernetes directly to any weapon or platform  from small remote devices with resource constraints to the DoD’s next-generation weapon systems and platforms.
+
+UDS Tactical Edge brings our proven secure software delivery platform, UDS, to the most challenging operational environments. Deploy Kubernetes directly to anything from small remote devices with resource constraints to the DoD’s next-generation weapon systems and platforms.
 
 - Limited resources needed (2GB RAM, such as a Raspberry Pi 5)
 - Applications can run with or without connectivity - a fully airgapped solution
@@ -11,13 +12,15 @@ UDS Tactical Edge brings our proven secure software delivery platform, UDS, to t
 
 UDS Tactical Edge ensures your critical operations have the same secure and efficient software delivery capabilities in the field that you expect in enterprise environments.
 
-To learn more watch this product explainer video.
+To learn more watch this product explainer video. [**Contact us**](https://defenseunicorns.com/contactus) if you want to see how we can help your mission.
+
 
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
   <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/qbv0fc5Zxec?si=M_u3KjjTGHTm7Xqk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 ## One-to-Many Fleet Management
+
 <table>
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
@@ -37,6 +40,7 @@ To learn more watch this product explainer video.
 </table>
 
 ## Integrate Once, Deploy Anywhere
+
 <table>
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
@@ -56,6 +60,7 @@ To learn more watch this product explainer video.
 </table>
 
 ## Built for Combat Operations
+
 <table>
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
@@ -75,6 +80,7 @@ To learn more watch this product explainer video.
 </table>
 
 ## Airgapped, Mission Applications
+
 <table>
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
@@ -94,6 +100,7 @@ To learn more watch this product explainer video.
 </table>
 
 ## Real-World Applications
+
 To get a better idea of UDS Tactical Edge watch this real-world demonstration.
 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
   <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/xZ3T9ePwa3U?si=jgnFIwd8Ap8qLY8a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -111,8 +118,6 @@ To get a better idea of UDS Tactical Edge watch this real-world demonstration.
 | **Expeditionary & Tactical Operation Centers** | Forward bases require self-sustaining software environments that can operate independently for extended periods. | UDS delivers hardened, containerized mission applications with automated sustainment capabilities, reducing dependency on external IT support. This approach enables supporting software factories at the enterprise level and applications at the edge level. |
 | **DevSecOps & CI/CD for Tactical Edge** | Traditional software updates are slow, manual, and expensive, increasing lifecycle costs and limiting adaptability. | UDS provides a declarative deployment model, ensuring that what you develop and test will behave consistently in a production environment. |
 
-
 <div align="center">
-    <strong>For a 1:1 consultation, contact:</strong><br />
-    <a href="mailto:sales@defenseunicorns.com">hello@defenseunicorns.com</a>
+    <strong>For a 1:1 consultation, <a href="https://defenseunicorns.com/contactus" target="_blank">contact us.</strong>
 </div>
