@@ -9,23 +9,27 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
 - Reduces time to deployment through streamlined package management
 - Consolidates CVE & Software Bill of Materials (SBOM) data for comprehensive security & compliance visibility
 - Simplifies procurement by providing clear access and dissemination of authorized packages
-    
-<td width="40%" style="vertical-align: middle; text-align: center;">
+
+<table>
+  <tr>
+    <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/registry.ui.catalog.png"
+        src="/assets/Registry.ui.catalog.png"
         alt="UDS Runtime UI - Application Catalog Page"
         style="max-width: 100%; border-radius: 8px;"
       />
-</td>
-
-## Key Feautures
+    </td>
+  </tr>
+</table> 
+    
+## Key Features
 
 ### Centralized Package Management
 <table>
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/package.tags.png"
+        src="/assets/Package.tags.png"
         alt="Application/Package page - available version tags"
         style="max-width: 100%; border-radius: 8px;"
       />
@@ -58,7 +62,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
         <li> <strong>CVE Tracking</strong> - Monitor security vulnerabilities across all packages.</li>
         <li> <strong>Metadata Preservation</strong> - Maintain critical security information throughout deployment.</li>
         <li> <strong>Compliance Validation</strong> - Verify packages against DoD security standards.</li>
-        <li> <strong>Vulnerability Managemen</strong> - Identify and address security risks proactively.</li>
+        <li> <strong>Vulnerability Management</strong> - Identify and address security risks proactively.</li>
       </ul>
     </td>
   </tr>
@@ -90,7 +94,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/on.prem.png"
+        src="/assets/on-prem.png"
         alt="Application/Package page - available version tags"
         style="max-width: 100%; border-radius: 8px;"
       />
