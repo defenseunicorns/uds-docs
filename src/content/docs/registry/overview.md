@@ -73,7 +73,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/UDS_UpdatedDistribution_Apr2025.png"
+        src="src/assets/UDS_UpdatedDistribution_Apr2025.png"
         alt="Application/Package page - available version tags"
         style="max-width: 100%; border-radius: 8px;"
       />
