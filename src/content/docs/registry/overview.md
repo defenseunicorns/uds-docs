@@ -12,7 +12,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
 
 <table>
   <tr>
-    <td width="40%" style="vertical-align: middle; text-align: center;">
+    <td width="100%" style="vertical-align: middle; text-align: center;">
       <img
         src="/assets/Registry.ui.catalog.png"
         alt="UDS Runtime UI - Application Catalog Page"
@@ -38,7 +38,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
       <ul>
         <li> <strong>Single Source of Truth</strong> - Access all available UDS packages from one secure location.</li>
         <li> <strong>Version Control</strong> - Track and manage multiple package versions with complete history.</li>
-        <li> <strong>Multiple Image Flavors</strong> - Support for different image flavors (Upstream, Iron Bank, Unicorn)y.</li>
+        <li> <strong>Multiple Image Flavors</strong> - Support for different image flavors (Upstream, Iron Bank, Unicorn).</li>
         <li> <strong>Cross-Architecture Support</strong> - Full compatibility with both ARM64 and AMD64 architectures.</li>
         <li> <strong>Comprehensive Metadata</strong> - Preserve security information, dependencies, and deployment requirements.</li>
         <li> <strong>Intuitive Search & Discovery</strong> - Find relevant packages quickly with powerful filtering and search capabilities.</li>
@@ -82,7 +82,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
       <ul>
         <li> <strong>Mission Environment Control</strong> - Install only the packages needed for specific scenarios.</li>
         <li> <strong>Customizable Deployments</strong> - Tailor software configurations to mission requirements.</li>
-        <li> <strong>Contract-Based Access</strong> - Control package distribution based on user permissions/Organization level entitlementsy.</li>
+        <li> <strong>Contract-Based Access</strong> - Control package distribution based on user permissions/Organization level entitlements.</li>
         <li> <strong>Bundle Creation</strong> - Group packages for specific mission scenarios or deployments.</li>
       </ul>
     </td>
