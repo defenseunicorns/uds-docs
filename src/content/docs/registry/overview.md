@@ -12,8 +12,8 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
     
 <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/source/assets/registry.ui.catalog.png"
-        alt="UDS Runtime UI - Applicatino Catalog Page"
+        src="/assets/registry.ui.catalog.png"
+        alt="UDS Runtime UI - Application Catalog Page"
         style="max-width: 100%; border-radius: 8px;"
       />
 </td>
@@ -47,7 +47,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
 <table>
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
-      <imgpackage 
+      <img 
         src="/assets/package.vulnerabilities.png"
         alt="Application/Package page - vulnerabilities"
         style="max-width: 100%; border-radius: 8px;"
@@ -69,7 +69,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
   <tr>
     <td width="40%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/registry.distribution.png"
+        src="/assets/UDS_UpdatedDistribution_Apr2025.png"
         alt="Application/Package page - available version tags"
         style="max-width: 100%; border-radius: 8px;"
       />
