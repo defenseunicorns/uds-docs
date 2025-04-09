@@ -14,7 +14,7 @@ UDS Registry is an OCI-compliant registry specifically designed for the Departme
   <tr>
     <td width="100%" style="vertical-align: middle; text-align: center;">
       <img
-        src="/assets/Registry.ui.catalog.png"
+        src="/assets/registry-ui-catalog"
         alt="UDS Runtime UI - Application Catalog Page"
         style="max-width: 100%; border-radius: 8px;"
       />
