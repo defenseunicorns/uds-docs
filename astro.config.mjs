@@ -132,6 +132,14 @@ export default defineConfig({
                 collapsed: true,
                 badge: { text: 'New!', variant: 'tip' }
             },
+            {
+                label: 'UDS Registry',
+                autogenerate: {
+                    directory: 'registry'
+                },
+                collapsed: true,
+                badge: { text: 'New!', variant: 'tip' }
+            },
         ],
     }), tailwind({
             applyBaseStyles: false
