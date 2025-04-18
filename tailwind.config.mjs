@@ -1,4 +1,3 @@
-// tailwind.config.mjs
 import { starlightTailwind } from '@astrojs/starlight-tailwind';
 
 /** @type {import('tailwindcss').Config} */
