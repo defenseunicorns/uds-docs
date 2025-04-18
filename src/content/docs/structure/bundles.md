@@ -55,7 +55,4 @@ reliable results in various scenarios. This adaptability makes UDS Bundles suita
 
 ### Security and Compliance
 
-UDS Bundles incorporate OSCAL (Open Security Controls Assessment Language) validation capabilities to ensure compliance with security standards during the deployment process. OSCAL validation scans the configuration settings, access controls, and network policies of the cloud environment to identify any deviations from the expected security baselines. Any non-compliant configurations are flagged, allowing users to promptly address and remediate potential security risks. Each UDS Bundle comes with a comprehensive document outlining all the controls available for applications running
-within the bundle. These controls encompass a range of functionalities, including security measures and configuration
-requirements. The documentation ensures the proper configuration of applications and facilitates the inheritance of
-controls within the UDS Bundle.
+UDS Bundles include SBOMs for all included packages, including anything that [Zarf](https://docs.zarf.dev/ref/sboms/) has pulled and packaged. When using and integrating your bundle with UDS Core, you also benefit from compliance and security standards that are automatically handled for you during deployment, such as network policies and pod security policies. For additional details on the security protection provided by UDS see the [Security Overview section](/security/overview/).
