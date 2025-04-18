@@ -74,9 +74,13 @@ export default defineConfig({
             Head: './src/components/Head.astro',
             ThemeProvider: './src/components/ThemeProvider.astro'
         },
-        social: {
-            github: 'https://github.com/defenseunicorns'
-        },
+        social: [
+            {
+                icon: 'github',
+                href: 'https://github.com/defenseunicorns/uds-docs',
+                label: 'GitHub'
+            }
+        ],
         sidebar: [
             {
                 label: 'Home',
