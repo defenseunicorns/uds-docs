@@ -46,19 +46,17 @@ The UDS Bundle being deployed in this example is the
 [`k3d-core-demo`](https://github.com/defenseunicorns/uds-core/blob/main/bundles/k3d-standard/README.md) bundle, which 
 creates a local k3d cluster with UDS Core installed.
 
-To deploy this bundle, run the `uds deploy k3d-core-demo:X.X.X` command in the terminal, replacing the "X" with the 
-current release. 
-For example, if the current release is `0.26.0`:
+To deploy this bundle, run the `uds deploy k3d-core-demo:latest` command in the terminal:
 
 ```bash
-uds deploy k3d-core-demo:0.26.0
+uds deploy k3d-core-demo:latest
 
 # deploy this bundle?
 y
 ```
 
 :::note
-You can view all versions of the package 
+You can also deploy a specific version of the bundle, see all versions of the bundle 
 [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-demo).
 :::
 
@@ -90,14 +88,14 @@ In addition to the demo bundle, there is also a
 [`k3d-slim-dev bundle`](https://github.com/defenseunicorns/uds-core/tree/main/bundles/k3d-slim-dev) designed specifically 
 for working with UDS Core with *only* Istio, Keycloak, and Pepr installed. To use it, execute the following command:
 
-:::note
-Again, be sure to specify the version. The latest version as of this writing is 0.26.0. You can view all versions of the
-package [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-slim-dev).
-:::
-
 ```bash
-uds deploy k3d-core-slim-dev:X.X.X
+uds deploy k3d-core-slim-dev:latest
 ```
+
+:::note
+You can also deploy a specific version of the bundle, see all versions of the
+bundle [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-slim-dev).
+:::
 
 ## Developing UDS Core
 
