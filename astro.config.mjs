@@ -77,7 +77,7 @@ export default defineConfig({
         social: [
             {
                 icon: 'github',
-                href: 'https://github.com/defenseunicorns/uds-docs',
+                href: 'https://github.com/defenseunicorns/uds-core',
                 label: 'GitHub'
             }
         ],
