@@ -135,7 +135,7 @@ After installation, you can follow OS-specific steps below.
         :::caution
         Your computer needs to be running Windows 10 version 2004 and higher (Build 19041 and higher) or Windows 11.
         If you are on an older build, there are manual installation steps for older versions of WSL available
-        [here](https://learn.microsoft.com/en-us/windows/wsl/install-manual).
+        [here](https://learn.microsoft.com/en-us/windows/wsl/install-manual). 
         :::
 
         #### Overview
@@ -165,6 +165,12 @@ After installation, you can follow OS-specific steps below.
         command in the Ubuntu terminal:
 
         `sudo apt update && sudo apt upgrade`
+
+        :::caution
+        Based on end user reports you may need to be on a Linux kernel version of 6.6.x+ in order to have the required
+        kernel modules for Istio (see [prerequisite documentation](https://uds.defenseunicorns.com/reference/uds-core/prerequisites/#istio)).
+        You can update your kernel to the latest prerelease version using `wsl --update --pre-release`.
+        :::
 
         #### WSL Configurations
         By default, WSL will have access 100% of your system's CPU cores and 50% of your memory/RAM.  If you need to
