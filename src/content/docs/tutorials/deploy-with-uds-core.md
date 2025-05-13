@@ -115,7 +115,7 @@ packages:
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
-    ref: 0.34.0-upstream
+    ref: 0.42.0-upstream
     # Set overrides for Keycloak SSO tutorial
     overrides:
       keycloak:

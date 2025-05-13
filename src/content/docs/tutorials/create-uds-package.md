@@ -133,7 +133,7 @@ spec:
           app.kubernetes.io/name: podinfo
         gateway: tenant
         host: podinfo
-        port: 9898  
+        port: 9898
   # SSO allows for the creation of Keycloak clients and with automatic secret generation and protocolMappers
   sso:
     - name: Podinfo SSO
@@ -145,7 +145,7 @@ spec:
       groups:
         anyOf:
           - "/UDS Core/Admin"
-```          
+```
 
 Save the file and apply the changes:
 
@@ -156,6 +156,7 @@ kubectl apply -f podinfo-package.yaml
 The package will now show the `uds-core-podinfo` client under `SSO CLIENTS`:
 
 ```bash
+kubectl get package -n podinfo
 NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS                                      NETWORK POLICIES   AGE
 podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   ["podinfo-podmonitor","podinfo-svcmonitor"]   9                  10m
 ```
@@ -164,7 +165,7 @@ podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   ["podinfo-podmon
 Notice how the count under `NETWORK POLICIES` has increased. The UDS Operator recognized that additional `NetworkPolicies` were required for Keycloak to communicate with `podinfo`, so it automatically created additional `NetworkPolicies` to allow that.
 :::
 
-When navigating to `podinfo.uds.dev`, you will be redirected to a login screen. Only users that are members of the `UDS Core/Admin` group in Keycloak are permitted to access the site. Run the `create-doug-user` task with the UDS CLI to create a test user that is part of the `/UDS Core/Admin` group:
+When navigating to `podinfo.uds.dev`, you will be redirected to a login screen. Only users that are members of the `/UDS Core/Admin` group in Keycloak are permitted to access the site. Run the `create-doug-user` task with the UDS CLI to create a test user that is part of the `/UDS Core/Admin` group:
 
 ```bash
 uds run common-setup:create-doug-user --set KEYCLOAK_GROUP="/UDS Core/Admin"
@@ -191,7 +192,7 @@ spec:
           app.kubernetes.io/name: podinfo
         gateway: tenant
         host: podinfo
-        port: 9898  
+        port: 9898
   # SSO allows for the creation of Keycloak clients and with automatic secret generation and protocolMappers
   sso:
     - name: Podinfo SSO
@@ -215,7 +216,7 @@ spec:
       targetPort: 9898
       portName: http
       description: "svcmonitor"
-      kind: ServiceMonitor          
+      kind: ServiceMonitor
 ```
 
 Save the file and apply the changes:
