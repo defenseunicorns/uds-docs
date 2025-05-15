@@ -90,6 +90,13 @@ NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS   NETWO
 podinfo   Ready    []                     ["podinfo.uds.dev"]   []         7                  60s
 ```
 
+View the pods. Notice how the podinfo pod has an additional container as a result of the UDS Operator configuring istio:
+```bash
+kubectl get pods -n podinfo
+NAME                           READY   STATUS    RESTARTS   AGE
+podinfo-5cbbf59f6d-bqhsk       2/2     Running   0          2m
+```
+
 Observe the Istio VirtualService that the UDS Operator created:
 
 ```bash

@@ -49,10 +49,7 @@ components:
 
 Re-run the `zarf package create` and `uds create` commands to generate new artifacts that now include the `Package` Custom Resource for `podinfo`. From there, the bundle can be re-deployed and `podinfo` will be automatically integrated with UDS Core.
 
-#### Clean up
 
-Execute the following command to clean up your cluster:
+#### Next Steps
 
-```bash
-k3d cluster delete uds
-```
+(Optional) This tutorial deployed podinfo in Istio Sidecar mode - the default deployment method for applications in UDS Core. UDS Core releases v0.39.0 and later added support for Istio Ambient Mesh. To walkthrough migrating the podinfo to Istio Ambient Mesh using the UDS Operator, continue to the next tutorial. 
