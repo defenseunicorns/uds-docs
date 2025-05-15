@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-The UDS Operator supports automatically integrating your application with Istio Ambient Mesh. It even supports automically migrating your workfload from Istio Sidecars to Ambient mode if you are updating an existing application.
+The UDS Operator supports automatically integrating your application with Istio Ambient Mesh. It also supports automically migrating your workfload from Istio Sidecars to Ambient mode if you are upgrading an existing application.
 
 For the sake of this tutorial, we will cover migrating the podinfo application that was deployed in the previous tutorials to Ambient mode.
 
@@ -36,7 +36,7 @@ NAME                           READY   STATUS    RESTARTS   AGE
 podinfo-5cbbf59f6d-bqhsk       2/2     Running   0          2m
 ```
 
-By default, UDS Core ships with all required components to support both Istio Sidecar mode and Ambient mode starting in release v0.39.0 and onward. For the sake of this tutorial, this means that migrating the podinfo to Istio Ambient mode is as simple as making a single change to the Package Custom Resource.
+By default, UDS Core ships with all required components to support both Istio Sidecar mode and Ambient mode starting in release v0.39.0 and onward. That means that migrating the podinfo to Istio Ambient mode is as simple as making a single change to the Package Custom Resource.
 
 In the Package Custom Resource definition, add a new entry for `spec.network.serviceMesh.mode: ambient`:
 ```yaml
@@ -74,7 +74,7 @@ spec:
 ```
 
 :::note
-Authservice Clients are currently not supported in Ambient mode. As a result, the SSO configuration above was removed.
+Authservice Clients are currently not supported in Ambient mode. As a result, the SSO configuration above was removed. You can track the status of this feature [here](https://github.com/defenseunicorns/uds-core/issues/1200).
 :::
 
 Save your changes and re-apply the Package Custom Resource.
@@ -87,7 +87,7 @@ NAME      STATUS   AGE    LABELS
 podinfo   Active   120m   app.kubernetes.io/managed-by=zarf,istio.io/dataplane-mode=ambient,kubernetes.io/metadata.name=podinfo
 ```
 
-This label tells Istio that all workloads in the `podinfo` namespace will use Ambient mode.
+The `istio.io/dataplane-mode=ambient` label tells Istio that all workloads in the `podinfo` namespace will use Ambient mode.
 
 Next, the operator performed a rolling restart of the podinfo application. This is required to decommision the sidecar that was previously present:
 ```bash
