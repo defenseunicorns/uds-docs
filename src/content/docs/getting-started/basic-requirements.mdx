@@ -166,6 +166,12 @@ After installation, you can follow OS-specific steps below.
 
         `sudo apt update && sudo apt upgrade`
 
+        :::caution
+        Based on end user reports you may need to be on a Linux kernel version of 6.6.x+ in order to have the required
+        kernel modules for Istio (see [prerequisite documentation](https://uds.defenseunicorns.com/reference/uds-core/prerequisites/#istio)).
+        You can update your kernel to the latest prerelease version using `wsl --update --pre-release`.
+        :::
+
         #### WSL Configurations
         By default, WSL will have access 100% of your system's CPU cores and 50% of your memory/RAM.  If you need to
         increase the available memory/RAM or change configurations, you will need to create a `.wslconfig` or wsl.config
