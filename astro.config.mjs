@@ -6,8 +6,6 @@ import starlightImageZoom from 'starlight-image-zoom';
 
 import tailwindcss from '@tailwindcss/vite';
 
-import tailwindcss from '@tailwindcss/vite';
-
 // https://astro.build/config
 export default defineConfig({
     site: 'https://uds.defenseunicorns.com/docs/',
@@ -82,7 +80,7 @@ export default defineConfig({
         social: [
             {
                 icon: 'github',
-                href: 'https://github.com/defenseunicorns/uds-docs',
+                href: 'https://github.com/defenseunicorns/uds-core',
                 label: 'GitHub'
             }
         ],
