@@ -5,7 +5,6 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 /* Dark mode colors (default) */
-/* Dark mode colors (default) */
 :root {
     --sl-content-width: 50rem;
     color-scheme: dark;
