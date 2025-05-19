@@ -91,7 +91,7 @@ metadata:
 packages:
   - name: uds-k3d
     repository: ghcr.io/defenseunicorns/packages/uds-k3d
-    ref: 0.8.0
+    ref: 0.14.0
     overrides:
       uds-dev-stack:
         minio:

@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-The UDS Operator supports automatically integrating your application with Istio Ambient Mesh. It also supports automically migrating your workfload from Istio Sidecars to Ambient mode if you are upgrading an existing application.
+The UDS Operator supports automatically integrating your application with Istio Ambient Mesh. It also supports automatically migrating your workfload from Istio Sidecars to Ambient mode if you are upgrading an existing application.
 
 For the sake of this tutorial, we will cover migrating the podinfo application that was deployed in the previous tutorials to Ambient mode.
 
@@ -15,16 +15,15 @@ Istio Ambient Mode was added in UDS Core v0.39.0. Please ensure you are running 
 Run `zarf package list` and check the version number for the `core-base` package:
 ```bash
 zarf package list
-     Package                     | Version | Components
-     core-base                   | 0.42.0  | [uds-operator-config prometheus-operator-crds pepr-uds-core istio-controlplane gateway-api-crds istio-admin-gateway istio-tenant-gateway]
-     core-identity-authorization | 0.42.0  | [keycloak authservice]
-     init                        | v0.54.0 | [zarf-injector zarf-seed-registry zarf-registry zarf-agent]
-     podinfo                     |         | [podinfo]
-     uds-k3d-dev                 | 0.13.0  | [destroy-cluster create-cluster uds-dev-stack]
+     Package | Version | Components
+     core    | 0.42.0  | [uds-operator-config prometheus-operator-crds pepr-uds-core istio-controlplane gateway-api-crds istio-admin-gateway istio-tenant-gateway keycloak neuvector loki kube-prometheus-stack vector grafana authservice velero]
+     init    | v0.42.2 | [zarf-injector zarf-seed-registry zarf-registry zarf-agent]
+     uds-k3d | 0.14.0  | [destroy-cluster create-cluster uds-dev-stack]
+     podinfo |         | [podinfo]
 ```
 
 ### Migrate Podinfo To Istio Ambient Mode
-While not explicitly called out in the previous tutorials, the UDS Operator automatically handled setting up Istio injection for the podinfo application. The default method for Istio Injection is [Sidecar](https://istio.io/latest/docs/reference/config/networking/sidecar/). If you look at the podinfo application and its namespace, you will notice that the UDS Operator added the proper attributes for the workload to be recognized by istio and have sidecar injection enabled:
+While not explicitly called out in the previous tutorials, the UDS Operator automatically handled setting up Istio injection for the podinfo application. The default method for Istio mesh integration in UDS is [Sidecar](https://istio.io/latest/docs/reference/config/networking/sidecar/). If you look at the podinfo application and its namespace, you will notice that the UDS Operator added the proper attributes for the workload to be recognized by istio and have sidecar injection enabled:
 
 ```bash
 kubectl get ns podinfo --show-labels
@@ -79,7 +78,7 @@ Authservice Clients are currently not supported in Ambient mode. As a result, th
 
 Save your changes and re-apply the Package Custom Resource.
 
-Once applied, the UDS Operator will migrate the podinfo workload to Ambient mode by first updating the Istio label the namespace:
+Once applied, the UDS Operator will migrate the podinfo workload to Ambient mode by first updating the Istio label on the namespace:
 
 ```bash
 kubectl get ns podinfo --show-labels
@@ -89,7 +88,7 @@ podinfo   Active   120m   app.kubernetes.io/managed-by=zarf,istio.io/dataplane-m
 
 The `istio.io/dataplane-mode=ambient` label tells Istio that all workloads in the `podinfo` namespace will use Ambient mode.
 
-Next, the operator performed a rolling restart of the podinfo application. This is required to decommision the sidecar that was previously present:
+Next, the operator performed a rolling restart of the podinfo application. This is required to decommission the sidecar that was previously present:
 ```bash
 k get po -n podinfo
 NAME                       READY   STATUS    RESTARTS   AGE
