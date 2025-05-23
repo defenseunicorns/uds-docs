@@ -10,7 +10,7 @@ The UDS Operator supports automatically integrating your application with Istio 
 For the sake of this tutorial, we will cover migrating the podinfo application that was deployed in the previous tutorials to Ambient mode.
 
 ### Prerequisites
-Istio Ambient Mode was added in UDS Core v0.39.0. Please ensure you are running at this version or higher before proceeding.
+Istio Ambient Mode was added in UDS Core v0.40.0. Please ensure you are running at this version or higher before proceeding.
 
 Run `zarf package list` and check the version number for the `core-base` package:
 ```bash
