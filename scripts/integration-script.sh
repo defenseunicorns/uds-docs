@@ -51,3 +51,5 @@ rm -rf temp
 # Remove the dev and adr docs folders if present
 rm -rf "$TARGET_DIR/dev"
 rm -rf "$TARGET_DIR/adr"
+
+# Deploy again
