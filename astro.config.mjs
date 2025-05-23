@@ -37,6 +37,9 @@ export default defineConfig({
         '/cli/command-reference/uds_version/': '/reference/cli/commands/uds_version',
         '/reference/configuration/uds-operator/': '/reference/configuration/uds-operator/overview/',
         '/reference/configuration/uds-user-groups/': '/reference/configuration/single-sign-on/overview/',
+        '/reference/configuration/ingress/': '/reference/configuration/service-mesh/ingress/',
+        '/reference/configuration/non-http-ingress/': '/reference/configuration/service-mesh/non-http-ingress/',
+        '/reference/configuration/authorization-policies/': '/reference/configuration/service-mesh/authorization-policies/',
     },
 
     integrations: [starlight({

@@ -3,7 +3,7 @@
 TARGET_DIR="src/content/docs/"
 
 repos=(
-    "https://github.com/defenseunicorns/uds-core/ main ./temp/uds-core"
+    "https://github.com/defenseunicorns/uds-core/ docs/ambient ./temp/uds-core"
     "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config"
     "https://github.com/defenseunicorns/uds-cli main ./temp/cli"
 )
