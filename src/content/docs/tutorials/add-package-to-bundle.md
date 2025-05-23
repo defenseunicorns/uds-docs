@@ -52,4 +52,4 @@ Re-run the `zarf package create` and `uds create` commands to generate new artif
 
 #### Next Steps
 
-(Optional) This tutorial deployed podinfo in Istio Sidecar mode - the default deployment method for applications in UDS Core. UDS Core releases v0.39.0 and later added support for Istio Ambient Mesh. To walkthrough migrating the podinfo application to Istio Ambient Mesh using the UDS Operator, continue to the next tutorial.
+(Optional) This tutorial deployed podinfo in Istio Sidecar mode - the default deployment method for applications in UDS Core. UDS Core releases v0.40.0 and later added support for Istio Ambient Mesh. To walkthrough migrating the podinfo application to Istio Ambient Mesh using the UDS Operator, continue to the next tutorial.
