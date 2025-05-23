@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-The UDS Operator supports automatically integrating your application with Istio Ambient Mesh. It also supports automatically migrating your workfload from Istio Sidecars to Ambient mode if you are upgrading an existing application.
+The UDS Operator supports automatically integrating your application with Istio Ambient Mesh. It also supports automatically migrating your workload from Istio Sidecars to Ambient mode if you are upgrading an existing application.
 
 For the sake of this tutorial, we will cover migrating the podinfo application that was deployed in the previous tutorials to Ambient mode.
 
