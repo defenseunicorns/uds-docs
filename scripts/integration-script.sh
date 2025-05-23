@@ -51,3 +51,32 @@ rm -rf temp
 # Remove the dev and adr docs folders if present
 rm -rf "$TARGET_DIR/dev"
 rm -rf "$TARGET_DIR/adr"
+
+## this allows for naming directories in lowercase and hyphenated formats, still allows for space formatting
+BASE_DIR="src/content/docs/reference"
+
+# Reverse depth-first directory renaming, preserving acronyms and formatting
+find "$BASE_DIR" -type d ! -path "$BASE_DIR" | awk '{ print length, $0 }' | sort -rn | cut -d" " -f2- | while read -r dir; do
+  base=$(basename "$dir")
+  parent=$(dirname "$dir")
+
+  # Skip if already space-formatted and not hyphenated
+  [[ "$base" == *" "* && "$base" != *"-"* ]] && continue
+
+  # Convert kebab-case to spaced words with acronym support
+  new_base=$(echo "$base" | sed -E 's/-/ /g' | awk '{
+    for (i = 1; i <= NF; i++) {
+      if (tolower($i) == "uds") $i = "UDS";
+      else if (tolower($i) == "idam") $i = "IdAM";
+      else $i = toupper(substr($i,1,1)) substr($i,2)
+    }
+    print
+  }')
+
+  new_path="$parent/$new_base"
+
+  if [ "$dir" != "$new_path" ] && [ ! -e "$new_path" ]; then
+    echo "Renaming: $dir → $new_path"
+    mv "$dir" "$new_path"
+  fi
+done
