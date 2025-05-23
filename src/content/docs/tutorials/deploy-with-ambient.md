@@ -35,7 +35,7 @@ NAME                           READY   STATUS    RESTARTS   AGE
 podinfo-5cbbf59f6d-bqhsk       2/2     Running   0          2m
 ```
 
-By default, UDS Core ships with all required components to support both Istio Sidecar mode and Ambient mode starting in release v0.39.0 and onward. That means that migrating the podinfo to Istio Ambient mode is as simple as making a single change to the Package Custom Resource.
+By default, UDS Core ships with all required components to support both Istio Sidecar mode and Ambient mode starting in release v0.40.0 and onward. That means that migrating the podinfo to Istio Ambient mode is as simple as making a single change to the Package Custom Resource.
 
 In the Package Custom Resource definition, add a new entry for `spec.network.serviceMesh.mode: ambient`:
 ```yaml
