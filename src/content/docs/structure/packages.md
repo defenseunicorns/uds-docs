@@ -210,7 +210,7 @@ components:
   # Unicorn flavor as shown by the 'only' block.
   - name: gitlab
     required: true
-    description: "Deploy gitlab with chainguard images"
+    description: "Deploy gitlab with rapidfort images"
     import:  # See this
       path: common
     only:
@@ -223,10 +223,10 @@ components:
         valuesFiles:
           - values/unicorn-values.yaml  # And this
     images:
-      # And finally the chainguard OCI image URLs 
-      - "cgr.dev/du-uds-defenseunicorns/gitlab-certificates-fips:17.3.6"
+      # And finally the rapidfort OCI image URLs
+      - "quay.io/rfcurated/gitlab/certificates:17.10.5-jammy-scratch-rfcurated"
       ...
-      - "cgr.dev/du-uds-defenseunicorns/gitlab-exporter-fips:17.3.6"
+      - "quay.io/rfcurated/gitlab/gitlab-exporter:17.10.5-15.2.0-jammy-fips-rfcurated"
 ```
 
 #### GitLab's Testing & Development
