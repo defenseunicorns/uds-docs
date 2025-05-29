@@ -46,7 +46,7 @@ NIST Open Security Controls Assessment Language (OSCAL) simplifies the process o
 
 UDS Packages and so bundles include docker images from someone's registries. Per mission-hero preference we can typically pull from one of three sources:
 
-1. [Chainguard](https://www.chainguard.dev/). They are the best option when available, with the fastest response time to new CVEs, lowest CVE counts, and _the_ leader in the field. This flavor is denoted in source code as `unicorn` because we are proud offer their images as the best unicorn-level images that are.
+1. [Rapidfort](https://www.rapidfort.com/). They are the best option when available, with the fastest response time to new CVEs, lowest CVE counts, and _the_ leader in the field. This flavor is denoted in source code as `unicorn` because we are proud offer their images as the best unicorn-level images that are.
 2. Platform One's Ironbank. This image source is often required on DoD contracts. The flavor is denoted in source code as `registry1`.
 3. The vendor's image registry. We refer to the vendor-flavor as `upstream`.
 
