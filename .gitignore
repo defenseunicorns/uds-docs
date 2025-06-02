@@ -32,3 +32,5 @@ src/content/docs/reference/
 
 # temp folder
 temp/
+# Local Netlify folder
+.netlify
