@@ -15,14 +15,13 @@
   const config = {
     api_host: posthogUrl,
     cross_subdomain_cookie: true,
+    ...(distinct_id || session_id ? {
+      bootstrap: {
+        ...(distinct_id ? { distinctID: distinct_id } : {}),
+        ...(session_id ? { sessionID: session_id } : {})
+      }
+    } : {})
   };
-
-  if (distinct_id || session_id) {
-    config.bootstrap = {
-      distinctID: distinct_id,
-      sessionID: session_id
-    };
-  }
 
   posthog.init(posthogKey, config);
 
@@ -31,7 +30,10 @@
   }
 
   document.addEventListener('click', (event) => {
-    const link = event.target.closest('a');
+    const target = event.target as HTMLElement;
+    if (!target) return;
+    
+    const link = target.closest('a');
     if (!link || !link.href) return;
 
     try {
