@@ -1,15 +1,64 @@
 ---
 // See the framework guide here: https://posthog.com/docs/libraries/astro
 ---
-<script type="text/plain" data-category="analytics" data-service="PostHog" is:inline>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init(
-        'phc_FLmxTrtnMEGXleIteYSCtmsyhchqhBJrPcFCGIDtWtr',
-        {
-            api_host:'https://us.i.posthog.com',
-            persistence: 'localStorage+cookie',
-            cookie_domain: '.defenseunicorns.com',
-            person_profiles: 'identified_only'
+
+<script>
+  import posthog from 'posthog-js';
+  
+  const posthogKey = 'phc_bXFVKWRZnEDUWbXQf3VjlAHeemyJDSsTqkpvDINHGFG';
+  const posthogUrl = 'https://us.i.posthog.com';
+  
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const distinct_id = hashParams.get('distinct_id');
+  const session_id = hashParams.get('session_id');
+
+  const config = {
+    api_host: posthogUrl,
+    cross_subdomain_cookie: true,
+  };
+
+  if (distinct_id || session_id) {
+    config.bootstrap = {
+      distinctID: distinct_id,
+      sessionID: session_id
+    };
+  }
+
+  posthog.init(posthogKey, config);
+
+  if (window.location.hash && (distinct_id || session_id)) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a');
+    if (!link || !link.href) return;
+
+    try {
+      const url = new URL(link.href);
+      const currentDomain = window.location.hostname;
+
+      if (url.hostname !== currentDomain) {
+        const distinctId = posthog.get_distinct_id();
+        const sessionId = posthog.get_session_id();
+
+        if (distinctId || sessionId) {
+          event.preventDefault();
+
+          const hashParams = new URLSearchParams();
+          if (distinctId) hashParams.set('distinct_id', distinctId);
+          if (sessionId) hashParams.set('session_id', sessionId);
+
+          const trackedUrl = `${link.href}${link.href.includes('#') ? '&' : '#'}${hashParams.toString()}`;
+
+          if (link.target === '_blank' || event.ctrlKey || event.metaKey) {
+            window.open(trackedUrl, '_blank');
+          } else {
+            window.location.href = trackedUrl;
+          }
         }
-    )
+      }
+    } catch {
+    }
+  });
 </script>
