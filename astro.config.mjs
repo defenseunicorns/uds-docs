@@ -1,6 +1,5 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import starlightDocSearch from '@astrojs/starlight-docsearch';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightImageZoom from 'starlight-image-zoom';
 
@@ -45,12 +44,6 @@ export default defineConfig({
     integrations: [starlight({
         plugins: [
             starlightLinksValidator(),
-            starlightDocSearch({
-                appId: '4RA2E2XHYT',
-                apiKey: 'f3cce33f634f204c0a97446f7c241e03',
-                indexName: 'uds-defenseunicorns',
-                insights: true
-            }),
             starlightImageZoom()
         ],
         defaultLocale: 'root',
