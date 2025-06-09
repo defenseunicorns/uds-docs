@@ -24,6 +24,8 @@
   };
 
   posthog.init(posthogKey, config);
+  
+  (window as any).posthog = posthog;
 
   if (window.location.hash && (distinct_id || session_id)) {
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
