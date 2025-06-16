@@ -6,7 +6,7 @@ sidebar:
 ---
 
 UDS creates, supports, and maintains a secure runtime platform that simplifies software delivery and deployment for both application development
-teams and platform teams. UDS deploys mission applications into any environment while providing documentation and evidence to facilitate obtaining an Authority to Operate (ATO). By leveraging the power of open source projects like Zarf, Pepr, Lula, LeapfrogAI and more, UDS enables the creation of
+teams and platform teams. UDS deploys mission applications into any environment while providing documentation and evidence to facilitate obtaining an Authority to Operate (ATO). By leveraging the power of open source projects like Zarf, Pepr, Lula, and more, UDS enables the creation of
 portable and compliant
 software artifacts.
 
