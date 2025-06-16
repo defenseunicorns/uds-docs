@@ -15,7 +15,9 @@ By leveraging these applications within UDS Core, users can confidently deploy a
 
 At a high level, UDS bundles infrastructure, platform, and mission applications in a way that makes them portable to
 different mission systems and environments. It is an end-to-end solution that establishes and leverages a secure and declarative baseline
-to streamline software delivery. UDS tightly integrates and leverages Defense Unicorns' open source projects: Zarf, Pepr, Lula, and LeapfrogAI. The UDS CLI serves as the interaction point connecting these components, facilitating seamless deployment and security of infrastructure within the UDS platform.
+to streamline software delivery. UDS tightly integrates and leverages Defense Unicorns' open source projects: Zarf,
+Pepr, and Lula. The UDS CLI serves as the interaction point connecting these components, facilitating
+seamless deployment and security of infrastructure within the UDS platform.
 
 ### Zarf
 
@@ -38,7 +40,6 @@ The UDS CLI serves as the primary interface for users to interact with various c
 UDS CLI simplifies deployment by bundling multiple Zarf Packages into a single deployable artifact. This process ensures that UDS Bundles, which encompass infrastructure, platform, and mission applications, can be efficiently deployed within any Mission Hero's system environment. Additionally, the UDS CLI extends its capabilities to Pepr, where multiple Pepr applications are bundled and deployed as a single Pepr Module to support UDS Bundles during runtime.
 
 The UDS CLI is the interaction point for the entire UDS platform and combines and deploys various UDS products. This unified interface allows users to interact with UDS as a comprehensive platform, simplifying the management of mission-critical applications and components.
-
 
 ## UDS Core Capabilities
 
