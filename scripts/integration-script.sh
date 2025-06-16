@@ -65,11 +65,11 @@ find "$BASE_DIR" -type d ! -path "$BASE_DIR" | awk '{ print length, $0 }' | sort
 
   # Convert kebab-case to spaced words with acronym support
   new_base=$(echo "$base" | sed -E 's/-/ /g' | awk '{
-    orig = tolower($0)
-    if (orig == "single sign on") {
-      print "Single Sign-On"
-      next
-    }
+    # orig = tolower($0)
+    # if (orig == "single sign on") {
+    #   print "Single Sign-On"
+    #   next
+    # }
 
     for (i = 1; i <= NF; i++) {
       if (tolower($i) == "uds") $i = "UDS";
