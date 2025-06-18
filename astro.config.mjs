@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightImageZoom from 'starlight-image-zoom';
+import rehypeMermaid from "rehype-mermaid";
 
 import tailwindcss from '@tailwindcss/vite';
 
@@ -39,6 +40,10 @@ export default defineConfig({
         '/reference/configuration/ingress/': '/reference/configuration/service-mesh/ingress/',
         '/reference/configuration/non-http-ingress/': '/reference/configuration/service-mesh/non-http-ingress/',
         '/reference/configuration/authorization-policies/': '/reference/configuration/service-mesh/authorization-policies/',
+    },
+
+    markdown: {
+        rehypePlugins: [rehypeMermaid],
     },
 
     integrations: [starlight({
