@@ -19,6 +19,7 @@
     "@fontsource/teko": "^5.1.1",
     "@tailwindcss/vite": "^4.1.4",
     "astro": "^5.1.3",
+    "playwright": "^1.53.1",
     "rehype-mermaid": "^3.0.0",
     "sharp": "^0.34.0",
     "starlight-image-zoom": "^0.12.0",
