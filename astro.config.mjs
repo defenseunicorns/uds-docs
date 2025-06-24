@@ -5,6 +5,8 @@ import starlightImageZoom from 'starlight-image-zoom';
 
 import tailwindcss from '@tailwindcss/vite';
 
+import d2 from 'astro-d2';
+
 // https://astro.build/config
 export default defineConfig({
     site: 'https://uds.defenseunicorns.com/docs/',
@@ -144,10 +146,9 @@ export default defineConfig({
                 badge: { text: 'New!', variant: 'tip' }
             },
         ],
-    })],
+    }), d2()],
 
     vite: {
         plugins: [tailwindcss()]
     }
 });
-
