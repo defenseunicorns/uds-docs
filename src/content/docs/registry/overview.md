@@ -3,6 +3,8 @@ title: Registry Overview
 sidebar:
   order: 1
 ---
+## Check it Out Now!! [UDS Registry](https://registry.defenseunicorns.com/)
+
 UDS Registry is an OCI-compliant registry specifically designed for the Department of Defense (DoD) to manage and deploy UDS packages to any mission environment. This centralized, security-focused system helps you discover, distribute, and deploy your team's mission applications onto our DoD-compliant platform [UDS Core](https://uds.defenseunicorns.com/reference/uds-core/overview/) while preserving critical security metadata throughout the software delivery lifecycle.
 
 **UDS Registry delivers three key benefits:**
@@ -134,8 +136,8 @@ The UDS Registry builds on standard OCI (Open Container Initiative) protocols, e
 ## Getting Started
 We offer two ways to begin using the UDS Registry:
 
-### Explore Our Public Registry (Coming Soon)
-- View the Public Unicorn Registry - [Link coming soon]
+### Explore Our Public Registry
+- View the Public Unicorn Registry - [UDS Registry](https://registry.defenseunicorns.com/)
 - Browse available packages and explore registry features without authentication
 - See how the UDS Registry can enhance your deployment workflows
 
@@ -143,7 +145,7 @@ We offer two ways to begin using the UDS Registry:
 - Discover how a dedicated registry can address your specific mission needs.
 - Discuss adding UDS Registry to your environment with UDS Premium.
 
-Contact our solutions team at hello@defenseunicorns.com to get personalized guidance on implementation options.
+**[Contact us](https://defenseunicorns.com/registry-inquiry) for more information on how UDS Registry can accelerate your mission!**
 
 ## Related Documentation
 [Why UDS](https://uds.defenseunicorns.com/overview/why-uds/)<br>
