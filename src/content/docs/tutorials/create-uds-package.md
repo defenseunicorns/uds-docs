@@ -7,7 +7,7 @@ sidebar:
 
 ## Background
 
-When UDS Core is deployed into a Kubernetes Cluster, an [operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) is deployed. An operator allows users to extend the functionality of their Kubernetes clusters via [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) and custom controllers. This operator, henceforth known as the UDS Operator, looks for `Package` Custom Resources to be created. When a user creates a `Package` resource, the UDS Operator processes the request and performs the necessary operations to create the package per the [specification](https://github.com/defenseunicorns/uds-core/blob/main/docs/reference/configuration/custom-resources/packages-v1alpha1-cr.md) given.
+When UDS Core is deployed into a Kubernetes Cluster, an [operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) is deployed. An operator allows users to extend the functionality of their Kubernetes clusters via [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) and custom controllers. This operator, henceforth known as the UDS Operator, looks for `Package` Custom Resources to be created. When a user creates a `Package` resource, the UDS Operator processes the request and performs the necessary operations to create the package per the [specification](/reference/configuration/custom-resources/packages-v1alpha1-cr/) given.
 
 Read more about the UDS Operator [here](https://uds.defenseunicorns.com/reference/configuration/uds-operator/).
 
