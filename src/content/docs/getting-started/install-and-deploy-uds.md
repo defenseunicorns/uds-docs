@@ -97,6 +97,8 @@ uds deploy k3d-core-slim-dev:latest
 :::note
 You can also deploy a specific version of the bundle, see all versions of the
 bundle [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-slim-dev).
+
+If you deploy a specific version and want to update UDS Core, on top of your existing cluster, this can also be done using the [`--packages` flag](/reference/cli/quickstart-and-usage/#specifying-packages-using---packages) to deploy just core (rather than redeploying the full cluster as well): `uds deploy k3d-core-slim-dev:<new-version> --packages core-base,core-identity-authorization`
 :::
 
 ## Developing UDS Core
