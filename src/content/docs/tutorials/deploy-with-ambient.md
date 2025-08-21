@@ -1,5 +1,5 @@
 ---
-title: Use Istio Ambient Mesh
+title: Switching to Istio Ambient Mesh
 
 sidebar:
   order: 4
