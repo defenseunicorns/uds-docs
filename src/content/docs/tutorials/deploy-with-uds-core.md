@@ -18,14 +18,14 @@ This tutorial uses UDS CLI to deploy an example application, [podinfo](https://g
 
 ### Quickstart
 
-To begin, a Zarf Package needs to be created for `podinfo`. See the [Zarf documentation](https://docs.zarf.dev/) for in-depth information on how to create a Zarf Package, or simply use the information provided below.
+To begin, a Zarf Package needs to be created for `podinfo`. See the [Zarf documentation](https://docs.zarf.dev/) for in-depth information on how to create a Zarf Package, or simply use the information provided below to create a basic package.
 
 #### Make a Directory
 
 Make a new directory for this package using the following command:
 
 ```bash
-mkdir package
+mkdir package && cd package
 ```
 
 Create the following `zarf.yaml` in the new directory:
@@ -41,12 +41,12 @@ components:
     required: true
     charts:
       - name: podinfo
-        version: 6.4.0
+        version: 6.9.1
         namespace: podinfo
         url: https://github.com/stefanprodan/podinfo.git
         gitPath: charts/podinfo
     images:
-      - ghcr.io/stefanprodan/podinfo:6.4.0
+      - ghcr.io/stefanprodan/podinfo:6.9.1
     actions:
       onDeploy:
         after:
@@ -91,7 +91,7 @@ metadata:
 packages:
   - name: uds-k3d
     repository: ghcr.io/defenseunicorns/packages/uds-k3d
-    ref: 0.14.0
+    ref: 0.16.0
     overrides:
       uds-dev-stack:
         minio:
@@ -111,20 +111,19 @@ packages:
 
   - name: init
     repository: oci://ghcr.io/zarf-dev/packages/init
-    ref: v0.42.2
+    ref: v0.60.0
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
-    ref: 0.42.0-upstream
-    # Set overrides for Keycloak SSO tutorial
+    ref: 0.50.0-upstream
     overrides:
-      keycloak:
-        keycloak:
-          variables:
-            - name: INSECURE_ADMIN_PASSWORD_GENERATION
-              description: "Generate an insecure admin password for dev/test"
-              path: insecureAdminPasswordGeneration.enabled
-              default: "true"
+      # Set overrides for k3d dev stack
+      pepr-uds-core:
+        module:
+          values:
+            - path: additionalIgnoredNamespaces
+              value:
+                - uds-dev-stack
 
   - name: podinfo
     path: ./
@@ -165,7 +164,7 @@ As above, the `<arch>` field in the name of your UDS Bundle will depend on your 
 
 #### Deploy
 
-You can now deploy the bundle to create the k3d cluster in order to deploy UDS Core and `podinfo`. This process will take approximately 5 to 10 minutes to complete:
+You can now deploy the bundle which will create a k3d cluster, deploy UDS Core, and deploy `podinfo`. This process will take approximately 10-15 minutes to complete:
 
 ```bash
 uds deploy uds-bundle-podinfo-bundle-*-0.0.1.tar.zst --confirm
@@ -173,10 +172,10 @@ uds deploy uds-bundle-podinfo-bundle-*-0.0.1.tar.zst --confirm
 
 #### Interact with Cluster
 
-Once successfully deployed, you can interact with the deployed cluster and applications using [kubectl](https://kubernetes.io/docs/tasks/tools/) or [k9s](https://k9scli.io/topics/install/). In the command below, we are listing pods and services in `podinfo` namesace that were just deployed as part of the UDS Bundle. Please note that the output for your `podinfo` pod will likely have a different name:
+Once successfully deployed, you can interact with the deployed cluster and applications using [kubectl](https://kubernetes.io/docs/tasks/tools/) or [k9s](https://k9scli.io/topics/install/). Both tools are included with `uds` as `uds zarf tools kubectl` and `uds zarf tools monitor` respectively. In the command below, we are listing pods and services in `podinfo` namespace that were just deployed as part of the UDS Bundle. Please note that the output for your `podinfo` pod will likely have a different name:
 
 ```bash
-kubectl get pods,services -n podinfo
+❯ kubectl get pods,services -n podinfo
 NAME                           READY   STATUS    RESTARTS   AGE
 pod/podinfo-5cbbf59f6d-bqhsk   1/1     Running   0          2m
 
@@ -185,12 +184,6 @@ service/podinfo   ClusterIP   10.43.63.124   <none>        9898/TCP,9999/TCP   2
 ```
 
 Connect to `podinfo` using `kubectl port-forward`:
-
-```bash
-kubectl port-forward service/<service_name> <local_port>:9898
-```
-
-Example command using the above sample output from `get pods`:
 
 ```bash
 kubectl port-forward service/podinfo 9898:9898 -n podinfo

@@ -24,7 +24,7 @@ includes:
 
 ### Integrate Podinfo with UDS Core
 
-You can think of the UDS Operator as the "glue" between your application and the services that are provided by UDS Core. It is the smart cluster operator that has working knowledge of UDS Core services in the cluster and takes care of integrating your app with those services for you. To register your application with the UDS Operator, you need to create a `Package` Kubernetes Custom Resource. Within the specification of the `Package` resource, you can specify different parameters that dictate how the UDS Operator should integrate your app per its unique requirements. The sections below cover creating a `Package` resource for `podinfo` and integrating `podinfo` with several UDS Core services.
+You can think of the UDS Operator as the "glue" between your application and the services that are provided by UDS Core. It is a [Kubernetes Operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) that has working knowledge of UDS Core services in the cluster and takes care of integrating your app with those services for you. To register your application with the UDS Operator, you need to create a `Package` Kubernetes Custom Resource. Within the specification of the `Package` resource, you can specify different parameters that dictate how the UDS Operator should integrate your app per its unique requirements. The sections below cover creating a `Package` resource for `podinfo` and integrating `podinfo` with several UDS Core services.
 
 :::note
 The `Package` Custom Kubernetes Resource is different from a [UDS Package](https://uds.defenseunicorns.com/structure/packages/), which is a collection of the Zarf Package for your application and the Kubernetes `Package` Custom Resource.
@@ -85,14 +85,14 @@ kubectl apply -f podinfo-package.yaml
 View the package resource:
 
 ```bash
-kubectl get package -n podinfo
-NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS   NETWORK POLICIES   AGE
-podinfo   Ready    []                     ["podinfo.uds.dev"]   []         7                  60s
+❯ kubectl get package -n podinfo
+NAME      STATUS   SSO CLIENTS   ENDPOINTS             MONITORS   NETWORK POLICIES   AUTHORIZATION POLICIES   AGE
+podinfo   Ready    []            ["podinfo.uds.dev"]   []         5                  2                        4s
 ```
 
 View the pods. Notice how the podinfo pod has an additional container as a result of the UDS Operator configuring istio:
 ```bash
-kubectl get pods -n podinfo
+❯ kubectl get pods -n podinfo
 NAME                           READY   STATUS    RESTARTS   AGE
 podinfo-5cbbf59f6d-bqhsk       2/2     Running   0          2m
 ```
@@ -100,7 +100,7 @@ podinfo-5cbbf59f6d-bqhsk       2/2     Running   0          2m
 Observe the Istio VirtualService that the UDS Operator created:
 
 ```bash
-kubectl get virtualservice -n podinfo
+❯ kubectl get virtualservice -n podinfo
 NAME                                  GATEWAYS                                  HOSTS                 AGE
 podinfo-tenant-podinfo-9898-podinfo   ["istio-tenant-gateway/tenant-gateway"]   ["podinfo.uds.dev"]   60s
 ```
@@ -108,22 +108,20 @@ podinfo-tenant-podinfo-9898-podinfo   ["istio-tenant-gateway/tenant-gateway"]   
 You will also notice that the UDS Operator automatically generated a set of Kubernetes `NetworkPolicies` that restrict access to your application to only required services:
 
 ```bash
-kubectl get networkpolicy -n podinfo
-NAME                                                         POD-SELECTOR                     AGE
-allow-podinfo-egress-dns-lookup-via-coredns                  <none>                           60s
-allow-podinfo-egress-istiod-communication                    <none>                           60s
-allow-podinfo-egress-uds-core-podinfo-authservice-egress     app.kubernetes.io/name=podinfo   60s
-allow-podinfo-egress-uds-core-podinfo-keycloak-jwks-egress   app.kubernetes.io/name=podinfo   60s
-allow-podinfo-ingress-9898-podinfo-istio-tenant-gateway      app.kubernetes.io/name=podinfo   60s
-allow-podinfo-ingress-sidecar-monitoring                     <none>                           60s
-deny-podinfo-default                                         <none>                           60s
+❯ kubectl get networkpolicy -n podinfo
+NAME                                                      POD-SELECTOR                     AGE
+allow-podinfo-egress-dns-lookup-via-coredns               <none>                           50s
+allow-podinfo-egress-istiod-communication                 <none>                           50s
+allow-podinfo-ingress-9898-podinfo-istio-tenant-gateway   app.kubernetes.io/name=podinfo   50s
+allow-podinfo-ingress-sidecar-monitoring                  <none>                           50s
+deny-podinfo-default                                      <none>                           50s
 ```
 
 Navigate to `podinfo.uds.dev` from your browser to interact with `podinfo`.
 
 #### Integrate with Single Sign On
 
-At this stage, anyone can access the `podinfo` application. You may wish to protect your application by only allowing authenticated users to access it. As part of UDS Core, the [Keycloak](https://www.keycloak.org/) Identity and Access Management Solution is included. Add the configuration under the `spec.sso` field below to integrate the `podinfo` application with Keycloak.
+At this stage, anyone can access the `podinfo` application. You may wish to protect your application by only allowing authenticated users to access it. As part of UDS Core, [Keycloak](https://www.keycloak.org/) and [Authservice](https://github.com/istio-ecosystem/authservice) are provided for Identity and Authorization management. Add the configuration under the `spec.sso` field below to integrate the `podinfo` application with Keycloak and  Authservice
 
 ```yaml
 apiVersion: uds.dev/v1alpha1
@@ -141,7 +139,7 @@ spec:
         gateway: tenant
         host: podinfo
         port: 9898
-  # SSO allows for the creation of Keycloak clients and with automatic secret generation and protocolMappers
+  # SSO allows for the creation of Keycloak clients and with automatic Authservice integration
   sso:
     - name: Podinfo SSO
       clientId: uds-core-podinfo
@@ -163,22 +161,22 @@ kubectl apply -f podinfo-package.yaml
 The package will now show the `uds-core-podinfo` client under `SSO CLIENTS`:
 
 ```bash
-kubectl get package -n podinfo
-NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS                                      NETWORK POLICIES   AGE
-podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   ["podinfo-podmonitor","podinfo-svcmonitor"]   9                  10m
+❯ kubectl get package -n podinfo
+NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS   NETWORK POLICIES   AUTHORIZATION POLICIES   AGE
+podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   []         7                  4                        3m29s
 ```
 
 :::note
 Notice how the count under `NETWORK POLICIES` has increased. The UDS Operator recognized that additional `NetworkPolicies` were required for Keycloak to communicate with `podinfo`, so it automatically created additional `NetworkPolicies` to allow that.
 :::
 
-When navigating to `podinfo.uds.dev`, you will be redirected to a login screen. Only users that are members of the `/UDS Core/Admin` group in Keycloak are permitted to access the site. Run the `create-doug-user` task with the UDS CLI to create a test user that is part of the `/UDS Core/Admin` group:
+When navigating to https://podinfo.uds.dev/, you will be redirected to a login screen. Only users that are members of the `/UDS Core/Admin` group in Keycloak are permitted to access the site. Run the `create-doug-user` task with the UDS CLI to create a test user that is part of the `/UDS Core/Admin` group:
 
 ```bash
-uds run common-setup:create-doug-user --set KEYCLOAK_GROUP="/UDS Core/Admin"
+uds run setup:keycloak-user --set KEYCLOAK_USER_GROUP="/UDS Core/Admin"
 ```
 
-Use the following credentials to login: `username: doug / password: unicorn123!@#UN`
+Use the following credentials to login to https://podinfo.uds.dev/: `username: doug / password: unicorn123!@#UN`
 
 #### Add Monitoring and Metrics Scraping
 
@@ -211,6 +209,7 @@ spec:
       groups:
         anyOf:
           - "/UDS Core/Admin"
+  # Monitor generates Prometheus Service and Pod monitor resources, capturing metrics exposed by your application
   monitor:
     - selector:
         app.kubernetes.io/name: podinfo
@@ -235,25 +234,28 @@ kubectl apply -f podinfo-package.yaml
 The package will now show `ServiceMonitors` and `PodMonitors` configured under `MONITORS`:
 
 ```bash
-NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS                                      NETWORK POLICIES   AGE
-podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   ["podinfo-podmonitor","podinfo-svcmonitor"]   9                  10m
+❯ kubectl get package -n podinfo
+NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS                                      NETWORK POLICIES   AUTHORIZATION POLICIES   AGE
+podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   ["podinfo-podmonitor","podinfo-svcmonitor"]   9                  6                        6m38s
 ```
 
 View the `PodMonitor` and `ServiceMonitor` resources that were created by the UDS Operator:
 
 ```bash
-kubectl get podmonitor,servicemonitor -n podinfo
+❯ kubectl get podmonitor,servicemonitor -n podinfo
 NAME                                                  AGE
-podmonitor.monitoring.coreos.com/podinfo-podmonitor   7m46s
+podmonitor.monitoring.coreos.com/podinfo-podmonitor   24s
 
 NAME                                                      AGE
-servicemonitor.monitoring.coreos.com/podinfo-svcmonitor   7m46s
+servicemonitor.monitoring.coreos.com/podinfo-svcmonitor   24s
 ```
 
-Logs and Metrics for `podinfo` can now be viewed in Grafana, which is deployed with UDS Core. Navigate to `grafana.admin.uds.dev` and login using the same credentials from the previous step.
+Logs and Metrics for `podinfo` can now be viewed in Grafana, which is deployed with UDS Core. Navigate to `grafana.admin.uds.dev` and login using the same credentials from the previous step (you may still be signed in since Keycloak is used for all authentication).
+
+From the menu, navigate to `Explore`, then select `Prometheus` from the top drop-down. Paste in the query `rate(process_cpu_seconds_total{namespace="podinfo"}[$__rate_interval])` and hit the `Run Query` button (blue refresh button on top right). This will provide us with a graph based on the metrics served by Podinfo.
 
 Now you have successfully integrated `podinfo` with UDS Core!
 
 #### Next Steps
 
-(Optional) With the `Package` Custom resource now created that integrates `podinfo` into UDS Core, the next guide will cover including the `Package` Custom Resource as part of a UDS Bundle.
+(Optional) With the `Package` Custom resource now created that integrates `podinfo` into UDS Core, the next guide will cover including the `Package` Custom Resource as part of your Zarf Package and UDS Bundle.
