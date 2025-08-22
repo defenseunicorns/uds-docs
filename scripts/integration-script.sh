@@ -6,6 +6,7 @@ repos=(
     "https://github.com/defenseunicorns/uds-core/ main ./temp/uds-core"
     "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config"
     "https://github.com/defenseunicorns/uds-cli main ./temp/cli"
+    "https://github.com/defenseunicorns/uds-rke2-demo main ./temp/uds-rke-demo tutorials"
 )
 
 mkdir temp
@@ -17,7 +18,7 @@ TROUBLESHOOTING_DIR="${TARGET_DIR}/troubleshooting"
 echo "Cleaning reference and troubleshooting directories..."
 
 find "$TARGET_DIR" -type d \( -name "reference" -o -name "troubleshooting" \) -exec rm -rf {} +
-mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
+mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting" "${TARGET_DIR}/tutorials"
 
 clone_repo() {
     repo_url="$1"
@@ -36,13 +37,18 @@ clone_repo() {
 
 # Loop through each repository and clone it
 for repo_info in "${repos[@]}"; do
-    # Split the repo_info string into url, branch, and target_dir
+    # Split the repo_info string into url, branch, target_dir, and optional destination
     IFS=' ' read -r -a repo <<< "$repo_info"
     clone_repo "${repo[0]}" "${repo[1]}" "${repo[2]}"
     echo -e "Cloned ${repo[0]}@${repo[1]} into ${repo[2]}\n"
 
-    # Copy the docs folder to the target directory
-    cp -r "${repo[2]}/docs/"* "$TARGET_DIR/"
+    # Copy the docs folder to the target directory (default) or tutorials if specified
+    dest="${repo[3]:-}"
+    if [[ "$dest" == "tutorials" ]]; then
+        cp -r "${repo[2]}/docs/"* "${TARGET_DIR}/tutorials/"
+    else
+        cp -r "${repo[2]}/docs/"* "$TARGET_DIR/"
+    fi
 done
 
 # Clean up and remove the temp folder
@@ -53,36 +59,44 @@ rm -rf "$TARGET_DIR/dev"
 rm -rf "$TARGET_DIR/adr"
 
 ## this allows for naming directories in lowercase and hyphenated formats, still allows for space formatting
-BASE_DIR="src/content/docs/reference"
+# Run kebab->spaced renaming in both reference and tutorials
+BASE_DIRS=(
+  "src/content/docs/reference"
+  "src/content/docs/tutorials"
+)
 
-# Reverse depth-first directory renaming, preserving acronyms and formatting
-find "$BASE_DIR" -type d ! -path "$BASE_DIR" | awk '{ print length, $0 }' | sort -rn | cut -d" " -f2- | while read -r dir; do
-  base=$(basename "$dir")
-  parent=$(dirname "$dir")
+for BASE_DIR in "${BASE_DIRS[@]}"; do
+  [[ -d "$BASE_DIR" ]] || continue
 
-  # Skip if already space-formatted and not hyphenated
-  [[ "$base" == *" "* && "$base" != *"-"* ]] && continue
+  # Reverse depth-first directory renaming, preserving acronyms and formatting
+  find "$BASE_DIR" -type d ! -path "$BASE_DIR" | awk '{ print length, $0 }' | sort -rn | cut -d" " -f2- | while read -r dir; do
+    base=$(basename "$dir")
+    parent=$(dirname "$dir")
 
-  # Convert kebab-case to spaced words with acronym support
-  new_base=$(echo "$base" | sed -E 's/-/ /g' | awk '{
-    orig = tolower($0)
-    if (orig == "single sign on") {
-      print "Single Sign-On"
-      next
-    }
+    # Skip if already space-formatted and not hyphenated
+    [[ "$base" == *" "* && "$base" != *"-"* ]] && continue
 
-    for (i = 1; i <= NF; i++) {
-      if (tolower($i) == "uds") $i = "UDS";
-      else if (tolower($i) == "idam") $i = "IdAM";
-      else $i = toupper(substr($i,1,1)) substr($i,2)
-    }
-    print
-  }')
+    # Convert kebab-case to spaced words with acronym support
+    new_base=$(echo "$base" | sed -E 's/-/ /g' | awk '{
+      orig = tolower($0)
+      if (orig == "single sign on") {
+        print "Single Sign-On"
+        next
+      }
 
-  new_path="$parent/$new_base"
+      for (i = 1; i <= NF; i++) {
+        if (tolower($i) == "uds") $i = "UDS";
+        else if (tolower($i) == "idam") $i = "IdAM";
+        else $i = toupper(substr($i,1,1)) substr($i,2)
+      }
+      print
+    }')
 
-  if [ "$dir" != "$new_path" ] && [ ! -e "$new_path" ]; then
-    echo "Renaming: $dir → $new_path"
-    mv "$dir" "$new_path"
-  fi
+    new_path="$parent/$new_base"
+
+    if [ "$dir" != "$new_path" ] && [ ! -e "$new_path" ]; then
+      echo "Renaming: $dir → $new_path"
+      mv "$dir" "$new_path"
+    fi
+  done
 done
