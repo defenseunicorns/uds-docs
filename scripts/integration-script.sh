@@ -42,12 +42,18 @@ for repo_info in "${repos[@]}"; do
     clone_repo "${repo[0]}" "${repo[1]}" "${repo[2]}"
     echo -e "Cloned ${repo[0]}@${repo[1]} into ${repo[2]}\n"
 
-    # Copy the docs folder to the target directory (default) or tutorials if specified
+    # Copy the repo's content:
+    # - default: from "docs"  -> $TARGET_DIR
+    # - if repo[3] is set (e.g., "tutorials"): from "docs/<dest>" -> $TARGET_DIR/<dest>
     dest="${repo[3]:-}"
-    if [[ "$dest" == "tutorials" ]]; then
-        cp -r "${repo[2]}/docs/"* "${TARGET_DIR}/tutorials/"
+    src_subpath="docs${dest:+/$dest}"
+    dest_dir="$TARGET_DIR${dest:+/$dest}"
+
+    mkdir -p "$dest_dir"
+    if [[ -d "${repo[2]}/$src_subpath" ]]; then
+      cp -r "${repo[2]}/$src_subpath/"* "$dest_dir/"
     else
-        cp -r "${repo[2]}/docs/"* "$TARGET_DIR/"
+      echo "Warning: source '${repo[2]}/$src_subpath' not found; skipping."
     fi
 done
 
