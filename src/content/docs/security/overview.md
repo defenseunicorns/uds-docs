@@ -5,18 +5,17 @@ prev: false
 next: false
 ---
 
-UDS Core provides a secure, airgap-ready runtime for Kubernetes workloads with opinionated defaults and automation that reduce toil and risk. Security is layered across the **software supply chain**, **network and service mesh**, **identity and access**, **admission control**, **runtime monitoring**, and **observability/audit**. The goal is a practical, least‑privilege baseline that’s easy to operate and easy to verify.
-
 ## Overview
 
-UDS Core ships a defense-in-depth baseline that provides real security through the entire software delivery process:
+UDS maintains a defense-in-depth baseline, providing real security through the entire software delivery process:
 
-- **Hardened supply chain** with CVE data and per-release SBOMs, distributed as **Zarf** packages for predictable, airgap-friendly installs.
+- **Secure supply chain** with CVE data and SBOMs for transparent software composition analysis and security audits.
+- **Airgap ready** with **Zarf** packages for predictable, offline deployments in disconnected environments.
 - **Zero‑trust networking** with default‑deny Kubernetes `NetworkPolicy`, Istio **STRICT mTLS**, and ALLOW‑based `AuthorizationPolicy`.
 - **Identity & SSO** via Keycloak and Authservice so apps can be protected consistently, whether they natively support authentication or not.
-- **Workload guardrails** enforced by **Pepr** admission policies (non‑root, drop caps, block privileged/host access, etc.).
-- **Runtime visibility** using **NeuVector** in **alerting (detection-first)** mode by default.
-- **Observability & audit**: centralized logs (Vector → Loki) and dashboards/metrics (Grafana/Prometheus).
+- **Admission control** enforced by **Pepr** policies (non‑root, drop capabilities, block privileged/host access, etc.).
+- **Runtime security** with realtime detection and alerting on malicious behavior.
+- **Observability & audit**: centralized collection and shipping as well as metrics and dashboards.
 
 :::note
 Security defaults are intentionally restrictive. End users can loosen controls, but changing defaults may reduce your security posture. This should be done carefully and any reductions in security should be documented.
@@ -27,17 +26,33 @@ Security defaults are intentionally restrictive. End users can loosen controls, 
 **What you get:**
 
 - **Per-release CVE scanning and SBOMs**: View CVEs and full SBOMs for every Core release in the UDS Registry
-- **Built with Zarf**: Packages include only what is needed for your environment and support offline/airgapped deployment through Zarf
+- **Deterministic packaging**: Packages include only what is needed for your environment, reducing drift and surprise dependencies
 
 **Why it matters:**
 
-- You can verify exactly what ships with each release through SBOMs and CVE scans.
-- Deterministic packages reduce drift and surprise dependencies.
-- You can deploy and operate securely in offline environments without introducing “backdoor” network dependencies.
-- Supports mission-critical use cases in highly secure networks where connectivity cannot be assumed.
+- You can verify exactly what ships with each release through SBOMs and CVE scans
+- Transparent software composition analysis helps you understand and mitigate security risks
+- Clear visibility into dependencies helps with compliance and security audits
 
 **References:**
 - UDS Registry: https://registry.defenseunicorns.com/repo/public/core/versions
+- Zarf: https://zarf.dev/
+
+## Airgap Ready
+
+**What you get:**
+
+- **Built with Zarf**: Full support for offline/airgapped deployment through Zarf
+- **No external dependencies**: All tools operate seamlessly without internet access
+- **Purpose-built for disconnected environments**: Designed from the ground up for airgapped systems
+
+**Why it matters:**
+
+- You can deploy and operate securely in offline environments without introducing "backdoor" network dependencies
+- Supports mission-critical use cases in highly secure networks where connectivity cannot be assumed
+- Unlike typical industry products that need adaptation for airgapped systems, UDS is built for airgap from the start
+
+**References:**
 - Zarf: https://zarf.dev/
 
 ## Identity & SSO
