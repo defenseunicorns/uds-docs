@@ -5,7 +5,7 @@ prev: false
 next: false
 ---
 
-UDS Core provides a secure, airgap-ready runtime for Kubernetes workloads with opinionated defaults and automation that reduce toil and risk. Security is layered across the **software supply chain**, **network and service mesh**, **identity and access**, **workload guardrails**, **runtime monitoring**, and **observability/audit**. The goal is a practical, least‑privilege baseline that’s easy to operate and easy to verify.
+UDS Core provides a secure, airgap-ready runtime for Kubernetes workloads with opinionated defaults and automation that reduce toil and risk. Security is layered across the **software supply chain**, **network and service mesh**, **identity and access**, **admission control**, **runtime monitoring**, and **observability/audit**. The goal is a practical, least‑privilege baseline that’s easy to operate and easy to verify.
 
 ## Overview
 
