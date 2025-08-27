@@ -5,46 +5,115 @@ prev: false
 next: false
 ---
 
-Defense Unicorns is committed to defense in depth best practices with continuous monitoring, logging, and alerting across a
-multi-layered approach. UDS ensures secure runtime by closely managing and monitoring software
-interactions within environments, verifying software components, and mitigating vulnerabilities in real-time to
-maintain a trusted and resilient operational state.
+UDS Core provides a secure, airgap-ready runtime for Kubernetes workloads with opinionated defaults and automation that reduce toil and risk. Security is layered across the **software supply chain**, **network and service mesh**, **identity and access**, **workload guardrails**, **runtime monitoring**, and **observability/audit**. The goal is a practical, least‑privilege baseline that’s easy to operate and easy to verify.
 
-## What makes UDS secure?
-The tooling may change but UDS provides: Identity & Authorization, Metrics Server, Monitoring, Logging, Runtime Security, Backup and Restore. 
+## Overview
 
-### Compliance Alignment: 
-* For the U.S. defense sector and other highly regulated environments, UDS satisfies 94% of technical program office security controls for IL-4. All highly regulated programs have some technical and administrative controls due to the very nature of their environments and operations. Defense Unicorns focuses on the areas that the typical DoD program finds more difficult to implement. With your pre-existing security and our built-in security, we fulfill 90% of security controls.
-* UDS aligns with NIST 800-53 Rev 5, ensuring deployments meet strict regulatory requirements for DoD and other government agencies. If you are still on Rev 4 baseline, we have experts that can help with the translation between the documents since there is a large control group overlap.
+UDS Core ships a defense-in-depth baseline that is pragmatic and auditable:
 
-### Air-Gap Compatibility: 
-* UDS supports secure, offline environments by ensuring all tools, from package managers to deployment tools like Zarf, operate seamlessly without internet access. UDS is designed from the ground up for airgapped systems to support disconnected, semi-disconnected, or highly secure environments. This is unique that UDS is built for air gap while typical industry products need adaption for airgapped systems.
-  * UDS can operate without the internet.
-  * UDS can operate without external network dependencies.
-  
-### Secure Baseline Configurations: 
-* UDS incorporates hardened configurations tailored for specific missions. These configurations include hardened images to meet DoD standards, further reducing vulnerabilities and ensuring compliance.
+- **Hardened supply chain** with CVE data and per-release SBOMs, distributed as **Zarf** packages for predictable, airgap-friendly installs.
+- **Zero‑trust networking** with default‑deny Kubernetes `NetworkPolicy`, Istio **STRICT mTLS**, and ALLOW‑based `AuthorizationPolicy`.
+- **Identity & SSO** via Keycloak and Authservice so apps can be protected consistently, whether they natively support authentication or not.
+- **Workload guardrails** enforced by **Pepr** admission policies (non‑root, drop caps, block privileged/host access, etc.).
+- **Runtime visibility** using **NeuVector** in **alerting (detection-first)** mode by default.
+- **Observability & audit**: centralized logs (Vector → Loki) and dashboards/metrics (Grafana/Prometheus).
 
-### Network Security: 
-* The Istio Service Mesh enforces secure communication between services, providing mutual TLS (mTLS) encryption, traffic policies, and network segmentation. A dedicated admin gateway isolates all administrative services, so that they are unreachable by a standard user.
+:::note
+Security defaults are intentionally conservative. End users can loosen controls, but removing layers may reduce your security posture. This should be done carefully and any reductions in security should be documented.
+:::
 
-### Istio-Authservice: 
-* Provides automatic authentication and group based authorization to any workload, including custom mission applications.
+## Secure Supply Chain
 
-### Continuous Monitoring and Logging: 
-* UDS leverages tools like Prometheus and Grafana to monitor system health, performance, and security in real time. Alerts are triggered for any unusual activity or potential breaches.
+**What you get:**
 
-### Runtime Security: 
-* UDS integrates NeuVector to monitor container runtime behavior, detect and block anomalies, and enforce runtime application security policies.
+- **Per-release CVE scanning and SBOMs**: View CVEs and full SBOMs for every Core release in the UDS Registry
+- **Built with Zarf**: Packages include only what is needed for your environment and support offline/airgapped deployment through Zarf
 
-### Identity and Access Management (IdAM): 
-* Keycloak provides centralized authentication, enabling single sign-on (SSO) and role-based access control (RBAC) to restrict access to authorized users.
+**Why it matters:**
 
-### Workload Policies:
-* [Pepr](https://pepr.dev/) is used to enforce policies on cluster workloads, following best practices like the [Kubernetes Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) and [Big Bang's Kyverno Policies](https://docs-bigbang.dso.mil/latest/packages/kyverno-policies/docs/policies/). Pepr mutations are also used to force workloads into compliance where possible.
+- You can verify exactly what ships with each release.
+- SBOMs provide evidence for compliance and downstream scanning.
+- Deterministic packages reduce drift and surprise dependencies.
+- Fully airgapped ensures you aren't pulling anything from potentially vulnerable external sources.
 
-### Software Composition Analysis:
-* UDS continuously monitors the software supply chain, ensuring only verified components are deployed.
+**References:**
+- UDS Registry: https://registry.defenseunicorns.com/repo/public/core/versions
+- Zarf: https://zarf.dev/
 
-### Backup and Restore 
-* Velero: Provides backup and restore functionality for Kubernetes resources and persistent data. This provides protectection of data and configurations, allowing for quick recovery in case of accidental deletion, data corruption, or system failures.*
+## Identity & SSO
+
+**What you get:**
+
+- **Keycloak** for SSO management with opinionated defaults for realms, clients, and group-based access.
+- **Authservice** integration to protect apps that don’t natively speak OIDC—enforced at the mesh edge.
+
+**Why it matters:**
+
+- Consistent login, token handling, and group mapping across apps.
+- Centralized access control that is easy to audit.
+
+**References:**
+- Keycloak SSO: https://uds.defenseunicorns.com/reference/configuration/single-sign-on/overview/
+- Authservice Protection: https://uds.defenseunicorns.com/reference/configuration/single-sign-on/auth-service/
+
+## Zero‑Trust Networking & Service Mesh
+
+**What you get:**
+
+- **Default‑deny network posture**: Per‑namespace `NetworkPolicy` isolates workloads by default with explicit allow rules generated from your package’s declared needs.
+- **Istio STRICT mTLS**: All in-mesh traffic is encrypted and identity-authenticated by default.
+- **ALLOW‑based authorization**: `AuthorizationPolicy` enforces least privilege at the service layer.
+- **Explicit egress**: Outbound access is explicitly declared to both in-cluster endpoints and remote hosts.
+- **Admin vs Tenant ingress**: Administrative UIs are isolated behind a dedicated admin gateway.
+
+**Why it matters:**
+
+- Lateral movement is constrained by both the Kubernetes networking layer and Istio.
+- Connectivity to/from your application is explicitly declared and easily reviewable.
+
+**References:**
+- Istio mTLS: https://istio.io/latest/blog/2023/secure-apps-with-istio/
+- Ingress Gateways: https://uds.defenseunicorns.com/reference/configuration/service-mesh/ingress/#gateways
+- Authorization Policies: https://uds.defenseunicorns.com/reference/configuration/service-mesh/authorization-policies/
+
+## Workload Guardrails (Pepr Policies)
+
+**What you get:**
+
+- **Secure defaults** that block overly privileged workloads.
+- **Security mutations** to force workloads to use more secure configuration.
+- **Controlled exemptions** for edge cases, keeping RBAC tight and changes auditable.
+
+**Why it matters:**
+
+- Misconfigurations and overly-permissive settings are blocked before they reach the cluster.
+- In some cases workloads are automatically "downgraded" to least privilege.
+- Exemptions are explicit and reviewable.
+
+**References:**
+- Pepr Policies: https://uds.defenseunicorns.com/reference/configuration/pepr-policies/
+- Exemptions: https://uds.defenseunicorns.com/reference/configuration/uds-operator/exemption/
+
+## Runtime Security
+
+**What you get:**
+
+- **Runtime/container security** from NeuVector, used in alerting/monitor mode by default.
+- **Visibility** into suspicious process, network, and file activity with alerts routed to your ops tooling.
+
+**Why it matters:**
+
+- You get actionable detection without the risk of blocking production traffic.
+- Malicious behavior is instantly detected, allowing for quick triage and resolution.
+
+## Observability & Audit
+
+**What you get:**
+
+- **Centralized logging**: Vector collects and ships all cluster and application logs for searchable audit trails.
+- **Metrics & dashboards**: Prometheus scrapes metrics and Grafana provides pre‑wired datasources and dashboards.
+
+**Why it matters:**
+
+- Unified troubleshooting across logs and metrics.
+- Auditability for change control and incident response.
