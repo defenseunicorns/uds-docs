@@ -19,7 +19,7 @@ UDS Core ships a defense-in-depth baseline that provides real security through t
 - **Observability & audit**: centralized logs (Vector → Loki) and dashboards/metrics (Grafana/Prometheus).
 
 :::note
-Security defaults are intentionally conservative. End users can loosen controls, but removing layers may reduce your security posture. This should be done carefully and any reductions in security should be documented.
+Security defaults are intentionally restrictive. End users can loosen controls, but changing defaults may reduce your security posture. This should be done carefully and any reductions in security should be documented.
 :::
 
 ## Secure Supply Chain
