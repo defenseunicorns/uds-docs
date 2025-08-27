@@ -31,10 +31,10 @@ Security defaults are intentionally conservative. End users can loosen controls,
 
 **Why it matters:**
 
-- You can verify exactly what ships with each release.
-- SBOMs provide evidence for compliance and downstream scanning.
+- You can verify exactly what ships with each release through SBOMs and CVE scans.
 - Deterministic packages reduce drift and surprise dependencies.
-- Fully airgapped ensures you aren't pulling anything from potentially vulnerable external sources.
+- You can deploy and operate securely in offline environments without introducing “backdoor” network dependencies.
+- Supports mission-critical use cases in highly secure networks where connectivity cannot be assumed.
 
 **References:**
 - UDS Registry: https://registry.defenseunicorns.com/repo/public/core/versions
@@ -76,7 +76,7 @@ Security defaults are intentionally conservative. End users can loosen controls,
 - Ingress Gateways: https://uds.defenseunicorns.com/reference/configuration/service-mesh/ingress/#gateways
 - Authorization Policies: https://uds.defenseunicorns.com/reference/configuration/service-mesh/authorization-policies/
 
-## Workload Guardrails (Pepr Policies)
+## Admission Control (Pepr Policies)
 
 **What you get:**
 
