@@ -9,7 +9,7 @@ UDS Core provides a secure, airgap-ready runtime for Kubernetes workloads with o
 
 ## Overview
 
-UDS Core ships a defense-in-depth baseline that is pragmatic and auditable:
+UDS Core ships a defense-in-depth baseline that provides real security through the entire software delivery process:
 
 - **Hardened supply chain** with CVE data and per-release SBOMs, distributed as **Zarf** packages for predictable, airgap-friendly installs.
 - **Zero‑trust networking** with default‑deny Kubernetes `NetworkPolicy`, Istio **STRICT mTLS**, and ALLOW‑based `AuthorizationPolicy`.
