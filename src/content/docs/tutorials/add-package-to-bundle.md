@@ -29,6 +29,7 @@ components:
         namespace: podinfo
         url: https://github.com/stefanprodan/podinfo.git
         gitPath: charts/podinfo
+    # Add this new manifests section with our Package CR
     manifests:
       - name: podinfo-uds-config
         namespace: podinfo
@@ -47,8 +48,7 @@ components:
                 condition: available
 ```
 
-Re-run the `zarf package create` and `uds create` commands to generate new artifacts that now include the `Package` Custom Resource for `podinfo`. From there, the bundle can be re-deployed and `podinfo` will be automatically integrated with UDS Core.
-
+Re-run `zarf package create --confirm` and `uds create --confirm` commands to generate new artifacts that now include the `Package` Custom Resource for `podinfo`. From there, the bundle can be re-deployed (`uds deploy uds-bundle-podinfo-bundle-*-0.0.1.tar.zst --confirm`) and `podinfo` will be automatically integrated with UDS Core.
 
 #### Next Steps
 
