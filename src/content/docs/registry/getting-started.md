@@ -15,9 +15,10 @@ sidebar:
   - [Public](https://registry.defenseunicorns.com/org/public/packages) - contains public packages that can be pulled and deployed.
 
 ### Deploy Your Own Registry
-- [Contact us](https://defenseunicorns.com/registry-inquiry) to get access to the UDS Registry package.
-- Use the UDS Registry package in your [UDS Bundle](https://uds.defenseunicorns.com/reference/bundles/overview/)
-- [UDS Registry Configuration Guide](/registry/configuration)
+UDS Registry is Airgap native and can be self hosted! [Contact us](https://defenseunicorns.com/registry-inquiry) to get access to the UDS Registry package.
+
+
+Deploy the UDS Registry package in your [UDS Bundle](https://uds.defenseunicorns.com/reference/bundles/overview/), see the [UDS Registry Configuration Guide](/registry/configuration) for more details.
 
 ```yaml
 # Example: uds-bundle.yaml
