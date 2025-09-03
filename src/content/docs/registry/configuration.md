@@ -1,5 +1,6 @@
 ---
 title: Configuration
+
 sidebar:
   order: 3
 ---
