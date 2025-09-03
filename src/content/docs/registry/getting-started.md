@@ -17,7 +17,7 @@ sidebar:
 ### Deploy Your Own Registry
 - [Contact us](https://defenseunicorns.com/registry-inquiry) to get access to the UDS Registry package.
 - Use the UDS Registry package in your [UDS Bundle](https://uds.defenseunicorns.com/reference/bundles/overview/)
-- [UDS Registry Configuration Guide](/registry/configuration/configuration.md)
+- [UDS Registry Configuration Guide](/registry/configuration)
 
 ```yaml
 # Example: uds-bundle.yaml
