@@ -135,23 +135,6 @@ The UDS Registry builds on standard OCI (Open Container Initiative) protocols, e
     - ARM64 architecture for edge and energy-efficient environments
     - AMD64 architecture for traditional server environments
 
-## Getting Started
-We offer two ways to begin using the UDS Registry:
-
-### Explore Our Public Registry
-- View the Public Unicorn Registry - [UDS Registry](https://registry.defenseunicorns.com/)
-- Create a free [account](https://registry.defenseunicorns.com/sign-in)
-  - **Free account benefits:**
-    - Gain access to our public organization, and download related packages at no cost.
-    - Create and manage tokens for automated package retrieval and CI/CD integration.
-- Browse available packages and explore registry features without authentication
-  - [Airgap Store](https://registry.defenseunicorns.com/org/airgap-store/packages) - lists all UDS Packages published by Defense Unicorns. All packages in this organization are view-only: you can access configuration, SBOM and vulnerability data, but you cannot pull or deploy a package directly from this organization.
-  - [Public](https://registry.defenseunicorns.com/org/public/packages) - contains public packages that can be pulled and deployed.
-
-### Deploy Your Own Registry
-- Discover how a dedicated registry can address your specific mission needs.
-- Discuss adding UDS Registry to your environment with UDS Premium.
-
 **[Contact us](https://defenseunicorns.com/registry-inquiry) for more information on how UDS Registry can accelerate your mission!**
 
 ## Related Documentation
