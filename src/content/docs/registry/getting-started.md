@@ -48,14 +48,5 @@ packages:
                 - admin-user@defenseunicorns.com
 ```
 
-**[Contact us](https://defenseunicorns.com/registry-inquiry) for more information on how UDS Registry can accelerate your mission!**
-
-## Related Documentation
-[Why UDS](https://uds.defenseunicorns.com/overview/why-uds/)<br>
-[Mission and Technical Relevance](https://uds.defenseunicorns.com/overview/uds-mission-relevance/)<br>
-[UDS Packages](https://uds.defenseunicorns.com/structure/packages/)<br>
-[UDS Security Overview](https://uds.defenseunicorns.com/security/overview/)<br>
-[Published Package Flavors](https://uds.defenseunicorns.com/reference/deployment/flavors/)<br>
-
 ## Support
 For assistance with the UDS Registry, contact the UDS support team at hello@defenseunicorns.com or through the internal support channels.
