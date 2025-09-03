@@ -4,9 +4,6 @@ title: Getting Started
 sidebar:
   order: 2
 ---
-## Getting Started
-We offer two ways to begin using the UDS Registry:
-
 ### Explore Our Public Registry
 - View the Public Unicorn Registry - [UDS Registry](https://registry.defenseunicorns.com/)
 - Create a free [account](https://registry.defenseunicorns.com/sign-in)
@@ -20,7 +17,7 @@ We offer two ways to begin using the UDS Registry:
 ### Deploy Your Own Registry
 - [Contact us](https://defenseunicorns.com/registry-inquiry) to get access to the UDS Registry package.
 - Use the UDS Registry package in your [UDS Bundle](https://uds.defenseunicorns.com/reference/bundles/overview/)
-<!-- - [UDS Registry Configuration Guide](configuration.md) -->
+- [UDS Registry Configuration Guide](/registry/configuration/configuration.md)
 
 ```yaml
 # Example: uds-bundle.yaml
