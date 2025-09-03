@@ -4,7 +4,7 @@ title: Configuration
 sidebar:
   order: 3
 ---
-# UDS Registry Configuration Guide
+## UDS Registry Configuration Guide
 
 This document provides a comprehensive overview of all configuration options available in the UDS Registry Helm chart.
 

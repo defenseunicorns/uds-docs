@@ -4,7 +4,7 @@ title: Getting Started
 sidebar:
   order: 2
 ---
-# Getting Started
+## Getting Started
 We offer two ways to begin using the UDS Registry:
 
 ### Explore Our Public Registry
