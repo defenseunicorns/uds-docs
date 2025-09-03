@@ -20,7 +20,7 @@ We offer two ways to begin using the UDS Registry:
 ### Deploy Your Own Registry
 - [Contact us](https://defenseunicorns.com/registry-inquiry) to get access to the UDS Registry package.
 - Use the UDS Registry package in your [UDS Bundle](https://uds.defenseunicorns.com/reference/bundles/overview/)
-- [UDS Registry Configuration Guide](configuration.md)
+<!-- - [UDS Registry Configuration Guide](configuration.md) -->
 
 ```yaml
 # Example: uds-bundle.yaml
