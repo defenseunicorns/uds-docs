@@ -96,7 +96,7 @@
 }
 
 /* Table styling to prevent first two columns from wrapping - configuration page only */
-.configuration-tables table th:nth-child(1),
+/* .configuration-tables table th:nth-child(1),
 .configuration-tables table th:nth-child(2),
 .configuration-tables table td:nth-child(1),
 .configuration-tables table td:nth-child(2) {
@@ -105,31 +105,4 @@
     width: max-content !important;
     overflow: visible !important;
     text-overflow: clip !important;
-}
-
-/* Add horizontal lines between table rows - configuration page only */
-.configuration-tables table tr {
-    border-bottom: 1px solid #374151 !important;
-}
-
-.configuration-tables table thead tr {
-    border-bottom: 2px solid #374151 !important;
-}
-
-/* Dark mode borders */
-:root[data-theme='dark'] .configuration-tables table tr {
-    border-bottom: 1px solid #4b5563 !important;
-}
-
-:root[data-theme='dark'] .configuration-tables table thead tr {
-    border-bottom: 2px solid #4b5563 !important;
-}
-
-/* Light mode borders */
-:root[data-theme='light'] .configuration-tables table tr {
-    border-bottom: 1px solid #d1d5db !important;
-}
-
-:root[data-theme='light'] .configuration-tables table thead tr {
-    border-bottom: 2px solid #d1d5db !important;
-}
+} */

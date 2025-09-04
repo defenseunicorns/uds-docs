@@ -20,6 +20,25 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 
 <div class="configuration-tables">
 
+<style>
+.configuration-tables table {
+    border-collapse: collapse !important;
+}
+.configuration-tables table tr {
+    border-bottom: 1px solid #4b5563 !important;
+}
+.configuration-tables table thead tr {
+    border-bottom: 2px solid #4b5563 !important;
+}
+.configuration-tables table th:nth-child(1),
+.configuration-tables table th:nth-child(2),
+.configuration-tables table td:nth-child(1),
+.configuration-tables table td:nth-child(2) {
+    white-space: nowrap !important;
+    min-width: max-content !important;
+}
+</style>
+
 ### Basic Configuration [[example]](#basic-development-setup)
 
 | Parameter | Default | Description |
