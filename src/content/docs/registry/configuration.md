@@ -120,13 +120,9 @@ When `haDatabase` is enabled:
 | `registry.scanner.scanInterval` | `24h` | Image scanning interval |
 
 ### Feature Flags <small>[(example)](#feature-flags-configuration)</small>
-:::Warning
-Garbage collection creates an unprotected `/uds/gc` endpoint that hard deletes unused data.
-:::
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `registry.features.garbageCollection` | `false` | Enable garbage collection endpoint |
 | `registry.features.registryAnalytics` | `false` | Enable registry analytics |
 | `registry.features.servePrivate` | `true` | Serve private repositories |
 
@@ -356,7 +352,6 @@ scanner:
 # Enable/disable registry features
 features:
   servePrivate: true
-  garbageCollection: false
   registryAnalytics: false
   strictPackageValidation: true
 ```
@@ -435,7 +430,6 @@ scanner:
 
 features:
   servePrivate: true
-  garbageCollection: false
   registryAnalytics: true
 
 logging:
