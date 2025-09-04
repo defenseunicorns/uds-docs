@@ -106,3 +106,12 @@
     overflow: visible !important;
     text-overflow: clip !important;
 }
+
+/* Add horizontal lines between table rows - configuration page only */
+.configuration-tables table tr {
+    border-bottom: 1px solid var(--sl-color-border) !important;
+}
+
+.configuration-tables table thead tr {
+    border-bottom: 2px solid var(--sl-color-border) !important;
+}
