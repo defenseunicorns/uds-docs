@@ -6,6 +6,9 @@ sidebar:
 ---
 This document provides a comprehensive overview of all configuration options available in the UDS Registry Helm chart.
 
+> [!TIP]
+> UDS Registry uses sensible defaults, most deployments will need to only require a minimal set of configuration.
+
 ## Table of Contents
 
 - [Basic Configuration](#basic-configuration)
