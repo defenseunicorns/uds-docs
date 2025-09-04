@@ -94,15 +94,3 @@
     --sl-color-accent: #4f46e5;
     --sl-color-accent-high: #312e81;
 }
-
-/* Table styling to prevent first two columns from wrapping - configuration page only */
-/* .configuration-tables table th:nth-child(1),
-.configuration-tables table th:nth-child(2),
-.configuration-tables table td:nth-child(1),
-.configuration-tables table td:nth-child(2) {
-    white-space: nowrap !important;
-    min-width: max-content !important;
-    width: max-content !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-} */

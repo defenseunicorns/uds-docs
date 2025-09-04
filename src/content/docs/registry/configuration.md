@@ -39,7 +39,7 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 }
 </style>
 
-### Basic Configuration [[example]](#basic-development-setup)
+### Basic Configuration <small>[(example)](#basic-development-setup)</small>
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -63,8 +63,10 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 | `package.useRootDomain` | `false` | Use root domain instead of subdomain |
 | `package.serviceMeshMode` | `ambient` | Service mesh mode configuration |
 
-### Resource Configuration [[example]](#basic-development-setup)
-**Note:** Default resource values are suitable for uds-core only. Increase for production workloads.
+### Resource Configuration <small>[(example)](#basic-development-setup)</small>
+:::Note
+Default resource values are suitable for uds-core only. Increase for production workloads.
+:::
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `resources.requests.memory` | `128Mi` | Memory request |
@@ -72,28 +74,31 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 | `resources.limits.memory` | `1Gi` | Memory limit |
 | `resources.limits.cpu` | `750m` | CPU limit |
 
-### Storage Configuration [[example]](#basic-development-setup)
- **Note:** Two storage backends are available:
- - **filesystem** - Uses persistent volumes for storage
- - **s3** - Uses S3-compatible object storage
+### Storage Configuration <small>[(example)](#basic-development-setup)</small>
+:::Note
+Two storage backends are available:
+- **filesystem** - Uses persistent volumes for storage
+- **s3** - Uses S3-compatible object storage
+:::
+:::Important
+When `haDatabase` is enabled:
+- `ociStorage` must be set to `s3`
+- Database PVC creation is disabled
+- External database must be configured via `database.connectionString`
+:::
 
- **Important:** When `haDatabase` is enabled:
- - `ociStorage` must be set to `s3`
- - Database PVC creation is disabled
- - External database must be configured via `database.connectionString`
-
-| Parameter | Default | Options/Required | Description |
-|-----------|---------|------------------|-------------|
+| Parameter | Default | Options | Description |
+|-----------|---------|---------|-------------|
 | `ociStorage` | `filesystem` | `filesystem`, `s3` | Storage backend for OCI artifacts |
 | `haDatabase` | `false` | - | Enable HA database (requires S3 storage) |
 
-### Registry Configuration [[example]](#filesystem-storage-configuration)
+### Registry Configuration <small>[(example)](#filesystem-storage-configuration)</small>
 
-| Parameter | Default | Options/Required | Description |
-|-----------|---------|------------------|-------------|
+| Parameter | Default | Options | Description |
+|-----------|---------|---------|-------------|
 | `registry.logging.level` | `INFO` | `DEBUG`, `INFO`, `WARN`, `ERROR` | Log level |
 
-### Authentication Configuration [[example]](#authentication-and-session-configuration)
+### Authentication Configuration <small>[(example)](#authentication-and-session-configuration)</small>
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -106,7 +111,7 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 | `registry.auth.serviceTokens.defaultExpiry` | `1440h` | Default token expiry (60 days) |
 | `registry.auth.serviceTokens.maxExpiry` | `8760h` | Maximum token expiry (365 days) |
 
-### Scanner Configuration [[example]](#scanner-configuration)
+### Scanner Configuration <small>[(example)](#scanner-configuration)</small>
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -114,8 +119,10 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 | `registry.scanner.updateInterval` | `12h` | Scanner database update interval |
 | `registry.scanner.scanInterval` | `24h` | Image scanning interval |
 
-### Feature Flags [[example]](#feature-flags-configuration)
- **Warning:** Garbage collection creates an unprotected `/uds/gc` endpoint that hard deletes unused data.
+### Feature Flags <small>[(example)](#feature-flags-configuration)</small>
+:::Warning
+Garbage collection creates an unprotected `/uds/gc` endpoint that hard deletes unused data.
+:::
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -147,18 +154,20 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 | `persistence.registry.pv.existingClaim` | `""` | Use existing PVC |
 | `persistence.registry.pv.extraPvcLabels` | `{}` | Extra PVC labels |
 
-### Distribution Configuration [[example]](#filesystem-storage-configuration)
- **Important:** Set a secure random string for production deployments to ensure consistency across replicas.
+### Distribution Configuration <small>[(example)](#filesystem-storage-configuration)</small>
+:::Important
+Set a secure random string for production deployments to ensure consistency across replicas.
+:::
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `distribution.http.secret` | `""` | HTTP secret for upload resumption |
 | `distribution.storage.filesystem.rootDirectory` | `/app/data/registry` | Root directory for registry data |
 
-### S3 Storage Configuration [[example]](#s3-storage-configuration)
+### S3 Storage Configuration <small>[(example)](#s3-storage-configuration)</small>
 
-| Parameter | Default | Options/Required | Description |
-|-----------|---------|------------------|-------------|
+| Parameter | Default | Required | Description |
+|-----------|---------|----------|-------------|
 | `distribution.storage.s3.region` | `us-west-1` | Yes | AWS region |
 | `distribution.storage.s3.regionEndpoint` | `""` | No | Custom S3 endpoint |
 | `distribution.storage.s3.bucket` | `uds-registry` | Yes | S3 bucket name |
@@ -174,10 +183,10 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 | `distribution.storage.s3.accessKey` | `""` | No | AWS secret access key |
 | `distribution.storage.s3.sessionToken` | `""` | No | AWS session token |
 
-### Database Configuration [[example]](#database-examples)
+### Database Configuration <small>[(example)](#database-examples)</small>
 
-| Parameter | Default | Options/Required | Description |
-|-----------|---------|------------------|-------------|
+| Parameter | Default | Options | Description |
+|-----------|---------|---------|-------------|
 | `database.type` | `sqlite3` | `sqlite3`, `postgres` | Database type |
 | `database.connectionString` | `file:./db/registry.sqlite?_pragma=foreign_keys(1)` | - | Database connection string |
 
