@@ -185,10 +185,25 @@ Set a secure random string for production deployments to ensure consistency acro
 
 ### Database Configuration <small>[(example)](#database-examples)</small>
 
+<div class="database-config-table">
+<style>
+.database-config-table table th:nth-child(1),
+.database-config-table table th:nth-child(2),
+.database-config-table table th:nth-child(3),
+.database-config-table table td:nth-child(1),
+.database-config-table table td:nth-child(2),
+.database-config-table table td:nth-child(3) {
+    white-space: nowrap !important;
+    min-width: max-content !important;
+}
+</style>
+
 | Parameter | Default | Options | Description |
 |-----------|---------|---------|-------------|
 | `database.type` | `sqlite3` | `sqlite3`, `postgres` | Database type |
 | `database.connectionString` | `file:./db/registry.sqlite?_pragma=foreign_keys(1)` | - | Database connection string |
+
+</div>
 
 ### Security Configuration
 
