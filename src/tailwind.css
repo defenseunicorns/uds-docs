@@ -109,9 +109,27 @@
 
 /* Add horizontal lines between table rows - configuration page only */
 .configuration-tables table tr {
-    border-bottom: 1px solid var(--sl-color-border) !important;
+    border-bottom: 1px solid #374151 !important;
 }
 
 .configuration-tables table thead tr {
-    border-bottom: 2px solid var(--sl-color-border) !important;
+    border-bottom: 2px solid #374151 !important;
+}
+
+/* Dark mode borders */
+:root[data-theme='dark'] .configuration-tables table tr {
+    border-bottom: 1px solid #4b5563 !important;
+}
+
+:root[data-theme='dark'] .configuration-tables table thead tr {
+    border-bottom: 2px solid #4b5563 !important;
+}
+
+/* Light mode borders */
+:root[data-theme='light'] .configuration-tables table tr {
+    border-bottom: 1px solid #d1d5db !important;
+}
+
+:root[data-theme='light'] .configuration-tables table thead tr {
+    border-bottom: 2px solid #d1d5db !important;
 }
