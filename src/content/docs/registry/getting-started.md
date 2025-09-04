@@ -5,14 +5,15 @@ sidebar:
   order: 2
 ---
 ### Explore Our Public Registry
-- View the Public Unicorn Registry - [UDS Registry](https://registry.defenseunicorns.com/)
-- Create a free [account](https://registry.defenseunicorns.com/sign-in)
-  - **Free account benefits:**
-    - Gain access to our public organization, and download related packages at no cost.
-    - Create and manage tokens for automated package retrieval and CI/CD integration.
-- Browse available packages and explore registry features without authentication
-  - [Airgap Store](https://registry.defenseunicorns.com/org/airgap-store/packages) - lists all UDS Packages published by Defense Unicorns. All packages in this organization are view-only: you can access configuration, SBOM and vulnerability data, but you cannot pull or deploy a package directly from this organization.
-  - [Public](https://registry.defenseunicorns.com/org/public/packages) - contains public packages that can be pulled and deployed.
+
+[registry.defenseunicorns.com](https://registry.defenseunicorns.com/) is a hosted instance of UDS Registry and is **free to try**. It is the easiest way to explore UDS packages and see how the registry works. There are two main organizations to explore, each serving different purposes for package distribution and evaluation.
+
+- **[Airgap Store](https://registry.defenseunicorns.com/org/airgap-store/packages)** - lists all UDS Packages published by Defense Unicorns. All packages in this organization are view-only: you can access configuration, SBOM and vulnerability data, but you cannot pull or deploy a package directly from this organization.
+- **[Public](https://registry.defenseunicorns.com/org/public/packages)** - contains public packages that can be pulled and deployed.
+
+**Create a free account** at [registry.defenseunicorns.com/sign-in](https://registry.defenseunicorns.com/sign-in) for additional benefits:
+- Gain access to our public organization and download related packages at no cost
+- Create and manage tokens for automated package retrieval and CI/CD integration
 
 ### Deploy Your Own Registry
 UDS Registry is Airgap native and can be self hosted! [Contact us](https://defenseunicorns.com/registry-inquiry) to get access to the UDS Registry package.
