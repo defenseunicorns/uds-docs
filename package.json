@@ -22,6 +22,7 @@
     "sharp": "^0.34.0",
     "starlight-image-zoom": "^0.13.0",
     "starlight-links-validator": "^0.17.0",
+    "starlight-llms-txt": "^0.6.0",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.7.3",
     "vanilla-cookieconsent": "^3.0.1"

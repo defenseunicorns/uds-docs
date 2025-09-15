@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightImageZoom from 'starlight-image-zoom';
+import starlightLlmsTxt from 'starlight-llms-txt';
 
 import tailwindcss from '@tailwindcss/vite';
 
@@ -45,7 +46,8 @@ export default defineConfig({
     integrations: [starlight({
         plugins: [
             starlightLinksValidator(),
-            starlightImageZoom()
+            starlightImageZoom(),
+            starlightLlmsTxt()
         ],
         defaultLocale: 'root',
         locales: {
