@@ -51,7 +51,6 @@ export default defineConfig({
               projectName: 'UDS Documentation',
               description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
               details: [
-                '- Content is auto-sourced via scripts/integration-script.sh.',
                 '- CLI examples use `uds` and bash-like shells.',
                 '- Start with Getting Started; use CLI Reference for flags.',
               ].join('\n'),
