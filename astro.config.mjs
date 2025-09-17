@@ -67,8 +67,6 @@ export default defineConfig({
                 { label: 'Tutorials', paths: ['tutorials/**'] },
               ],
               promote: ['index*', 'getting-started/**', 'overview/**', 'structure/**', 'reference/cli/**'],
-              demote: ['tactical-edge-deployments/**', 'registry/**'],
-              exclude: ['tactical-edge-deployments/**', 'registry/**'], // affects llms-small only
               minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
               pageSeparator: '\n\n-----\n\n',
               rawContent: false,
