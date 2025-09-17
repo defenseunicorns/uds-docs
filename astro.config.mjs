@@ -47,7 +47,32 @@ export default defineConfig({
         plugins: [
             starlightLinksValidator(),
             starlightImageZoom(),
-            starlightLlmsTxt()
+            starlightLlmsTxt({
+              projectName: 'UDS Documentation',
+              description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
+              details: [
+                '- Content is auto-sourced via scripts/integration-script.sh.',
+                '- CLI examples use `uds` and bash-like shells.',
+                '- Start with Getting Started; use CLI Reference for flags.',
+              ].join('\n'),
+              optionalLinks: [
+                { label: 'UDS Core (GitHub)', url: 'https://github.com/defenseunicorns/uds-core' },
+                { label: 'UDS CLI (GitHub)', url: 'https://github.com/defenseunicorns/uds-cli' },
+                { label: 'Zarf Docs', url: 'https://docs.zarf.dev/' },
+              ],
+              customSets: [
+                { label: 'Getting Started', paths: ['getting-started/**'], description: 'Install and first steps.' },
+                { label: 'CLI Reference', paths: ['reference/cli/**'], description: 'Commands and flags.' },
+                { label: 'UDS Core', paths: ['reference/uds-core/**'] },
+                { label: 'Tutorials', paths: ['tutorials/**'] },
+              ],
+              promote: ['index*', 'getting-started/**', 'overview/**', 'structure/**', 'reference/cli/**'],
+              demote: ['tactical-edge-deployments/**', 'registry/**'],
+              exclude: ['tactical-edge-deployments/**', 'registry/**'], // affects llms-small only
+              minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
+              pageSeparator: '\n\n-----\n\n',
+              rawContent: false,
+            })
         ],
         defaultLocale: 'root',
         locales: {
