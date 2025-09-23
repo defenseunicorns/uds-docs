@@ -40,7 +40,8 @@ export default defineConfig({
         '/reference/configuration/ingress/': '/reference/configuration/service-mesh/ingress/',
         '/reference/configuration/non-http-ingress/': '/reference/configuration/service-mesh/non-http-ingress/',
         '/reference/configuration/authorization-policies/': '/reference/configuration/service-mesh/authorization-policies/',
-        '/reference/configuration/single-sign-on/keycloak-session-timeouts/': '/reference/configuration/single-sign-on/keycloak-session-management/'
+        '/reference/configuration/single-sign-on/keycloak-session-timeouts/': '/reference/configuration/single-sign-on/keycloak-session-management/',
+        '/reference/configuration/uds-monitoring-metrics/': '/reference/configuration/observability/monitoring-metrics/'
     },
 
     integrations: [starlight({
