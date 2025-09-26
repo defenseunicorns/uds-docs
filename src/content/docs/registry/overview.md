@@ -1,5 +1,6 @@
 ---
 title: Registry Overview
+
 sidebar:
   order: 1
 ---
@@ -134,18 +135,6 @@ The UDS Registry builds on standard OCI (Open Container Initiative) protocols, e
 - Deploy to diverse environments with support for:
     - ARM64 architecture for edge and energy-efficient environments
     - AMD64 architecture for traditional server environments
-
-## Getting Started
-We offer two ways to begin using the UDS Registry:
-
-### Explore Our Public Registry
-- View the Public Unicorn Registry - [UDS Registry](https://registry.defenseunicorns.com/)
-- Browse available packages and explore registry features without authentication
-- See how the UDS Registry can enhance your deployment workflows
-
-### Deploy Your Own Registry
-- Discover how a dedicated registry can address your specific mission needs.
-- Discuss adding UDS Registry to your environment with UDS Premium.
 
 **[Contact us](https://defenseunicorns.com/registry-inquiry) for more information on how UDS Registry can accelerate your mission!**
 
