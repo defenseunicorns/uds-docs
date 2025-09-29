@@ -9,14 +9,6 @@
     --sl-content-width: 50rem;
     color-scheme: dark;
 
-    *,
-    :before,
-    :after {
-        border-width: 0;
-        border-style: solid;
-        border-color: #e5e7eb;
-    }
-
     a,
     a:hover {
         text-decoration: none;
