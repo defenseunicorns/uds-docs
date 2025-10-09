@@ -4,6 +4,9 @@
     "baseUrl": "./",
     "paths": {
       "@components/*": ["src/components/*"]
-    }
+    },
+    "types": [
+      "likec4/vite-plugin-modules"
+    ]
   }
 }

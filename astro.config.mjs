@@ -1,10 +1,11 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
-import starlightImageZoom from 'starlight-image-zoom';
 import starlightLlmsTxt from 'starlight-llms-txt';
 
 import tailwindcss from '@tailwindcss/vite';
+import { LikeC4VitePlugin } from 'likec4/vite-plugin';
+import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
@@ -44,10 +45,11 @@ export default defineConfig({
         '/reference/configuration/uds-monitoring-metrics/': '/reference/configuration/observability/monitoring-metrics/'
     },
 
-    integrations: [starlight({
+    integrations: [
+      react(),
+      starlight({
         plugins: [
             starlightLinksValidator(),
-            starlightImageZoom(),
             starlightLlmsTxt({
               projectName: 'UDS Documentation',
               description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
@@ -170,10 +172,15 @@ export default defineConfig({
                 badge: { text: 'New!', variant: 'tip' }
             },
         ],
-    })],
 
-    vite: {
-        plugins: [tailwindcss()]
-    }
+    },
+  )],
+  vite: {
+    plugins: [
+      tailwindcss(),
+      LikeC4VitePlugin({
+        modelRoot: './src/content/docs/reference/UDS Core/.c4/',
+      }),
+    ],
+  },
 });
-

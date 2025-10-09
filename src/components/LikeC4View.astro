@@ -1,0 +1,21 @@
+---
+import { LikeC4View as ReactLikeC4View, type LikeC4ViewId } from 'likec4:react';
+
+interface Props {
+  viewId: LikeC4ViewId;
+}
+
+const { viewId } = Astro.props;
+---
+
+<ReactLikeC4View
+  viewId={viewId}
+  {/* Configure view */}
+  controls={false}
+  browser={{
+    // options for likec4 browser
+    enableFocusMode: false,
+    enableSearch: false,
+  }}
+  client:only="react">
+</ReactLikeC4View>

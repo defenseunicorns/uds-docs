@@ -13,6 +13,7 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/markdown-remark": "^6.0.1",
     "@astrojs/node": "^9.0.0",
+    "@astrojs/react": "^4.4.0",
     "@astrojs/starlight": "^0.36.0",
     "@astrojs/starlight-tailwind": "^4.0.0",
     "@fontsource/teko": "^5.1.1",
@@ -25,5 +26,8 @@
     "tailwindcss": "^4.1.4",
     "typescript": "^5.7.3",
     "vanilla-cookieconsent": "^3.0.1"
+  },
+  "devDependencies": {
+    "likec4": "^1.42.1"
   }
 }
