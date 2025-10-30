@@ -124,6 +124,17 @@ packages:
             - path: additionalIgnoredNamespaces
               value:
                 - uds-dev-stack
+      keycloak:
+        keycloak:
+          variables:
+            - name: KEYCLOAK_HEAP_OPTIONS
+              description: "Sets the JAVA_OPTS_KC_HEAP environment variable in Keycloak"
+              path: env[0].value
+          values:
+            - path: env[0]
+              value:
+                name: JAVA_OPTS_KC_HEAP
+                value: "-XX:MaxRAMPercentage=70 -XX:MinRAMPercentage=70 -XX:InitialRAMPercentage=50 -XX:MaxRAM=1G"
 
   - name: podinfo
     path: ./
