@@ -180,7 +180,7 @@ export default defineConfig({
     plugins: [
       tailwindcss(),
       LikeC4VitePlugin({
-        modelRoot: './src/content/docs/reference/UDS Core/.c4/',
+        modelRoot: './src/content/docs/.c4/',
       }),
     ],
   },
