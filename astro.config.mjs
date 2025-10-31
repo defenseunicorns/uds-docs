@@ -5,6 +5,7 @@ import starlightLlmsTxt from 'starlight-llms-txt';
 
 import tailwindcss from '@tailwindcss/vite';
 import { LikeC4VitePlugin } from 'likec4/vite-plugin';
+import starlightImageZoom from 'starlight-image-zoom';
 import react from '@astrojs/react';
 
 // https://astro.build/config
@@ -51,6 +52,7 @@ export default defineConfig({
       starlight({
         plugins: [
             starlightLinksValidator(),
+            starlightImageZoom(),
             starlightLlmsTxt({
               projectName: 'UDS Documentation',
               description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
@@ -72,7 +74,7 @@ export default defineConfig({
               promote: ['index*', 'getting-started/**', 'overview/**', 'structure/**', 'reference/cli/**'],
               minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
               pageSeparator: '\n\n-----\n\n',
-              rawContent: false,
+              rawContent: true,
             })
         ],
         defaultLocale: 'root',
