@@ -44,7 +44,8 @@ export default defineConfig({
         '/reference/configuration/authorization-policies/': '/reference/configuration/service-mesh/authorization-policies/',
         '/reference/configuration/single-sign-on/keycloak-session-timeouts/': '/reference/configuration/single-sign-on/keycloak-session-management/',
         '/reference/configuration/uds-monitoring-metrics/': '/reference/configuration/observability/monitoring-metrics/',
-        '/reference/deployment/secret-pod-reload/': '/reference/deployment/pod-reload/'
+        '/reference/deployment/secret-pod-reload/': '/reference/deployment/pod-reload/',
+        '/reference/configuration/single-sign-on/recoving-lost-credentials/': '/reference/configuration/single-sign-on/recovering-lost-credentials/',
     },
 
     integrations: [
