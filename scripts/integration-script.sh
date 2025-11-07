@@ -57,6 +57,13 @@ for repo_info in "${repos[@]}"; do
     fi
 done
 
+# Copy only uds-core LikeC4 model
+if [[ -d "./temp/uds-core/docs/.c4" ]]; then
+  rm -rf "${TARGET_DIR}/.c4"
+  mkdir -p "${TARGET_DIR}/.c4"
+  cp -r "./temp/uds-core/docs/.c4/." "${TARGET_DIR}/.c4/"
+fi
+
 # Clean up and remove the temp folder
 rm -rf temp
 

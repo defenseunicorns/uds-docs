@@ -4,14 +4,20 @@
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)"
   ],
-  "ignorePresets": [":ignoreModulesAndTests"],
+  "ignorePresets": [
+    ":ignoreModulesAndTests"
+  ],
   "branchConcurrentLimit": 0,
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "packageRules": [
     {
-      "matchManagers": ["npm"],
-      "matchFiles": ["package-lock.json"],
+      "matchManagers": [
+        "npm"
+      ],
+      "matchFileNames": [
+        "package-lock.json"
+      ],
       "groupName": "All npm dependencies",
       "groupSlug": "npm-dependencies"
     }

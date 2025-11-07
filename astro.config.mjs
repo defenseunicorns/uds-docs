@@ -1,10 +1,12 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
-import starlightImageZoom from 'starlight-image-zoom';
 import starlightLlmsTxt from 'starlight-llms-txt';
 
 import tailwindcss from '@tailwindcss/vite';
+import { LikeC4VitePlugin } from 'likec4/vite-plugin';
+import starlightImageZoom from 'starlight-image-zoom';
+import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
@@ -42,10 +44,13 @@ export default defineConfig({
         '/reference/configuration/authorization-policies/': '/reference/configuration/service-mesh/authorization-policies/',
         '/reference/configuration/single-sign-on/keycloak-session-timeouts/': '/reference/configuration/single-sign-on/keycloak-session-management/',
         '/reference/configuration/uds-monitoring-metrics/': '/reference/configuration/observability/monitoring-metrics/',
-        '/reference/deployment/secret-pod-reload/': '/reference/deployment/pod-reload/'
+        '/reference/deployment/secret-pod-reload/': '/reference/deployment/pod-reload/',
+        '/reference/configuration/single-sign-on/recoving-lost-credentials/': '/reference/configuration/single-sign-on/recovering-lost-credentials/',
     },
 
-    integrations: [starlight({
+    integrations: [
+      react(),
+      starlight({
         plugins: [
             starlightLinksValidator(),
             starlightImageZoom(),
@@ -70,7 +75,7 @@ export default defineConfig({
               promote: ['index*', 'getting-started/**', 'overview/**', 'structure/**', 'reference/cli/**'],
               minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
               pageSeparator: '\n\n-----\n\n',
-              rawContent: false,
+              rawContent: true,
             })
         ],
         defaultLocale: 'root',
@@ -171,10 +176,15 @@ export default defineConfig({
                 badge: { text: 'New!', variant: 'tip' }
             },
         ],
-    })],
 
-    vite: {
-        plugins: [tailwindcss()]
-    }
+    },
+  )],
+  vite: {
+    plugins: [
+      tailwindcss(),
+      LikeC4VitePlugin({
+        modelRoot: './src/content/docs/.c4/',
+      }),
+    ],
+  },
 });
-

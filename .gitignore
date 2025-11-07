@@ -34,3 +34,6 @@ src/content/docs/reference/
 temp/
 # Local Netlify folder
 .netlify
+
+# uds-core .c4 folder
+*.c4
