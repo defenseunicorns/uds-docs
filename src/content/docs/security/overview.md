@@ -116,7 +116,9 @@ Security defaults are intentionally restrictive. End users can loosen controls, 
 - **Runtime/container security** from Falco, providing real-time threat detection and security monitoring.
 - **Visibility** into suspicious process, network, and file activity with alerts routed to your ops tooling.
 
+:::caution
 - NeuVector has been deprecated, see [official uds-package](https://github.com/uds-packages/neuvector) for continued use.
+:::
 
 **Why it matters:**
 
