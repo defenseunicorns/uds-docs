@@ -14,7 +14,7 @@
     "@astrojs/markdown-remark": "^6.0.1",
     "@astrojs/node": "^9.0.0",
     "@astrojs/react": "^4.4.0",
-    "@astrojs/starlight": "^0.36.0",
+    "@astrojs/starlight": "^0.37.0",
     "@astrojs/starlight-tailwind": "^4.0.0",
     "@fontsource/teko": "^5.1.1",
     "@tailwindcss/vite": "^4.1.4",
