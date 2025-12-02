@@ -35,6 +35,10 @@ repo_key_from_url() {
   echo "${base%.git}"
 }
 
+# Start clean: remove common destination subdirectories composed from multiple sources
+rm -rf "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
+mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
+
 clone_repo() {
     repo_url="$1"
     branch="$2"
@@ -65,6 +69,12 @@ for repo_info in "${repos[@]}"; do
   fi
   src_subpath="docs${dest:+/$dest}"
   dest_dir="$TARGET_DIR${dest:+/$dest}"
+  # If this is the tutorials destination, ensure a clean slate once
+  if [[ -n "$dest" && "$dest" == "tutorials" && -z "${CLEANED_TUTORIALS:-}" ]]; then
+    rm -rf "$dest_dir"
+    mkdir -p "$dest_dir"
+    CLEANED_TUTORIALS=1
+  fi
   mkdir -p "$dest_dir"
 
   # Local override path
@@ -72,8 +82,8 @@ for repo_info in "${repos[@]}"; do
     local_path="${OVERRIDES[$key]}"
     echo "Using local override for '$key': $local_path"
     if [[ -d "$local_path/$src_subpath" ]]; then
-      # Overlay copy (keeps other repos intact)
-      cp -r "$local_path/$src_subpath/"* "$dest_dir/" 2>/dev/null || true
+      # Overlay copy (keeps other repos intact) without suppressing errors
+      rsync -rt "$local_path/$src_subpath/" "$dest_dir/"
     else
       echo "Warning: override source '$local_path/$src_subpath' not found; skipping."
     fi
@@ -85,7 +95,8 @@ for repo_info in "${repos[@]}"; do
   echo -e "Cloned ${repo_url}@${branch} into ${target_dir}\n"
 
   if [[ -d "${target_dir}/$src_subpath" ]]; then
-    cp -r "${target_dir}/$src_subpath/"* "$dest_dir/" 2>/dev/null || true
+    # Copy without suppressing errors and without globbing pitfalls
+    rsync -rt "${target_dir}/$src_subpath/" "$dest_dir/"
   else
     echo "Warning: source '${target_dir}/$src_subpath' not found; skipping."
   fi
