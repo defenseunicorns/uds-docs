@@ -24,17 +24,32 @@ This guide explains how to contribute content to the UDS documentation site. It 
 - **Site config**: `astro.config.mjs` (sidebar, redirects, integrations, etc.).
 - **Home page**: `src/pages/index.astro` (landing page cards and sections).
 
+### Repository Scope
+- **Docs site framework**: Astro + Starlight, Tailwind, and supporting plugins/config (e.g., `astro.config.mjs`, components under `src/`).
+- **CI / publishing**: Build and publishing configuration to Netlify (see `netlify.toml` and `.github/workflows/`).
+- **Integration scripts**: Pull reference/troubleshooting docs from upstream repos (see `scripts/integration-script.sh`).
+- **Some first‑party content**: High‑level docs and tutorials maintained here (e.g., `src/content/docs/getting-started/`, `src/content/docs/tutorials/`).
+
+### Reference documentation source of truth
+Reference and troubleshooting docs surfaced on this site are primarily sourced from upstream repositories and periodically integrated here. If you need to change reference content, make the update in the upstream repo:
+
+- UDS Core: https://github.com/defenseunicorns/uds-core
+- UDS CLI: https://github.com/defenseunicorns/uds-cli
+- UDS Identity Config: https://github.com/defenseunicorns/uds-identity-config
+
+This site ingests those docs via automation (see `scripts/integration-script.sh`) and places them according to `astro.config.mjs`.
+
 ## Local Development
 Prereqs:
 - Node.js (we recommend Node 20+). If unsure, match CI: check `.github/workflows/` or use Node 20/22/24.
 
 Install and run:
 ```bash
-npm install
-npm run dev     # Start local dev server
-# Optional:
-npm run build    # Validates (astro check) and builds site
-npm run preview # Serves the production build locally
+  npm install
+  npm run dev     # Start local dev server
+  # Optional:
+  npm run build    # Validates (astro check) and builds site
+  npm run preview # Serves the production build locally
 ```
 
 Notes:
@@ -54,12 +69,12 @@ Notes:
 
 Recommended file frontmatter for pages (example):
 ```yaml
----
-title: Deploying UDS on RKE2
-description: Step-by-step guide to deploy UDS on RKE2.
-sidebar:
-  order: 10   # Optional, controls ordering within a section
----
+  ---
+  title: Deploying UDS on RKE2
+  description: Step-by-step guide to deploy UDS on RKE2.
+  sidebar:
+    order: 10   # Optional, controls ordering within a section
+  ---
 ```
 
 ## Navigation & Sidebar
@@ -81,7 +96,7 @@ sidebar:
 ## Images & Media
 - Use `public/assets/` for images referenced by content. Example usage in Markdown:
   ```md
-  ![Alt text for screen reader](/assets/my-image.png)
+    ![Alt text for screen reader](/assets/my-image.png)
   ```
 - Reserve `src/assets/` for site/UI assets (e.g., logos referenced by components/config).
 - Always provide meaningful `alt` text.
@@ -93,17 +108,17 @@ sidebar:
 - **Voice**: Clear, direct, and active voice. Avoid internal jargon.
 - **Examples**: Prefer copy-pasteable shell blocks. Use fenced code blocks with language:
   ```bash
-  uds version
+    uds version
   ```
 - **Notes/Warnings**: Use Starlight callouts, e.g.:
   ```md
-  :::note
-  helpful tip or contextual note.
-  :::
+    :::note
+    helpful tip or contextual note.
+    :::
 
-  :::caution
-  Important caution for users.
-  :::
+    :::caution
+    Important caution for users.
+    :::
   ```
 - **Terminology**: Use consistent product names (e.g., “UDS Core”, “UDS CLI”).
 - **Links**: Prefer absolute paths beginning with `/` for internal links.
@@ -116,9 +131,9 @@ sidebar:
 ## Redirects (Required when Moving/Renaming)
 - Add redirects in `astro.config.mjs` under the `redirects` map. Example:
   ```js
-  redirects: {
-    '/old/path/': '/new/path/',
-  },
+    redirects: {
+      '/old/path/': '/new/path/',
+    },
   ```
 - Keep trailing slashes consistent with the target page.
 - Include the smallest set needed to preserve working links from prior URLs.
@@ -128,7 +143,7 @@ sidebar:
 - **Validate links**: Broken internal links will fail due to `starlight-links-validator` integration.
 - **Review navigation**: Confirm the page appears in the expected sidebar section.
 - **Review home page** (if updated): Verify card links render and route correctly.
-- **Spell/grammar**: Quick pass to improve clarity and correctness.
+- **Spelling/grammar**: Quick pass to improve clarity and correctness.
 
 ## Submitting a PR
 1. **Create an issue** (for larger changes) describing motivation and scope. Small fixes may skip this.
