@@ -69,12 +69,6 @@ for repo_info in "${repos[@]}"; do
   fi
   src_subpath="docs${dest:+/$dest}"
   dest_dir="$TARGET_DIR${dest:+/$dest}"
-  # If this is the tutorials destination, ensure a clean slate once
-  if [[ -n "$dest" && "$dest" == "tutorials" && -z "${CLEANED_TUTORIALS:-}" ]]; then
-    rm -rf "$dest_dir"
-    mkdir -p "$dest_dir"
-    CLEANED_TUTORIALS=1
-  fi
   mkdir -p "$dest_dir"
 
   # Local override path
