@@ -14,11 +14,30 @@ mkdir temp
 REFERENCE_DIR="${TARGET_DIR}/reference"
 TROUBLESHOOTING_DIR="${TARGET_DIR}/troubleshooting"
 
-# Wipe the directories and start fresh so there aren't duplicates in case files are moved or renamed
-echo "Cleaning reference and troubleshooting directories..."
+# DOCS_OVERRIDES="uds-core=/abs/path;uds-cli=/abs/path2"
 
-find "$TARGET_DIR" -type d \( -name "reference" -o -name "troubleshooting" \) -exec rm -rf {} +
-mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting" "${TARGET_DIR}/tutorials"
+declare -A OVERRIDES
+if [[ -n "${DOCS_OVERRIDES:-}" ]]; then
+  IFS=';' read -ra pairs <<< "$DOCS_OVERRIDES"
+  for p in "${pairs[@]}"; do
+    key="${p%%=*}"
+    val="${p#*=}"
+    [[ -n "$key" && -n "$val" ]] && OVERRIDES["$key"]="$val"
+  done
+fi
+
+
+repo_key_from_url() {
+  local url="$1"
+  # strip trailing slashes, then take the last segment and drop .git
+  url="${url%/}"
+  local base="${url##*/}"
+  echo "${base%.git}"
+}
+
+# Start clean: remove common destination subdirectories composed from multiple sources
+rm -rf "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
+mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
 
 clone_repo() {
     repo_url="$1"
@@ -37,28 +56,53 @@ clone_repo() {
 
 # Loop through each repository and clone it
 for repo_info in "${repos[@]}"; do
-    # Split the repo_info string into url, branch, target_dir, and optional destination
-    IFS=' ' read -r -a repo <<< "$repo_info"
-    clone_repo "${repo[0]}" "${repo[1]}" "${repo[2]}"
-    echo -e "Cloned ${repo[0]}@${repo[1]} into ${repo[2]}\n"
+  IFS=' ' read -r -a repo <<< "$repo_info"
+  repo_url="${repo[0]}"
+  branch="${repo[1]}"
+  target_dir="${repo[2]}"
+  dest="${repo[3]:-}" # optional, e.g. 'tutorials'
 
-    # Copy the repo's content:
-    # - default: from "docs"  -> $TARGET_DIR
-    # - if repo[3] is set (e.g., "tutorials"): from "docs/<dest>" -> $TARGET_DIR/<dest>
-    dest="${repo[3]:-}"
-    src_subpath="docs${dest:+/$dest}"
-    dest_dir="$TARGET_DIR${dest:+/$dest}"
+  key="$(repo_key_from_url "$repo_url")"
+  # Fallback if URL produced an empty key (e.g., trailing slash edge cases)
+  if [[ -z "$key" ]]; then
+    key="${target_dir##*/}"
+  fi
+  src_subpath="docs${dest:+/$dest}"
+  dest_dir="$TARGET_DIR${dest:+/$dest}"
+  mkdir -p "$dest_dir"
 
-    mkdir -p "$dest_dir"
-    if [[ -d "${repo[2]}/$src_subpath" ]]; then
-      cp -r "${repo[2]}/$src_subpath/"* "$dest_dir/"
+  # Local override path
+  if [[ ${OVERRIDES[$key]+_} ]]; then
+    local_path="${OVERRIDES[$key]}"
+    echo "Using local override for '$key': $local_path"
+    if [[ -d "$local_path/$src_subpath" ]]; then
+      # Overlay copy (keeps other repos intact) without suppressing errors
+      rsync -rt "$local_path/$src_subpath/" "$dest_dir/"
     else
-      echo "Warning: source '${repo[2]}/$src_subpath' not found; skipping."
+      echo "Warning: override source '$local_path/$src_subpath' not found; skipping."
     fi
+    continue
+  fi
+
+  # Default: clone and copy
+  clone_repo "$repo_url" "$branch" "$target_dir"
+  echo -e "Cloned ${repo_url}@${branch} into ${target_dir}\n"
+
+  if [[ -d "${target_dir}/$src_subpath" ]]; then
+    # Copy without suppressing errors and without globbing pitfalls
+    rsync -rt "${target_dir}/$src_subpath/" "$dest_dir/"
+  else
+    echo "Warning: source '${target_dir}/$src_subpath' not found; skipping."
+  fi
 done
 
 # Copy only uds-core LikeC4 model
-if [[ -d "./temp/uds-core/docs/.c4" ]]; then
+uds_core_override="${OVERRIDES[uds-core]:-}"
+if [[ -n "$uds_core_override" && -d "$uds_core_override/docs/.c4" ]]; then
+  rm -rf "${TARGET_DIR}/.c4"
+  mkdir -p "${TARGET_DIR}/.c4"
+  cp -r "$uds_core_override/docs/.c4/." "${TARGET_DIR}/.c4/"
+elif [[ -d "./temp/uds-core/docs/.c4" ]]; then
   rm -rf "${TARGET_DIR}/.c4"
   mkdir -p "${TARGET_DIR}/.c4"
   cp -r "./temp/uds-core/docs/.c4/." "${TARGET_DIR}/.c4/"
