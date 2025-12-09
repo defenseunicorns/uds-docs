@@ -46,6 +46,7 @@ export default defineConfig({
         '/reference/configuration/uds-monitoring-metrics/': '/reference/configuration/observability/monitoring-metrics/',
         '/reference/deployment/secret-pod-reload/': '/reference/deployment/pod-reload/',
         '/reference/configuration/single-sign-on/recoving-lost-credentials/': '/reference/configuration/single-sign-on/recovering-lost-credentials/',
+        '/reference/configuration/private-pki/': '/reference/configuration/trust-management/private-pki/',
     },
 
     integrations: [
