@@ -17,7 +17,6 @@ In this section, we will configure Single Sign On (SSO) for a sample user to acc
 
 In the root of the `package` directory, create a new file called `tasks.yaml` and include the lines below:
 
-<!-- renovate:uds-common -->
 ```yaml
 includes:
   - common-setup: https://raw.githubusercontent.com/defenseunicorns/uds-common/v1.21.3/tasks/setup.yaml

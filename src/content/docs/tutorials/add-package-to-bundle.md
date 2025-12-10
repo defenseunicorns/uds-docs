@@ -14,8 +14,6 @@ This guide assumes that you created the UDS `Package` Custom Resource in the [pr
 
 Within the `zarf.yaml` file that exists in the `package` directory, modify the `podinfo` component to reference the manifest created in the previous tutorial:
 
-<!-- renovate:podinfo-chart -->
-<!-- renovate:podinfo-image -->
 ```yaml
 kind: ZarfPackageConfig
 metadata:

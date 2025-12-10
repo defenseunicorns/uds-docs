@@ -30,8 +30,6 @@ mkdir package && cd package
 
 Create the following `zarf.yaml` in the new directory:
 
-<!-- renovate:podinfo-image -->
-
 ```yaml
 kind: ZarfPackageConfig
 metadata:
@@ -82,10 +80,6 @@ Create the UDS Bundle in the same directory as the `package` directory. The foll
 - Locally built example application: `podinfo`.
 
 Create the following `uds-bundle.yaml`:
-
-<!-- renovate:uds-k3d-ref -->
-<!-- renovate:zarf-init-ref -->
-<!-- renovate:core-ref -->
 
 ```yaml
 kind: UDSBundle

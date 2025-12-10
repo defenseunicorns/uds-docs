@@ -20,75 +20,63 @@
       ],
       "groupName": "All npm dependencies",
       "groupSlug": "npm-dependencies"
+    },
+    {
+      "enabled": false,
+      "matchFileNames": [
+        "src/content/docs/structure/packages.md"
+      ]
     }
   ],
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": [
-        "^src/content/docs/.*\\.(md|mdx)$"
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
       ],
       "matchStrings": [
-        "<!--\\s*renovate:core-ref\\s*-->[\\s\\S]*?repository:\\s*oci://ghcr\\.io/defenseunicorns/packages/uds/core[\\s\\S]*?ref:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)-upstream"
-      ],
-      "datasourceTemplate": "github-tags",
-      "depNameTemplate": "defenseunicorns/uds-core",
-      "versioningTemplate": "semver"
-    },
-    {
-      "fileMatch": [
-        "^src/content/docs/.*\\.(md|mdx)$"
-      ],
-      "matchStrings": [
-        "<!--\\s*renovate:uds-k3d-ref\\s*-->[\\s\\S]*?repository:\\s*ghcr\\.io/defenseunicorns/packages/uds-k3d[\\s\\S]*?ref:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+        "repository:\\s*(?:(?:oci://)?(?<registry>ghcr\\.io)/(?<depPath>[^\\s]+))[\\s\\S]*?ref:\\s*(?<currentValue>[^\\s\"']+)"
       ],
       "datasourceTemplate": "docker",
-      "depNameTemplate": "ghcr.io/defenseunicorns/packages/uds-k3d",
-      "versioningTemplate": "docker",
-      "registryUrlTemplate": "https://ghcr.io"
+      "depNameTemplate": "{{registry}}/{{depPath}}",
+      "versioningTemplate": "regex:^v?(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?",
+      "extractVersionTemplate": "^(?<version>v?\\d+\\.\\d+(?:\\.\\d+)?)(?<suffix>-uds\\.\\d+(?:-[\\w.-]+)?)?$",
+      "autoReplaceStringTemplate": "{{{newValue}}}{{{suffix}}}",
+      "registryUrlTemplate": "https://{{registry}}"
     },
     {
-      "fileMatch": [
-        "^src/content/docs/.*\\.(md|mdx)$"
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
       ],
       "matchStrings": [
-        "<!--\\s*renovate:zarf-init-ref\\s*-->[\\s\\S]*?repository:\\s*oci://ghcr\\.io/zarf-dev/packages/init[\\s\\S]*?ref:\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
-      ],
-      "datasourceTemplate": "github-tags",
-      "depNameTemplate": "zarf-dev/zarf",
-      "versioningTemplate": "semver"
-    },
-    {
-      "fileMatch": [
-        "^src/content/docs/.*\\.(md|mdx)$"
-      ],
-      "matchStrings": [
-        "<!--\\s*renovate:uds-common\\s*-->[\\s\\S]*?https://raw\\.githubusercontent\\.com/defenseunicorns/uds-common/(?<currentValue>v\\d+\\.\\d+\\.\\d+)/tasks/setup\\.yaml"
-      ],
-      "datasourceTemplate": "github-tags",
-      "depNameTemplate": "defenseunicorns/uds-common",
-      "versioningTemplate": "semver"
-    },
-    {
-      "fileMatch": [
-        "^src/content/docs/.*\\.(md|mdx)$"
-      ],
-      "matchStrings": [
-        "<!--\\s*renovate:podinfo-image\\s*-->[\\s\\S]*?ghcr\\.io/stefanprodan/podinfo:(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+        "(?m)^\\s*-\\s+['\"]?(?<depName>(?:ghcr\\.io|quay\\.io|docker\\.io)/[^\\s:@'\"]+(?:/[^\\s:@'\"]+)*)['\"]?:(?<currentValue>[\\w.\\-]+)\\s*$"
       ],
       "datasourceTemplate": "docker",
-      "depNameTemplate": "ghcr.io/stefanprodan/podinfo",
       "versioningTemplate": "docker"
     },
     {
-      "fileMatch": [
-        "^src/content/docs/.*\\.(md|mdx)$"
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
       ],
       "matchStrings": [
-        "<!--\\s*renovate:podinfo-chart\\s*-->[\\s\\S]*?name:\\s*podinfo[\\s\\S]*?version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)[\\s\\S]*?url:\\s*https://github\\.com/stefanprodan/podinfo\\.git"
+        "(?m)name:\\s*[^\\n]+[\\s\\S]*?version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)[\\s\\S]*?url:\\s*[\"']?(?<gitUrl>https?://(?:github\\.com|gitlab\\.com|bitbucket\\.org)/[^\\s\"']+?\\.git)[\"']?\\s*$"
       ],
       "datasourceTemplate": "git-tags",
-      "depNameTemplate": "https://github.com/stefanprodan/podinfo.git",
+      "depNameTemplate": "{{gitUrl}}",
       "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
+      ],
+      "matchStrings": [
+        "https://raw\\.githubusercontent\\.com/(?<depName>[^/]+/[^/]+)/(?<currentValue>v?\\d+\\.\\d+\\.\\d+)/[^\\s\"')]+"
+      ],
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "semver-coerced"
     }
   ]
 }
