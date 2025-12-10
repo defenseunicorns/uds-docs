@@ -17,9 +17,10 @@ In this section, we will configure Single Sign On (SSO) for a sample user to acc
 
 In the root of the `package` directory, create a new file called `tasks.yaml` and include the lines below:
 
+<!-- renovate:uds-common -->
 ```yaml
 includes:
-  - common-setup: https://raw.githubusercontent.com/defenseunicorns/uds-common/refs/tags/v0.13.1/tasks/setup.yaml
+  - common-setup: https://raw.githubusercontent.com/defenseunicorns/uds-common/v1.21.3/tasks/setup.yaml
 ```
 
 ### Integrate Podinfo with UDS Core
@@ -170,10 +171,10 @@ podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   []         7    
 Notice how the count under `NETWORK POLICIES` has increased. The UDS Operator recognized that additional `NetworkPolicies` were required for Keycloak to communicate with `podinfo`, so it automatically created additional `NetworkPolicies` to allow that.
 :::
 
-When navigating to https://podinfo.uds.dev/, you will be redirected to a login screen. Only users that are members of the `/UDS Core/Admin` group in Keycloak are permitted to access the site. Run the `create-doug-user` task with the UDS CLI to create a test user that is part of the `/UDS Core/Admin` group:
+When navigating to https://podinfo.uds.dev/, you will be redirected to a login screen. Only users that are members of the `/UDS Core/Admin` group in Keycloak are permitted to access the site. Create a test user in that group with the following command (using the uds-common task included above):
 
 ```bash
-uds run setup:keycloak-user --set KEYCLOAK_USER_GROUP="/UDS Core/Admin"
+uds run common-setup:keycloak-user --set KEYCLOAK_USER_GROUP="/UDS Core/Admin"
 ```
 
 Use the following credentials to login to https://podinfo.uds.dev/: `username: doug / password: unicorn123!@#UN`

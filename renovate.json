@@ -21,5 +21,74 @@
       "groupName": "All npm dependencies",
       "groupSlug": "npm-dependencies"
     }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^src/content/docs/.*\\.(md|mdx)$"
+      ],
+      "matchStrings": [
+        "<!--\\s*renovate:core-ref\\s*-->[\\s\\S]*?repository:\\s*oci://ghcr\\.io/defenseunicorns/packages/uds/core[\\s\\S]*?ref:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)-upstream"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "defenseunicorns/uds-core",
+      "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": [
+        "^src/content/docs/.*\\.(md|mdx)$"
+      ],
+      "matchStrings": [
+        "<!--\\s*renovate:uds-k3d-ref\\s*-->[\\s\\S]*?repository:\\s*ghcr\\.io/defenseunicorns/packages/uds-k3d[\\s\\S]*?ref:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "ghcr.io/defenseunicorns/packages/uds-k3d",
+      "versioningTemplate": "docker",
+      "registryUrlTemplate": "https://ghcr.io"
+    },
+    {
+      "fileMatch": [
+        "^src/content/docs/.*\\.(md|mdx)$"
+      ],
+      "matchStrings": [
+        "<!--\\s*renovate:zarf-init-ref\\s*-->[\\s\\S]*?repository:\\s*oci://ghcr\\.io/zarf-dev/packages/init[\\s\\S]*?ref:\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "zarf-dev/zarf",
+      "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": [
+        "^src/content/docs/.*\\.(md|mdx)$"
+      ],
+      "matchStrings": [
+        "<!--\\s*renovate:uds-common\\s*-->[\\s\\S]*?https://raw\\.githubusercontent\\.com/defenseunicorns/uds-common/(?<currentValue>v\\d+\\.\\d+\\.\\d+)/tasks/setup\\.yaml"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "defenseunicorns/uds-common",
+      "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": [
+        "^src/content/docs/.*\\.(md|mdx)$"
+      ],
+      "matchStrings": [
+        "<!--\\s*renovate:podinfo-image\\s*-->[\\s\\S]*?ghcr\\.io/stefanprodan/podinfo:(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "ghcr.io/stefanprodan/podinfo",
+      "versioningTemplate": "docker"
+    },
+    {
+      "fileMatch": [
+        "^src/content/docs/.*\\.(md|mdx)$"
+      ],
+      "matchStrings": [
+        "<!--\\s*renovate:podinfo-chart\\s*-->[\\s\\S]*?name:\\s*podinfo[\\s\\S]*?version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)[\\s\\S]*?url:\\s*https://github\\.com/stefanprodan/podinfo\\.git"
+      ],
+      "datasourceTemplate": "git-tags",
+      "depNameTemplate": "https://github.com/stefanprodan/podinfo.git",
+      "versioningTemplate": "semver"
+    }
   ]
 }
