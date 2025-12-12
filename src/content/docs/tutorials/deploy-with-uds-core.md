@@ -115,7 +115,7 @@ packages:
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
-    ref: 0.50.0-upstream
+    ref: 0.55.1-upstream
     overrides:
       # Set overrides for k3d dev stack
       pepr-uds-core:
@@ -140,6 +140,10 @@ packages:
     path: ./
     ref: 0.0.1
 ```
+
+:::note
+Use UDS Core version 0.55.1 or newer. Earlier versions may trigger browser certificate errors when accessing example HTTPS endpoints (for example, https://podinfo.uds.dev) due to an outdated development certificate.
+:::
 
 UDS Bundles can easily be configured to include additional applications and capabilities. For example, if you would like to deploy [dos-games](https://docs.zarf.dev/tutorials/3-deploy-a-retro-arcade/) instead of `podinfo`, in the `uds-bundle.yaml` simply replace:
 

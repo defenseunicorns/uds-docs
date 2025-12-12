@@ -1,0 +1,90 @@
+{
+  "extends": [
+    "github>defenseunicorns/uds-common//config/renovate.json5",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  "ignorePresets": [
+    ":ignoreModulesAndTests"
+  ],
+  "branchConcurrentLimit": 0,
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "matchFileNames": ["package-lock.json"],
+      "groupName": "All npm dependencies",
+      "groupSlug": "npm-dependencies"
+    },
+    {
+      "enabled": false,
+      "matchFileNames": ["src/content/docs/structure/packages.md"]
+    },
+    // Group updates from our docs regex customManagers (docker + git/github tags) into one PR.
+    {
+      "groupName": "Docs dependencies",
+      "groupSlug": "docs-deps",
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["docker", "git-tags", "github-tags"],
+      "matchFileNames": ["src/content/docs/**"]
+    }
+  ],
+  "customManagers": [
+    // Matches a ghcr.io repository (including oci://) and captures the next ref version, even if it spans multiple package blocks.
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
+      ],
+      // Test: https://regex101.com/r/2bifNc/
+      "matchStrings": [
+        "repository:\\s*(?:(?:oci:\\/\\)?(?<registry>ghcr\\.io)/(?<depPath>[^\\s]+))[\\s\\S]*?ref:\\s*(?<currentValue>[^\\s\"']+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "{{registry}}/{{depPath}}",
+      "versioningTemplate": "docker",
+      "registryUrlTemplate": "https://{{registry}}"
+    },
+    // Matches a ghcr.io repository and captures its ref version, limited to the same package entry only.
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
+      ],
+      // Test: https://regex101.com/r/Zpqw2u/
+      "matchStrings": [
+        "(?m)^\\s*-\\s+['\"]?(?<depName>(?:ghcr\\.io|quay\\.io|docker\\.io)/[^\\s:@'\"]+(?:/[^\\s:@'\"]+)*)['\"]?:(?<currentValue>[\\w.\\-]+)\\s*$"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    // Matches chart entries under `charts:` in markdown YAML blocks, capturing the chart `version:` and its GitHub `.git` `url:`
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
+      ],
+      // Test: https://regex101.com/r/ceSlFR/
+      "matchStrings": [
+        "(?m)^\\s*charts:\\s*\\n(?:^\\s{2,}.*\\n)*?^\\s*-\\s*name:\\s*[^\\n]+\\n(?:^\\s{2,}.*\\n)*?^\\s*version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s*\\n(?:^\\s{2,}.*\\n)*?^\\s*url:\\s*[\"']?(?<gitUrl>https?://github\\.com/[^\\s\"']+?\\.git)[\"']?\\s*$"
+      ],
+      "datasourceTemplate": "git-tags",
+      "depNameTemplate": "{{gitUrl}}",
+      "versioningTemplate": "semver"
+    },
+    // Matches raw.githubusercontent.com URLs and captures the repo (org/repo) + embedded vX.Y.Z tag for Renovate updates
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
+      ],
+      // Test: https://regex101.com/r/KftH4v/
+      "matchStrings": [
+        "https://raw\\.githubusercontent\\.com/(?<depName>[^/]+/[^/]+)/(?<currentValue>v?\\d+\\.\\d+\\.\\d+)/[^\\s\"')]+"
+      ],
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "semver-coerced"
+    }
+  ]
+}
