@@ -12,7 +12,7 @@ software artifacts.
 
 With UDS, mission teams can:
 
-- Deploy a new accreditable software environment swiftly and seamlessly.
+- Deploy a new authorizable software environment swiftly and seamlessly.
 - Update mission application bundles and packages on-demand in minutes.
 - Deploy mission applications to classified and unclassified cloud, on-premises, and edge environments.
 - Use open and extensible architectures.
@@ -23,7 +23,7 @@ With UDS, mission teams can:
 UDS places a strong emphasis on security and compliance, enabling Mission Heroes
 to meet stringent requirements for obtaining an Authority to Operate (ATO). It implements the Open Security Controls
 Assessment Language (OSCAL) framework, which binds compliance to specific software features, ensuring that controls
-required for accreditation are met efficiently. By integrating security and compliance into the software development
+required for authorization are met efficiently. By integrating security and compliance into the software development
 and deployment lifecycle, UDS helps your team proactively address potential vulnerabilities, reduce risk,
 and maintain a secure software ecosystem.
 
