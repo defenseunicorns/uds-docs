@@ -11,16 +11,13 @@ For the sake of this tutorial, we will cover migrating the podinfo application t
 
 ### Prerequisites
 
-For this tutorial please ensure you are running at UDS Core version 0.48.0 or higher. This will ensure full ambient support is present, including Authservice protection.
+For this tutorial please ensure you are running at UDS Core version 0.55.1 or higher. This will ensure full ambient support is present, including Authservice protection.
 
 Run `zarf package list` and check the version number for the `core` package:
 ```bash
 ❯ zarf package list
      Package | Namespace Override | Version | Components
-     core    |                    | 0.50.0  | [uds-crds uds-operator-config prometheus-operator-crds pepr-uds-core istio-controlplane gateway-api-crds istio-admin-gateway istio-tenant-gateway keycloak neuvector loki kube-prometheus-stack vector grafana authservice velero]
-     init    |                    | v0.60.0 | [zarf-injector zarf-seed-registry zarf-registry zarf-agent]
-     podinfo |                    | 0.0.1   | [podinfo]
-     uds-k3d |                    | 0.16.0  | [destroy-cluster create-cluster uds-dev-stack]
+     core    |                    | 0.55.1  | [uds-crds uds-operator-config prometheus-operator-crds pepr-uds-core istio-controlplane gateway-api-crds istio-admin-gateway istio-tenant-gateway keycloak neuvector loki kube-prometheus-stack vector grafana authservice velero]
 ```
 
 ### Migrate Podinfo To Istio Ambient Mode
