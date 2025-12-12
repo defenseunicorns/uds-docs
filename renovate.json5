@@ -12,28 +12,34 @@
   "prHourlyLimit": 0,
   "packageRules": [
     {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchFileNames": [
-        "package-lock.json"
-      ],
+      "matchManagers": ["npm"],
+      "matchFileNames": ["package-lock.json"],
       "groupName": "All npm dependencies",
       "groupSlug": "npm-dependencies"
     },
     {
       "enabled": false,
-      "matchFileNames": [
-        "src/content/docs/structure/packages.md"
+      "matchFileNames": ["src/content/docs/structure/packages.md"]
+    },
+    // Keep podinfo chart version + container image tag updates in a single PR so docs never reference mismatched versions.
+    {
+      "groupName": "podinfo docs",
+      "groupSlug": "podinfo-docs",
+      "matchManagers": ["custom.regex"],
+      "matchDepNames": [
+        "https://github.com/stefanprodan/podinfo.git",
+        "ghcr.io/stefanprodan/podinfo"
       ]
     }
   ],
   "customManagers": [
+    // Matches a ghcr.io repository (including oci://) and captures the next ref version, even if it spans multiple package blocks.
     {
       "customType": "regex",
       "managerFilePatterns": [
         "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
       ],
+      // Test: https://regex101.com/r/2bifNc/
       "matchStrings": [
         "repository:\\s*(?:(?:oci://)?(?<registry>ghcr\\.io)/(?<depPath>[^\\s]+))[\\s\\S]*?ref:\\s*(?<currentValue>[^\\s\"']+)"
       ],
@@ -44,34 +50,40 @@
       "autoReplaceStringTemplate": "{{{newValue}}}{{{suffix}}}",
       "registryUrlTemplate": "https://{{registry}}"
     },
+    // Matches a ghcr.io repository and captures its ref version, limited to the same package entry only.
     {
       "customType": "regex",
       "managerFilePatterns": [
         "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
       ],
+      // Test: https://regex101.com/r/Zpqw2u/
       "matchStrings": [
         "(?m)^\\s*-\\s+['\"]?(?<depName>(?:ghcr\\.io|quay\\.io|docker\\.io)/[^\\s:@'\"]+(?:/[^\\s:@'\"]+)*)['\"]?:(?<currentValue>[\\w.\\-]+)\\s*$"
       ],
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
     },
+    // Matches GitHub .git dependencies in markdown YAML blocks by pairing a `version:` field with its repo URL
     {
       "customType": "regex",
       "managerFilePatterns": [
         "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
       ],
+      // Test: https://regex101.com/r/mBEs5T/
       "matchStrings": [
-        "(?m)name:\\s*[^\\n]+[\\s\\S]*?version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)[\\s\\S]*?url:\\s*[\"']?(?<gitUrl>https?://(?:github\\.com|gitlab\\.com|bitbucket\\.org)/[^\\s\"']+?\\.git)[\"']?\\s*$"
+        "(?m)name:\\s*[^\\n]+[\\s\\S]*?version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)[\\s\\S]*?url:\\s*[\"']?(?<gitUrl>https?://(?:github\\.com)/[^\\s\"']+?\\.git)[\"']?\\s*$"
       ],
       "datasourceTemplate": "git-tags",
       "depNameTemplate": "{{gitUrl}}",
       "versioningTemplate": "semver"
     },
+    // Matches raw.githubusercontent.com URLs and captures the repo (org/repo) + embedded vX.Y.Z tag for Renovate updates
     {
       "customType": "regex",
       "managerFilePatterns": [
         "/^src\\/content\\/docs\\/.*\\.(md|mdx)$/"
       ],
+      // Test: https://regex101.com/r/KftH4v/
       "matchStrings": [
         "https://raw\\.githubusercontent\\.com/(?<depName>[^/]+/[^/]+)/(?<currentValue>v?\\d+\\.\\d+\\.\\d+)/[^\\s\"')]+"
       ],
