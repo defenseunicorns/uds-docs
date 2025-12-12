@@ -46,7 +46,7 @@
       "datasourceTemplate": "docker",
       "depNameTemplate": "{{registry}}/{{depPath}}",
       "versioningTemplate": "regex:^v?(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?",
-      "extractVersionTemplate": "^(?<version>v?\\d+\\.\\d+(?:\\.\\d+)?)(?<suffix>-uds\\.\\d+(?:-[\\w.-]+)?)?$",
+      "extractVersionTemplate": "^(?<version>v?\d+\.\d+(?:\.\d+)?)(?<suffix>-(?:uds\.\d+(?:-[\w.-]+)?|[\w.-]+))?$",
       "autoReplaceStringTemplate": "{{{newValue}}}{{{suffix}}}",
       "registryUrlTemplate": "https://{{registry}}"
     },
