@@ -44,7 +44,7 @@ These directories may be easiest understood through a detailed example.
 
 ### GitLab's UDS Package Anatomy
 
-GitLab is the cornerstone application in the UDS Software Factory. You can view the UDS Package for GitLab [on Defense Unicorn's GitHub](https://github.com/uds-packages/gitlab). This dive into UDS Package anatomy will use the repo as it existed in release [v17.3.6-uds.1](https://github.com/uds-packages/gitlab/tree/v17.3.6-uds.1). That is, GitLab version 17.3.6, second package release for that version (zero-indexed).
+GitLab is the cornerstone application in the UDS Software Factory. We will dive into the UDS Package anatomy, using Gitlab as an example.
 
 Rather than reviewing the repo according to the alphabetical ordering of it's directories as in the table above, components of the repo are discussed in terms of how they build to produce a UDS Package, and not all components will receive the same screen-time, rather, what follows is something of a guided tour through the repository.
 
@@ -52,7 +52,7 @@ Rather than reviewing the repo according to the alphabetical ordering of it's di
 
 ##### `common/zarf.yaml`
 
-Starting with [`common/zarf.yaml`](https://github.com/uds-packages/gitlab/blob/v17.3.6-uds.1/common/zarf.yaml) we have the base [`ZarfPackageConfig`](https://docs.zarf.dev/ref/packages/#zarfpackageconfig). It is reprinted in abbreviated form below with comments added for clear in-line explanation.
+Starting with `common/zarf.yaml` we have the base `ZarfPackageConfig`. It is reprinted in abbreviated form below with comments added for clear in-line explanation.
 
 ```yaml
 kind: ZarfPackageConfig  # A UDS Package is just a kind of Zarf Package
@@ -66,7 +66,7 @@ components:
     required: true
     charts:  # These charts are deployed in the order listed, use this to your advantage
 
-      # Adds SSO, postgre, and redis auth secrets which are expected (required) by the main
+      # Adds SSO, postgres, and redis auth secrets which are expected (required) by the main
       # app (if missing, will break the deployment). Also includes the UDS Package resource 
       # which makes this Zarf Package also a UDS Package.
       - name: uds-gitlab-config
@@ -88,8 +88,8 @@ components:
         # for the desired flavor
           - ../values/common-values.yaml
 
-      # If you inspect https://github.com/uds-packages/gitlab/blob/v17.3.6-uds.1/charts/settings/templates/_settings-pod.tpl
-      # you will see this chart creates a job that further configures GitLab in ways that
+      # In the `charts/settings/templates/_settings-pod.tpl`
+      # this chart creates a job that further configures GitLab in ways that
       # could not be done via Helm at deploy-time.
       - name: uds-gitlab-settings
         namespace: gitlab
@@ -105,7 +105,7 @@ components:
 
 ##### `./zarf.yaml`
 
-If we go now to the root-level [zarf.yaml](https://github.com/uds-packages/gitlab/blob/v17.3.6-uds.1/zarf.yaml) file we can see the [Zarf variables](https://docs.zarf.dev/ref/values/) and [flavors](/overview/acronyms-and-terms/#flavor-as-in-uds-package-or-bundle-flavor) get added in.
+If we go now to the root-level zarf.yaml file we can see the [Zarf variables](https://docs.zarf.dev/ref/values/) and [flavors](/overview/acronyms-and-terms/#flavor-as-in-uds-package-or-bundle-flavor) get added in.
 
 ```yaml
 kind: ZarfPackageConfig  # As before, a UDS Package is just a Zarf Package with made for UDS
@@ -170,8 +170,8 @@ components:
       - name: uds-gitlab-settings
         valuesFiles:
           # Because the gitlab settings setting job runs in an image, also grab the Ironbank 
-          # version of the required image. See:
-          # https://github.com/uds-packages/gitlab/blob/v17.3.6-uds.1/charts/settings/values.yaml#L8
+          # version of the required image. Set in:
+          # `charts/settings/values.yaml`
           - values/registry1-values.yaml
     images:
       # Here we list all the images referenced in the values.yaml files. This is how Zarf
@@ -235,7 +235,7 @@ As explained in the [anatomy overview](/structure/packages/#anatomy-of-a-uds-pac
 
 Bundle files get larger than the `zarf.yaml` files previously explored so this one will be more severely abbreviated.
  
-[uds-bundle.yaml](https://github.com/uds-packages/gitlab/blob/v17.3.6-uds.1/bundle/uds-bundle.yaml) excerpts:
+`uds-bundle.yaml` excerpts:
 ```yaml
 kind: UDSBundle
 metadata:
@@ -249,7 +249,7 @@ packages:
   # and testing, this service is often provided by an off-cluster service in large deployments.
   # Repo behind the package: https://github.com/uds-packages/minio-operator
   - name: dev-minio
-    repository: ghcr.io/uds-packages/minio-operator
+    repository: ghcr.io/defenseunicorns/packages/uds/dev-minio
     ref: 0.0.2
 
   # This is a bit of an odd duck. We create the namespace for GitLab ahead of time so if we run
@@ -317,10 +317,7 @@ packages:
     path: ../
     ref: 0.1.0
   
-  # This is where we add the GitLab UDS Package to the bundle. Recall that it had two charts included:
-  # - https://github.com/uds-packages/gitlab/tree/v17.3.6-uds.1/charts
-  # - https://github.com/uds-packages/gitlab/blob/v17.3.6-uds.1/common/zarf.yaml#L14
-  # - https://github.com/uds-packages/gitlab/blob/v17.3.6-uds.1/common/zarf.yaml#L25
+  # This is where we add the GitLab UDS Package to the bundle. Recall that it had two charts included.
   - name: gitlab
     # Note that the path for the GitLab Zarf package (which is a UDS package) is '../' same as for
     # the dev-secret package because all zarf packages are built before the bundle is built, and put
