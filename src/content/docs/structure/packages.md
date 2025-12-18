@@ -52,7 +52,7 @@ Rather than reviewing the repo according to the alphabetical ordering of it's di
 
 ##### `common/zarf.yaml`
 
-Starting with `common/zarf.yaml` we have the base `ZarfPackageConfig`. It is reprinted in abbreviated form below with comments added for clear in-line explanation.
+Starting with `common/zarf.yaml` we have the base [`ZarfPackageConfig`](https://docs.zarf.dev/ref/packages/#zarfpackageconfig). It is reprinted in abbreviated form below with comments added for clear in-line explanation.
 
 ```yaml
 kind: ZarfPackageConfig  # A UDS Package is just a kind of Zarf Package
@@ -231,7 +231,7 @@ components:
 
 #### GitLab's Testing & Development
 
-As explained in the [anatomy overview](/structure/packages/#anatomy-of-a-uds-package-repo), the [bundle/](https://github.com/uds-packages/gitlab/tree/v17.3.6-uds.1/bundle) directory contains a bundle using the GitLab UDS Package and serves two functions. First, it provides a way to deploy and test GitLab as configured by the UDS Package. Second, like any good test, it is a form of documentation showing how Gitlab may be connected into a bundle.
+As explained in the [anatomy overview](/structure/packages/#anatomy-of-a-uds-package-repo), the `bundle/` directory contains a bundle using the GitLab UDS Package and serves two functions. First, it provides a way to deploy and test GitLab as configured by the UDS Package. Second, like any good test, it is a form of documentation showing how Gitlab may be connected into a bundle.
 
 Bundle files get larger than the `zarf.yaml` files previously explored so this one will be more severely abbreviated.
  
