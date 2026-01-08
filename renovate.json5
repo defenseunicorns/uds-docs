@@ -39,8 +39,9 @@
       ],
       // Test: https://regex101.com/r/2bifNc/
       "matchStrings": [
-        "repository:\\s*(?:(?:oci:\\/\\)?(?<registry>ghcr\\.io)/(?<depPath>[^\\s]+))[\\s\\S]*?ref:\\s*(?<currentValue>[^\\s\"']+)"
+        "repository:\\s*(?:(?:oci:\\/\\/)?(?<registry>ghcr\\.io)\\/(?<depPath>[^\\s]+))[\\s\\S]*?ref:\\s*(?<currentValue>[^\\s\"']+)"
       ],
+      "currentValueTemplate": "{{{currentValue}}}",
       "datasourceTemplate": "docker",
       "depNameTemplate": "{{registry}}/{{depPath}}",
       "versioningTemplate": "docker",
