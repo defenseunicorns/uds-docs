@@ -31,7 +31,7 @@ Pepr automates the integration of applications with runtime capabilities within 
 
 ### Lula
 
-Lula is the compliance bridge that leverages the NIST OSCAL framework to automate and simplify compliance in a Kubernetes environment. Lula will demonstrate control inheritance and validation for each UDS Package within the UDS environment. Lula documents and validates controls satisfied by applications, expediting the authorization process and generating real-time reports for authorizing officials, reducing the burden on the site reliability engineering team and other individuals involved in manually providing control mapping and responses. For additional information, please see the [Lula GitHub page](https://github.com/defenseunicorns/lula#readme).
+Lula is an open-source compliance-as-code tool that brings GitOps principles to compliance management in software projects. It enables teams to represent security and regulatory controls as structured code, integrate them into normal development workflows, and automatically assess changes through pull requests and CI/CD pipelines. By treating compliance artifacts — such as control definitions, mappings, and evidence — as versioned code, Lula helps teams track, review, and manage compliance frameworks (like NIST 800-53, CIS, SOC2, and custom standards) in a repository in a way that integrates seamlessly with everyday development practices. For additional information, please see the [Lula GitHub page](https://github.com/defenseunicorns/lula#readme).
 
 ## UDS CLI
 
