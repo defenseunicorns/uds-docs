@@ -115,7 +115,7 @@ packages:
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
-    ref: 0.58.1-upstream
+    ref: 0.59.0-upstream
     overrides:
       # Set overrides for k3d dev stack
       pepr-uds-core:
