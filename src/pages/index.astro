@@ -1,6 +1,6 @@
 ---
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components';
 import '@fontsource/teko';
 
 const frontmatter = {
@@ -18,65 +18,6 @@ const frontmatter = {
     next: false
 } as const;
 
-const sections = [
-    {
-        title: 'Get Started',
-        links: [
-            { title: 'Why UDS?', href: 'overview/why-uds' },
-            { title: 'Basic Requirements', href: 'getting-started/basic-requirements' },
-            { title: 'Install & Deploy UDS', href: 'getting-started/install-and-deploy-uds' },
-            { title: 'What is a UDS Bundle?', href: '/structure/bundles/' },
-            { title: 'Quickstart', href: '/reference/cli/quickstart-and-usage/' },
-            { title: 'Command Reference', href: '/reference/cli/commands/uds/' },
-        ]
-    },
-    {
-        title: 'Product Capabilities',
-        links: [
-            { title: 'Secure Runtime with UDS Core', href: '/reference/uds-core/overview/' },
-            { title: 'Tactical Edge Deployments', badge: { text: 'New!', variant: 'tip' }, href: '/tactical-edge-deployments/overview' },
-            { title: 'UDS Registry', badge: { text: 'New!', variant: 'tip' }, href: '/registry/overview' }
-        ]
-    },
-    {
-        title: 'Working with UDS Core',
-        links: [
-            { title: 'Prerequisites', href: '/reference/uds-core/prerequisites' },
-            { title: 'Bundle Overrides', href: '/reference/bundles/overrides' },
-            { title: 'Distribution Support', href: '/reference/uds-core/distribution-support/' },
-            { title: 'Functional Layers', href: '/reference/uds-core/functional-layers/' },
-            { title: 'UDS Core Flavors', href: '/reference/uds-core/flavor-specific-development-notes/' },
-            { title: 'Upgrading UDS Core', href: '/reference/deployment/upgrades/' }
-        ]
-    },
-    {
-        title: 'Bundles & Configuration',
-        links: [
-            { title: 'Istio Ingress', href: '/reference/configuration/service-mesh/ingress' },
-            { title: 'Pepr Policies', href: '/reference/configuration/pepr-policies' },
-            { title: 'UDS Operator', href: '/reference/configuration/uds-operator/overview/' },
-            { title: 'DNS Configuration', href: '/reference/uds-core/dns/' },
-        ]
-    },
-    {
-        title: 'Security & Identity',
-        links: [
-            {title: 'UDS Security Overview', href: '/security/overview'},
-            {title: 'UDS Identity Config Overview', href: '/reference/uds-core/idam/uds-identity-config-overview'},
-            {title: 'Keycloak Plugin', href: '/reference/uds-core/idam/plugin'},
-        ]
-    },
-    {
-        title: 'Tutorials',
-        links: [
-            {title: 'Deploy a sample app with UDS Core', href: '/tutorials/deploy-with-uds-core/'},
-            {title: 'Integrate an App with UDS Core', href: '/tutorials/create-uds-package/'},
-            {title: 'Add UDS to a Zarf package', href: '/tutorials/add-package-to-bundle/'},
-            {title: 'Use Istio Ambient Mesh', href: '/tutorials/deploy-with-ambient/'},
-            {title: 'Deploying UDS on RKE2', href: '/tutorials/deploy-uds-on-rke2/'},
-        ]
-    }
-]
 ---
 <style>
     :root[data-theme='light'] {
@@ -97,7 +38,7 @@ const sections = [
         }
     }
 
-    html:not([data-has-sidebar]) {
+    html:where([data-has-sidebar]) {
         --sl-content-width: 67.5rem;
 
         .card > .body ul {
@@ -151,7 +92,7 @@ const sections = [
 
         @media (min-width: 70rem) {
             .card-grid {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
                 gap: 1.5rem;
             }
         }
@@ -194,62 +135,147 @@ const sections = [
     .sl-badge.small {
         padding: 0.2rem 0.5rem; /* Adjusted padding */
     }
+
+    .doc-links {
+        list-style: none;
+        padding: 0;
+        margin: 0.75rem 0 0;
+        display: grid;
+        gap: 0.35rem;
+    }
+
+    .doc-links a {
+        text-decoration: none;
+    }
+
+    .doc-links a:hover {
+        text-decoration: underline;
+    }
+
+    .callout-stack {
+        margin-top: 1.25rem;
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .callout {
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--sl-color-hairline, #e5e7eb);
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+        background: var(--sl-color-bg-alt, rgba(17,24,39,0.5));
+    }
+
+    .callout-links {
+        list-style: none;
+        padding: 0;
+        margin: 0.4rem 0 0;
+        display: grid;
+        gap: 0.3rem;
+        font-size: 0.93rem;
+    }
+
+    .icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .icon-link:hover {
+        text-decoration: underline;
+    }
+
+    .icon-link svg {
+        width: 1rem;
+        height: 1rem;
+        display: inline-block;
+    }
+
+    :global(.content-panel) {
+        padding: 0rem var(--sl-content-pad-x);
+    }
 </style>
 
-<StarlightPage frontmatter={frontmatter} hasSidebar={false}>
+<StarlightPage frontmatter={frontmatter} hasSidebar={true}>
     <div class="space-y-8">
         <CardGrid>
-            {
-                sections.map((section) => (
-                    <Card title={section.title}>
-                        <ul >
-                            {section.links.map((link) => (
-                                <li>
-                                    <a class="no-underline" href={link.href}>
-                                        {link.title}
-                                        {link.badge && (
-                                            <span class={`sl-badge tip small`}> 
-                                                {link.badge.text}
-                                            </span>
-                                        )}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </Card>
-                ))
-            }
-        </CardGrid>
-    </div>
-    <div>
-        <h2 class="text-left">Get involved</h2>
-        <div>
-            <Card title="UDS Core">
-                <p>
-                        UDS Core provides a secure baseline for cloud-native systems and includes compliance documentation with strong support for airgap environments.
-                </p>
-                    <LinkCard title="Go to UDS Core on GitHub" href="https://github.com/defenseunicorns/uds-core" />
-            </Card>
-            <Card title="UDS CLI">
-                <p>
-                        UDS CLI allows bundling and deploying multiple independent Zarf packages efficiently.
-                </p>
-                    <LinkCard title="Go to UDS CLI on GitHub" href="https://github.com/defenseunicorns/uds-cli" target="_blank" />
-            </Card>
-            <Card title="Docs for LLMs">
-                <p>
-                        We support the llms.txt convention for making documentation available to large language models and the applications that make use of them.
-                </p>
-                <p>
-                        Currently, we have the following root-level files:
-                </p>
-                <ul>
-                    <li><a href="/llms.txt" class="no-underline">/llms.txt</a> — a listing of the available files</li>
-                    <li><a href="/llms-full.txt" class="no-underline">/llms-full.txt</a> — complete documentation for UDS</li>
-                    <li><a href="/llms-small.txt" class="no-underline">/llms-small.txt</a> — compressed documentation for use with smaller context windows</li>
+            <Card title="Learn more about UDS">
+                <p>Understand why UDS exists and how it supports secure delivery missions.</p>
+                <ul class="doc-links">
+                    <li>
+                        <a class="no-underline" href="/overview/why-uds/">Why UDS</a>
+                    </li>
+                    <li>
+                        <a class="no-underline" href="/overview/uds-mission-relevance/">Mission Relevance</a>
+                    </li>
                 </ul>
             </Card>
-            </div>
+
+            <Card title="Get started with UDS">
+                <p>Install UDS CLI and UDS Core on your local machine.</p>
+                <ul class="doc-links">
+                    <li>
+                        <a class="no-underline" href="/getting-started/basic-requirements/">Basic Requirements</a>
+                    </li>
+                    <li>
+                        <a class="no-underline" href="/getting-started/install-and-deploy-uds/">Install & Deploy</a>
+                    </li>
+                </ul>
+            </Card>
+
+            <Card title="UDS Core">
+                <p>Explore UDS Core, then integrate and deploy an application with Core.</p>
+                <ul class="doc-links">
+                    <li>
+                        <a class="no-underline" href="/reference/uds-core/overview/">UDS Core Overview</a>
+                    </li>
+                    <li>
+                        <a class="no-underline" href="/tutorials/deploy-with-uds-core/">Deploy with UDS Core</a>
+                    </li>
+                </ul>
+            </Card>
+
+            <Card title="Product Capabilities">
+                <p>Learn more about UDS at the Tactical Edge and the UDS Registry.</p>
+                <ul class="doc-links">
+                    <li>
+                        <a class="no-underline" href="/tactical-edge-deployments/overview/">Tactical Edge</a>
+                    </li>
+                    <li>
+                        <a class="no-underline" href="/registry/overview/">UDS Registry</a>
+                    </li>
+                </ul>
+            </Card>
+        </CardGrid>
+    </div>
+    <div class="callout-stack">
+        <div class="callout involve-callout">
+            <strong>Get Involved:</strong>
+            <ul class="callout-links">
+                <li>
+                    <a class="icon-link" href="https://github.com/defenseunicorns/uds-core" target="_blank">
+                        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4.01 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+                        UDS Core on GitHub
+                    </a>
+                </li>
+                <li>
+                    <a class="icon-link" href="https://github.com/defenseunicorns/uds-cli" target="_blank">
+                        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4.01 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+                        UDS CLI on GitHub
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="callout llm-callout">
+            <strong>Docs for LLMs:</strong> machine-readable snapshots for assistants and automation.
+            <ul class="callout-links">
+                <li><a href="/llms.txt">llms.txt</a> — listing of available files</li>
+                <li><a href="/llms-full.txt">llms-full.txt</a> — complete documentation for UDS</li>
+                <li><a href="/llms-small.txt">llms-small.txt</a> — compressed documentation for smaller context windows</li>
+            </ul>
         </div>
     </div>
 </StarlightPage>
