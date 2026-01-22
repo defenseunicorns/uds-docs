@@ -98,6 +98,16 @@ When `haDatabase` is enabled:
 |-----------|---------|---------|-------------|
 | `registry.logging.level` | `INFO` | `DEBUG`, `INFO`, `WARN`, `ERROR` | Log level |
 
+### Classification Banner <small>[(example)](#classification-banner)</small>
+
+Use the classification banner to render a header and footer in the UI. The `classification` value sets the banner colors and, if no label is provided, the banner text. If you provide a `label`, it replaces the displayed text, so you _must_ include the classification in the label if you want it shown (for example: `CUI//EXERCISE USE ONLY`). Providing only `classification: CUI` and `label: EXERCISE USE ONLY` displays only `EXERCISE USE ONLY`.
+
+| Parameter | Default | Options | Description |
+|-----------|---------|---------|-------------|
+| `registry.classificationBanner.classification` | `""` | `UNCLASSIFIED`, `CUI`, `CONFIDENTIAL`, `SECRET`, `TOP SECRET`, `TOP SECRET//SCI` | Required classification value used to set banner colors. |
+| `registry.classificationBanner.label` | `""` | - | Optional label that overrides the displayed classification text. |
+
+
 ### Authentication Configuration <small>[(example)](#authentication-and-session-configuration)</small>
 
 | Parameter | Default | Description |
@@ -263,6 +273,20 @@ distribution:
 
 logging:
   level: "INFO"
+```
+
+### Classification Banner
+
+```yaml
+classificationBanner:
+  classification: "CUI"
+  label: "CUI//EXERCISE USE ONLY"
+```
+
+```yaml
+classificationBanner:
+  classification: "SECRET"
+  label: ""
 ```
 
 ### S3 Storage Configuration
