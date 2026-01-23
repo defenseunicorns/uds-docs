@@ -111,7 +111,7 @@ packages:
 
   - name: init
     repository: oci://ghcr.io/zarf-dev/packages/init
-    ref: v0.69.0
+    ref: v0.70.1
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
