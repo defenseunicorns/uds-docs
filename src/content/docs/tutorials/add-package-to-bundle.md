@@ -25,7 +25,7 @@ components:
     required: true
     charts:
       - name: podinfo
-        version: 6.9.4
+        version: 6.10.0
         namespace: podinfo
         url: https://github.com/stefanprodan/podinfo.git
         gitPath: charts/podinfo
@@ -36,7 +36,7 @@ components:
         files:
           - podinfo-package.yaml
     images:
-      - ghcr.io/stefanprodan/podinfo:6.9.4
+      - ghcr.io/stefanprodan/podinfo:6.10.0
     actions:
       onDeploy:
         after:
