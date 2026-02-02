@@ -41,12 +41,12 @@ components:
     required: true
     charts:
       - name: podinfo
-        version: 6.9.4
+        version: 6.10.0
         namespace: podinfo
         url: https://github.com/stefanprodan/podinfo.git
         gitPath: charts/podinfo
     images:
-      - ghcr.io/stefanprodan/podinfo:6.9.4
+      - ghcr.io/stefanprodan/podinfo:6.10.0
     actions:
       onDeploy:
         after:
@@ -115,7 +115,7 @@ packages:
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
-    ref: 0.59.1-upstream
+    ref: 0.60.1-upstream
     overrides:
       # Set overrides for k3d dev stack
       pepr-uds-core:
