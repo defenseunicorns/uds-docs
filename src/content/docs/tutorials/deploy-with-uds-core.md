@@ -41,12 +41,12 @@ components:
     required: true
     charts:
       - name: podinfo
-        version: 6.10.0
+        version: 6.10.1
         namespace: podinfo
         url: https://github.com/stefanprodan/podinfo.git
         gitPath: charts/podinfo
     images:
-      - ghcr.io/stefanprodan/podinfo:6.10.0
+      - ghcr.io/stefanprodan/podinfo:6.10.1
     actions:
       onDeploy:
         after:
