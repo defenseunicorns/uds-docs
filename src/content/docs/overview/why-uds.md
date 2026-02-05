@@ -21,11 +21,10 @@ With UDS, mission teams can:
 ## Security and Compliance
 
 UDS places a strong emphasis on security and compliance, enabling Mission Heroes
-to meet stringent requirements for obtaining an Authority to Operate (ATO). It implements the Open Security Controls
-Assessment Language (OSCAL) framework, which binds compliance to specific software features, ensuring that controls
-required for authorization are met efficiently. By integrating security and compliance into the software development
-and deployment lifecycle, UDS helps your team proactively address potential vulnerabilities, reduce risk,
-and maintain a secure software ecosystem.
+to meet stringent requirements for obtaining an Authority to Operate (ATO). It binds compliance to specific software
+features, ensuring that controls required for authorization are met efficiently. By integrating security and 
+compliance into the software development and deployment lifecycle, UDS helps your team proactively address potential
+vulnerabilities, reduce risk, and maintain a secure software ecosystem.
 
 ## Enhanced Portability and Cross-Platform Support
 

@@ -39,9 +39,6 @@ Authority to Operate (ATO) is a formal declaration that a system or application 
 ### Software Bill of Materials
 A Software Bill of Materials (SBOM) is a comprehensive list of components used in building a software product. It provides transparency into the software supply chain, detailing the dependencies and libraries that make up the software. SBOMs are essential for understanding and managing software vulnerabilities, facilitating effective risk management and compliance efforts.
 
-### Open Security Controls Assessment Language
-NIST Open Security Controls Assessment Language (OSCAL) simplifies the process of implementing, assessing, and documenting security controls, promoting consistency and efficiency in security management and compliance activities. It provides a common framework for expressing security requirements, controls, and assessment procedures, facilitating interoperability and automation across security tools and platforms.
-
 ### Flavor (as in UDS Package or Bundle flavor)
 
 UDS Packages and so bundles include docker images from someone's registries. Per mission-hero preference we can typically pull from one of three sources:
