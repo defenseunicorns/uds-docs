@@ -6,10 +6,17 @@ sidebar:
 draft: true
 ---
 
+This document describes the standards for UDS Package Requirements. This is not a _guide_ on how to create a UDS Package, but instead a list of requirements for a UDS Package to be properly and confidently integrated and operated in production environments.
+
+:::note
+This document follows [RFC-2119](https://datatracker.ietf.org/doc/html/rfc2119) for definitions of requirement levels (e.g. must, should and may).
+:::
+
 :::note
 For a `Markdown` version of this that is easy to copy, see here.
 :::
 
+### Requirements for all UDS Package Integrators
 - [ ]  **Must** be declaratively defined as a [Zarf package](https://docs.zarf.dev/ref/create/).
 - [ ]  **Must** minimize the scope and number of exemptions, to only what is absolutely required by the application. UDS Packages may make use of the [UDS Exemption custom resource](https://uds.defenseunicorns.com/reference/configuration/uds-operator/exemption/) for exempting any Pepr policies, but in doing so they **Must** document rationale for the exemptions. Exemptions should be documented in `docs/justifications.md` of the UDS Package repository.
 - [ ]  **Must** declaratively implement any available application hardening guidelines by default (Example: [GitLab Hardening guidelines](https://docs.gitlab.com/ee/security/hardening.html)).
@@ -44,3 +51,8 @@ For a `Markdown` version of this that is easy to copy, see here.
 - [ ]  **May** template Keycloak fields to provide flexibility for delivery customers to configure.
 - [ ]  **Should** be created from the [UDS Package Template](https://github.com/uds-packages/template).
 - [ ]  **Should** lint their configurations with appropriate tooling, such as [`yamllint`](https://github.com/adrienverge/yamllint) and [`zarf dev lint`](https://docs.zarf.dev/commands/zarf_dev_lint/).
+
+### Requirements Specific to Internal Unicorn Engineers
+- [ ] **Must** be actively maintained by the package maintainers identified in CODEOWNERS [see #CODEOWNERS section for more information](https://github.com/defenseunicorns/uds-common/blob/main/docs/uds-packages/requirements/uds-package-requirements.md#codeowners)
+- [ ] **Must** have a dependency management bot (such as renovate) configured to open PRs to update the core package and support dependencies.
+- [ ] **Must** release its package to the ghcr.io/uds-packages/<group> namespace as the application's name (i.e. ghcr.io/uds-packages/nexus).
