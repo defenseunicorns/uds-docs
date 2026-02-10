@@ -1,10 +1,15 @@
 ---
 title: Anatomy
+
+sidebar:
+  order: 2
+draft: true
 ---
+<!-- Before going live, will need to remove this Anatomy Reference: https://uds.defenseunicorns.com/structure/packages/ -->
 
 ## Anatomy of a UDS Package Repository
 
-The goal of this document is to cover the main components of a UDS Package and their functions at an overview level. It will then aim to show specifically how these components are tied together in the case of the [reference-package](https://github.com/uds-packages/reference-package).
+The goal of this document is to cover the main components of a UDS Package and their functions at an overview level. It will then aim to show specifically how these components are tied together in the case of the [Reference Package](https://github.com/uds-packages/reference-package).
 
 ### Anatomy Overview
 
@@ -21,5 +26,3 @@ The goal of this document is to cover the main components of a UDS Package and t
 | `values/` | UDS Package Component | Contains all the helm `values.yaml` files, required for the main application's helm chart. This directory typically contains a `common-values.yaml`, which pertains to all flavors, as well as, specific flavors files, named `<flavor>-values.yaml`, for each flavor required in the UDS Package. |
 | `tasks.yaml` | Testing & Development | Entrypoint for utilizing workflows for UDS Package integration. [UDS Runner Tasks](https://uds.defenseunicorns.com/reference/cli/uds-runner/) perform workflows such as `run`, `deploy`, `test`, to execute a series of tasks. Visit [UDS Common](https://github.com/defenseunicorns/uds-common/blob/main/tasks.yaml) for a list of commonly used tasks. |
 | `zarf.yaml` | UDS Package Component | The primary Zarf Config to define the overall UDS Package. Defines all top-level Zarf variables, and includes components for every required `flavor`. Each component imports the `common/zarf.yaml` file. 
-
-
