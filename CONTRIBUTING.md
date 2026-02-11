@@ -58,14 +58,12 @@ Notes:
 ## Content Structure
 - Place docs under `src/content/docs/` using folders that match major areas in the sidebar.
 - Common top-level sections autoloaded in the sidebar (see `astro.config.mjs`):
-  - `getting-started/`
   - `overview/`
-  - `structure/`
-  - `security/`
+  - `getting-started/`
+  - `concepts/`
+  - `how-to-guides/`
   - `reference/`
-  - `tutorials/`
-  - `tactical-edge-deployments/`
-  - `registry/`
+  - `operations/`
 
 Recommended file frontmatter for pages (example):
 ```yaml
@@ -121,6 +119,8 @@ Recommended file frontmatter for pages (example):
     :::
   ```
 - **Terminology**: Use consistent product names (e.g., “UDS Core”, “UDS CLI”).
+- **Version banners for How‑tos**: If a how‑to guide only applies to certain UDS Core versions, add a short callout
+  near the top that clearly states the supported version range and points to upgrade/changes docs when relevant.
 - **Links**: Prefer absolute paths beginning with `/` for internal links.
 
 ## Links & Cross-References
@@ -163,5 +163,7 @@ Recommended file frontmatter for pages (example):
 ## Resources
 - `astro.config.mjs` for sidebar, redirects, integrations.
 - `src/pages/index.astro` for landing page content/cards.
+- `scripts/integration-script.sh` for importing docs from other repos; keep its destinations aligned with the current
+  IA when adding or moving imported content.
 - Astro Docs: https://docs.astro.build/
 - Starlight Docs: https://starlight.astro.build/

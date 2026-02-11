@@ -50,142 +50,128 @@ export default defineConfig({
     },
 
     integrations: [
-      react(),
-      starlight({
-        plugins: [
-            starlightLinksValidator(),
-            starlightImageZoom(),
-            starlightLlmsTxt({
-              projectName: 'UDS Documentation',
-              description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
-              details: [
-                '- CLI examples use `uds` and bash-like shells.',
-                '- Start with Getting Started; use CLI Reference for flags.',
-              ].join('\n'),
-              optionalLinks: [
-                { label: 'UDS Core (GitHub)', url: 'https://github.com/defenseunicorns/uds-core' },
-                { label: 'UDS CLI (GitHub)', url: 'https://github.com/defenseunicorns/uds-cli' },
-                { label: 'Zarf Docs', url: 'https://docs.zarf.dev/' },
-              ],
-              customSets: [
-                { label: 'Getting Started', paths: ['getting-started/**'], description: 'Install and first steps.' },
-                { label: 'CLI Reference', paths: ['reference/cli/**'], description: 'Commands and flags.' },
-                { label: 'UDS Core', paths: ['reference/uds-core/**'] },
-                { label: 'Tutorials', paths: ['tutorials/**'] },
-              ],
-              promote: ['index*', 'getting-started/**', 'overview/**', 'structure/**', 'reference/cli/**'],
-              minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
-              pageSeparator: '\n\n-----\n\n',
-              rawContent: true,
-            })
-        ],
-        defaultLocale: 'root',
-        locales: {
-            root: {
-                label: 'English',
-                lang: 'en',
-            }
-        },
-        // The title is set to '' because otherwise it shows in the top navigation which is redundant with the logo.
-        // However, if this is done, the title delimiter has no text after it, which affects what you see in the
-        // page title (e.g. Basic Requirements | [title]). We can fix this by changing the delimiter value and
-        // ensure the logo has alternative text for accessibility purposes.
-        title: '',
-        titleDelimiter: '| UDS',
-        lastUpdated: true,
-        customCss: [
-            './src/tailwind.css',
-        ],
-        logo: {
-            light: './src/assets/light-logo.svg',
-            dark: './src/assets/dark-logo.svg',
-            alt: 'Unicorn Delivery Service'
-        },
-        components: {
-            Footer: './src/components/Footer.astro',
-            Head: './src/components/Head.astro',
-            ThemeProvider: './src/components/ThemeProvider.astro'
-        },
-        social: [
-            {
-                icon: 'github',
-                href: 'https://github.com/defenseunicorns/uds-core',
-                label: 'GitHub'
-            }
-        ],
-        sidebar: [
-            {
-                label: 'Home',
-                link: '/',
+        react(),
+        starlight({
+            plugins: [
+                starlightLinksValidator(),
+                starlightImageZoom(),
+                starlightLlmsTxt({
+                    projectName: 'UDS Documentation',
+                    description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
+                    details: [
+                        '- CLI examples use `uds` and bash-like shells.',
+                        '- Start with Getting Started; use CLI Reference for flags.',
+                    ].join('\n'),
+                    optionalLinks: [
+                        { label: 'UDS Core (GitHub)', url: 'https://github.com/defenseunicorns/uds-core' },
+                        { label: 'UDS CLI (GitHub)', url: 'https://github.com/defenseunicorns/uds-cli' },
+                        { label: 'Zarf Docs', url: 'https://docs.zarf.dev/' },
+                    ],
+                    customSets: [
+                        { label: 'Getting Started', paths: ['getting-started/**'], description: 'Install and first steps.' },
+                        { label: 'CLI Reference', paths: ['reference/cli/**'], description: 'Commands and flags.' },
+                        { label: 'Concepts', paths: ['concepts/**'], description: 'How UDS Core works and its major features.' },
+                        { label: 'Operations & Maintenance', paths: ['operations/**'], description: 'Day-2 operations, upgrades, and runbooks.' },
+                    ],
+                    promote: ['index*', 'getting-started/**', 'overview/**', 'concepts/**', 'reference/cli/**', 'operations/**'],
+                    minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
+                    pageSeparator: '\n\n-----\n\n',
+                    rawContent: true,
+                })
+            ],
+            defaultLocale: 'root',
+            locales: {
+                root: {
+                    label: 'English',
+                    lang: 'en',
+                }
             },
-            {
-                label: 'Getting Started',
-                autogenerate: {
-                    directory: 'getting-started'
+            // The title is set to '' because otherwise it shows in the top navigation which is redundant with the logo.
+            // However, if this is done, the title delimiter has no text after it, which affects what you see in the
+            // page title (e.g. Basic Requirements | [title]). We can fix this by changing the delimiter value and
+            // ensure the logo has alternative text for accessibility purposes.
+            title: '',
+            titleDelimiter: '| UDS',
+            lastUpdated: true,
+            customCss: [
+                './src/tailwind.css',
+            ],
+            logo: {
+                light: './src/assets/light-logo.svg',
+                dark: './src/assets/dark-logo.svg',
+                alt: 'Unicorn Delivery Service'
+            },
+            components: {
+                Footer: './src/components/Footer.astro',
+                Head: './src/components/Head.astro',
+                ThemeProvider: './src/components/ThemeProvider.astro'
+            },
+            social: [
+                {
+                    icon: 'github',
+                    href: 'https://github.com/defenseunicorns/uds-core',
+                    label: 'GitHub'
+                }
+            ],
+            sidebar: [
+                {
+                    label: 'Home',
+                    link: '/',
                 },
-                collapsed: false
-            },
-            {
-                label: 'Overview',
-                autogenerate: {
-                    directory: 'overview'
+                {
+                    label: 'Getting Started',
+                    collapsed: false,
+                    items: [
+                        { label: 'Overview', link: '/getting-started/overview/' },
+                        { label: 'Local demo (quickstart)', link: '/getting-started/local-demo/' },
+                        { label: 'Production deployments', link: '/getting-started/production/' },
+                    ],
                 },
-                collapsed: true,
-            },
-            {
-                label: 'Structure',
-                autogenerate: {
-                    directory: 'structure'
+                {
+                    label: 'Overview',
+                    autogenerate: {
+                        directory: 'overview'
+                    },
+                    collapsed: true,
                 },
-                collapsed: true
-            },
-            {
-                label: 'Security',
-                autogenerate: {
-                    directory: 'security'
+                {
+                    label: 'Concepts',
+                    autogenerate: {
+                        directory: 'concepts'
+                    },
+                    collapsed: true
                 },
-                collapsed: true
-            },
-            {
-                label: 'Reference',
-                autogenerate: {
-                    directory: 'reference'
+                {
+                    label: 'How‑to Guides',
+                    autogenerate: {
+                        directory: 'how-to-guides'
+                    },
+                    collapsed: true
                 },
-                collapsed: true,
-            },
-            {
-                label: 'Tutorials',
-                autogenerate: {
-                    directory: 'tutorials'
+                {
+                    label: 'Reference',
+                    autogenerate: {
+                        directory: 'reference'
+                    },
+                    collapsed: true,
                 },
-                collapsed: true
-            },
-            {
-                label: 'Tactical Edge',
-                autogenerate: {
-                    directory: 'tactical-edge-deployments'
+                {
+                    label: 'Operations & Maintenance',
+                    autogenerate: {
+                        directory: 'operations'
+                    },
+                    collapsed: true,
                 },
-                collapsed: true,
-                badge: { text: 'New!', variant: 'tip' }
-            },
-            {
-                label: 'UDS Registry',
-                autogenerate: {
-                    directory: 'registry'
-                },
-                collapsed: true,
-                badge: { text: 'New!', variant: 'tip' }
-            },
-        ],
+            ],
 
+        },
+        )],
+    vite: {
+        plugins: [
+            tailwindcss(),
+            LikeC4VitePlugin({
+                modelRoot: './src/content/docs/.c4/',
+            }),
+        ],
     },
-  )],
-  vite: {
-    plugins: [
-      tailwindcss(),
-      LikeC4VitePlugin({
-        modelRoot: './src/content/docs/.c4/',
-      }),
-    ],
-  },
 });

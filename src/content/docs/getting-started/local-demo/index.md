@@ -1,0 +1,25 @@
+---
+title: Local demo (quickstart)
+sidebar:
+  order: 2
+---
+
+## Local demo quickstart
+
+Use this path to spin up UDS Core on a local/demo cluster for evaluation and experimentation.
+
+This is **not** intended for production use.
+
+### Next steps
+
+- Read [Basic requirements](./basic-requirements/) to verify your local environment.
+- Then follow [Install and deploy UDS](./install-and-deploy-uds/) to bring up the demo bundle.
+
+If you want to go further, you can then [integrate your own package into the demo](./integrate-your-package/).
+
+### Source material from previous docs
+
+This path is based on the previous Getting Started flow:
+
+- `src/content/docs-old/getting-started/basic-requirements.mdx`
+- `src/content/docs-old/getting-started/install-and-deploy-uds.md`
