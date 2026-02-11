@@ -7,7 +7,7 @@ draft: true
 
 ## Anatomy of a UDS Package Repository
 
-The goal of this document is to cover the main components of a UDS Package and their functions at an overview level. It will then aim to show specifically how these components are tied together in the case of the [Reference Package](https://github.com/uds-packages/reference-package).
+The goal of this document is to cover the main components of a UDS Package and their functions at an overview level.
 
 ### Anatomy Overview
 
