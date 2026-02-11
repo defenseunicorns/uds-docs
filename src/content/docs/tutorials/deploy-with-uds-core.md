@@ -111,11 +111,11 @@ packages:
 
   - name: init
     repository: oci://ghcr.io/zarf-dev/packages/init
-    ref: v0.70.1
+    ref: v0.71.1
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
-    ref: 0.60.1-upstream
+    ref: 0.61.0-upstream
     overrides:
       # Set overrides for k3d dev stack
       pepr-uds-core:
