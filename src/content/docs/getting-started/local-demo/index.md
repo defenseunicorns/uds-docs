@@ -12,10 +12,10 @@ This is **not** intended for production use.
 
 ### Next steps
 
-- Read [Basic requirements](./basic-requirements/) to verify your local environment.
-- Then follow [Install and deploy UDS](./install-and-deploy-uds/) to bring up the demo bundle.
+- Read [Basic requirements](/getting-started/local-demo/basic-requirements/) to verify your local environment.
+- Then follow [Install and deploy UDS](/getting-started/local-demo/install-and-deploy-uds/) to bring up the demo bundle.
 
-If you want to go further, you can then [integrate your own package into the demo](./integrate-your-package/).
+If you want to go further, you can then [integrate your own package into the demo](/getting-started/local-demo/integrate-your-package/).
 
 ### Source material from previous docs
 
