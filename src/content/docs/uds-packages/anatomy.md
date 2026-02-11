@@ -1,8 +1,6 @@
 ---
 title: Anatomy
 
-sidebar:
-  order: 2
 draft: true
 ---
 <!-- Before going live, will need to remove this Anatomy Reference: https://uds.defenseunicorns.com/structure/packages/ -->
@@ -15,14 +13,14 @@ The goal of this document is to cover the main components of a UDS Package and t
 
 | Directory / Top-level file | Role | Function |
 | :--- | :------------------------- | :------- |
-| `.github/` | CI/CD | Directives to Reference Package, primarily it contains the build, test, and release pipeline(s). |
-| `adr/` | Docs | "ADR" stands for Architectural Decision Records. These documents record key architectural decisions and their reasoning. |
-| `bundle/` | Testing & Development | Utilizes [Bundle Overrides](https://uds.defenseunicorns.com/structure/bundles/), in order to bring in other applications, such as a database, in order to test the package configuration. The `bundle/` directory in a UDS Package repo is utilized specifically for other applications and dependencies required to test the UDS Package. It is important to note, that when the UDS Package is created, the `bundle/` directory is not included. |
-| `chart/` | UDS Package Component | Directory for the `uds-config` chart and supplemental resources. This includes at minimum the [UDS Package Custom Resource](https://uds.defenseunicorns.com/reference/configuration/custom-resources/packages-v1alpha1-cr/), in the `uds-package.yaml`. This directory is also used for any custom helm templates that need to be created, such as a [postgres database secret](https://github.com/uds-packages/reference-package/blob/main/chart/templates/postgres-secret.yaml).
-| `common/` | UDS Package Component | This directory holds a single `zarf.yaml` file. This file is imported by the root-level `zarf.yaml`. It is is used to support multiple [UDS Package Flavors](https://uds.defenseunicorns.com/overview/acronyms-and-terms/#flavor-as-in-uds-package-or-bundle-flavor). It pulls in the  shared [values/common-values.yaml](https://github.com/uds-packages/reference-package/blob/main/values/common-values.yaml), to apply values across all flavors. The separate flavor specific application values can be found in the root-level [zarf.yaml](https://github.com/uds-packages/reference-package/blob/3f54b283890b8ed8b441c559d007b6652f676eae/zarf.yaml#L39C18-L39C19)|
-| `docs/` | Docs | Documentation about the UDS Package. This can include things such as `configuration` docs. |
-| `tasks/` | Testing & Development | An extension of the tasks ran by the Maru Runner as shown below in the `tasks.yaml` section. These extended tasks typically hold tasks to execute automated testing, or to run required dependencies. |
-| `tests/` | Testing & Development | Contains files which are used to verify the application in a UDS Package is properly integrated with UDS Core and any specified dependencies. The tests are integration-level tests focused on validating connections between the application and the UDS ecosystem. |
-| `values/` | UDS Package Component | Contains all the helm `values.yaml` files, required for the main application's helm chart. This directory typically contains a `common-values.yaml`, which pertains to all flavors, as well as, specific flavors files, named `<flavor>-values.yaml`, for each flavor required in the UDS Package. |
-| `tasks.yaml` | Testing & Development | Entrypoint for utilizing workflows for UDS Package integration. [UDS Runner Tasks](https://uds.defenseunicorns.com/reference/cli/uds-runner/) perform workflows such as `run`, `deploy`, `test`, to execute a series of tasks. Visit [UDS Common](https://github.com/defenseunicorns/uds-common/blob/main/tasks.yaml) for a list of commonly used tasks. |
-| `zarf.yaml` | UDS Package Component | The primary Zarf Config to define the overall UDS Package. Defines all top-level Zarf variables, and includes components for every required `flavor`. Each component imports the `common/zarf.yaml` file. 
+| `.github/` | CI/CD | Directives to GitHub Actions/Github CI/CD workflows. Primarily contains the build, test, and release pipeline(s). |
+| `adr/` | Docs | Architectural Decision Records (ADRs) that capture key architectural decisions. |
+| `bundle/` | Testing & Development | Dev/test bundle(s) utilizing [Bundle Overrides](https://uds.defenseunicorns.com/reference/bundles/overrides/#quickstart), in order to deploy the package alongside dependencies (e.g., databases/object storage) to validate configuration and integration. This content is not included in the built UDS Package artifact. |
+| `chart/` | UDS Package Component | Helm chart(s) for `uds-config` and supplemental resources. Includes at minimum the [UDS Package Custom Resource](https://uds.defenseunicorns.com/reference/configuration/custom-resources/packages-v1alpha1-cr/) (`uds-package.yaml`), plus any required UDS integration Helm templates. (e.g., [postgres secret](https://github.com/uds-packages/reference-package/blob/main/chart/templates/postgres-secret.yaml), SSO secret, etc..).
+| `common/` | UDS Package Component | Base `zarf.yaml` imported by the root-level `zarf.yaml`, used to support multiple [UDS Package Flavors](https://uds.defenseunicorns.com/overview/acronyms-and-terms/#flavor-as-in-uds-package-or-bundle-flavor). Uses the shared [values/common-values.yaml](https://github.com/uds-packages/reference-package/blob/main/values/common-values.yaml), to apply values across all flavors. |
+| `docs/` | Docs | Package documentation (configuration, dependencies, usage, etc.). |
+| `tasks/` | Testing & Development | Repository-scoped UDS Runner task files that extend the workflows defined in `tasks.yaml` (often for test automation and dependency management). |
+| `tests/` | Testing & Development | Integration-level tests verifying the application is properly integrated with UDS Core and declared dependencies. |
+| `values/` | UDS Package Component | Helm values files for the upstream chart, typically `common-values.yaml`, plus a `<flavor>-values.yaml` per flavor. |
+| `tasks.yaml` | Testing & Development | Entrypoint for UDS Runner workflows (`uds run <task>`), such as deploy/test/dev flows. Composes local tasks plus shared tasks from [UDS Common](https://github.com/defenseunicorns/uds-common/blob/main/tasks.yaml). |
+| `zarf.yaml` | UDS Package Component | Primary Zarf package definition for the UDS Package. Defines package metadata, top-level Zarf variables, and declares components for each required flavor. Each component imports shared definitions from `common/zarf.yaml`, references the Helm chart and values for that flavor and defines the required container images to be pulled. |
