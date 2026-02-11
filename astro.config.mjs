@@ -169,9 +169,9 @@ export default defineConfig({
     vite: {
         plugins: [
             tailwindcss(),
-            LikeC4VitePlugin({
-                modelRoot: './src/content/docs/.c4/',
-            }),
+            // LikeC4VitePlugin({
+            //     modelRoot: './src/content/docs/.c4/',
+            // }),
         ],
     },
 });
