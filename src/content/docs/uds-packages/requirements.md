@@ -35,7 +35,7 @@ For a `Markdown` version of this that is easy to copy, see here.
 
 ### Packaging Lifecycle and Configuration
 
-- [ ] **MUST** (except if the application provides no application metrics) implement monitors for each application metrics endpoint using it's built-in chart monitors, `monitor` key, or manual monitors in the config chart. [Monitor Resource](https://uds.defenseunicorns.com/reference/configuration/observability/monitoring-metrics/)
+- [ ] **MUST** (except if the application provides no application metrics) implement monitors for each application metrics endpoint using its built-in chart monitors, `monitor` key, or manual monitors in the config chart. [Monitor Resource](https://uds.defenseunicorns.com/reference/configuration/observability/monitoring-metrics/)
 - [ ] **MUST** be versioned using the UDS Package [Versioning scheme](https://github.com/defenseunicorns/uds-common/blob/main/docs/uds-packages/requirements/uds-package-requirements.md#versioning).
 - [ ] **MUST** contain documentation under a `docs` folder at the root that describes how to configure the package and outlines package dependencies.
 - [ ] **MUST** include application [metadata for UDS Registry](https://github.com/defenseunicorns/uds-common/blob/main/docs/uds-packages/guidelines/metadata-guidelines.md) publishing.
@@ -51,7 +51,7 @@ For a `Markdown` version of this that is easy to copy, see here.
 - [ ] **MUST** not rely on exposed interfaces (e.g., `.uds.dev`) being accessible from the deployment environment (bastion or pipeline).
 - [ ] **MUST** deploy and operate successfully with Istio enabled.
 - [ ] **SHOULD** use Istio Ambient unless specific technical constraints require otherwise.
-- [ ] **MAY** use Istio Sidecars, when Istio Ambient is not technically feasible. Must document the specific technical restraints in `docs/justifications.md` if using Sidecars.
+- [ ] **MAY** use Istio Sidecars, when Istio Ambient is not technically feasible. Must document the specific technical constraints in `docs/justifications.md` if using Sidecars.
 - [ ] **SHOULD** avoid workarounds with Istio such as disabling strict mTLS peer authentication.
 - [ ] **MAY** template network policy keys to provide flexibility for delivery customers to configure.
 
