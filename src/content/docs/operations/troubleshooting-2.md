@@ -1,7 +1,7 @@
 ---
 title: Troubleshooting & runbooks 2
 sidebar:
-  order: 2
+  order: 6
 ---
 
 ## Troubleshooting & runbooks
