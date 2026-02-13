@@ -1,7 +1,7 @@
 ---
 title: Upgrades & configuration changes 1
 sidebar:
-  order: 3
+  order: 5
 ---
 
 ## Upgrades & configuration changes

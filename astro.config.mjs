@@ -145,12 +145,28 @@ export default defineConfig({
                   {
                     label: 'Registry',
                     link: '/registry/',
-                    items: ['registry/overview'],
+                    items: [
+                      {
+                          label: 'Overview',
+                          autogenerate: {
+                              directory: 'registry'
+                          },
+                          collapsed: false,
+                      },
+                    ],
                   },
                   {
                     label: 'Fleet',
                     link: '/fleet/',
-                    items: ['fleet/overview'],
+                    items: [
+                      {
+                          label: 'Overview',
+                          autogenerate: {
+                              directory: 'fleet'
+                          },
+                          collapsed: false,
+                      },
+                    ],
                   }
                 ]),
             ],
