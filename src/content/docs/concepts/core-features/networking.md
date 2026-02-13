@@ -1,7 +1,7 @@
 ---
-title: Networking concepts
+title: Networking
 sidebar:
-  order: 2
+  order: 1
 ---
 
 ## Networking and Service Mesh in UDS Core

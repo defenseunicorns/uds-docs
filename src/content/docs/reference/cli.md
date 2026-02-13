@@ -1,5 +1,5 @@
 ---
-title: CLI reference
+title: UDS CLI
 sidebar:
   order: 2
 ---

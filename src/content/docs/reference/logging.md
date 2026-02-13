@@ -1,7 +1,7 @@
 ---
-title: Logging reference
+title: Logging
 sidebar:
-  order: 6
+  order: 5
 ---
 
 ## Logging reference

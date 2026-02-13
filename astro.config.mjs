@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
+import starlightSidebarTopics from 'starlight-sidebar-topics';
 
 import tailwindcss from '@tailwindcss/vite';
 import { LikeC4VitePlugin } from 'likec4/vite-plugin';
@@ -77,7 +78,81 @@ export default defineConfig({
                     minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
                     pageSeparator: '\n\n-----\n\n',
                     rawContent: true,
-                })
+                }),
+                starlightSidebarTopics([
+                  {
+                    label: 'UDS Core',
+                    link: '/',
+                    items: [
+                      {
+                          label: 'Overview',
+                          autogenerate: {
+                              directory: 'overview'
+                          },
+                          collapsed: false,
+                      },
+                      {
+                          label: 'Getting Started',
+                          items: [
+                              { label: 'Overview', link: '/getting-started/overview/' },
+                              { label: 'Local Demo', autogenerate: {directory: '/getting-started/local-demo/'}, collapsed: true },
+                              { label: 'Production Deployment', autogenerate: {directory: '/getting-started/production/'}, collapsed: true },
+                          ],
+                          collapsed: false
+                      },
+                      {
+                          label: 'Concepts',
+                          items: [
+                              { label: 'UDS Core Concepts', link: '/concepts/overview/' },
+                              { label: 'Core Features', autogenerate: {directory: '/concepts/core-features/'}, collapsed: true },
+                              { label: 'Platform', autogenerate: {directory: '/concepts/platform/'}, collapsed: true },
+                              { label: 'Configuration & Packaging', autogenerate: {directory: '/concepts/configuration-and-packaging/'}, collapsed: true },
+                          ],
+                          collapsed: true
+                      },
+                      {
+                          label: 'How-to Guides',
+                          items: [
+                              { label: 'How-to Overview', link: '/how-to-guides/overview/' },
+                              { label: 'Networking', autogenerate: {directory: '/how-to-guides/networking/'}, collapsed: true },
+                              { label: 'Identity Access', autogenerate: {directory: '/how-to-guides/identity-access/'}, collapsed: true },
+                              { label: 'Logging', autogenerate: {directory: '/how-to-guides/logging/'}, collapsed: true },
+                              { label: 'Monitoring & Observability', autogenerate: {directory: '/how-to-guides/monitoring-observability/'}, collapsed: true },
+                              { label: 'Runtime Security', autogenerate: {directory: '/how-to-guides/runtime-security/'}, collapsed: true },
+                              { label: 'Backup & Restore', autogenerate: {directory: '/how-to-guides/backup-restore/'}, collapsed: true },
+                              { label: 'High Availability', autogenerate: {directory: '/how-to-guides/high-availability/'}, collapsed: true },
+                              { label: 'Policy & Compliance', autogenerate: {directory: '/how-to-guides/policy-and-compliance/'}, collapsed: true },
+                              { label: 'Packaging Applications', autogenerate: {directory: '/how-to-guides/packaging-applications/'}, collapsed: true },
+                          ],
+                          collapsed: true
+                      },
+                      {
+                          label: 'Reference',
+                          autogenerate: {
+                              directory: 'reference'
+                          },
+                          collapsed: true,
+                      },
+                      {
+                          label: 'Operations & Maintenance',
+                          autogenerate: {
+                              directory: 'operations'
+                          },
+                          collapsed: true,
+                      },
+                    ],
+                  },
+                  {
+                    label: 'Registry',
+                    link: '/registry/',
+                    items: ['registry/overview'],
+                  },
+                  {
+                    label: 'Fleet',
+                    link: '/fleet/',
+                    items: ['fleet/overview'],
+                  }
+                ]),
             ],
             defaultLocale: 'root',
             locales: {
@@ -113,57 +188,6 @@ export default defineConfig({
                     label: 'GitHub'
                 }
             ],
-            sidebar: [
-                {
-                    label: 'Home',
-                    link: '/',
-                },
-                {
-                    label: 'Getting Started',
-                    collapsed: false,
-                    items: [
-                        { label: 'Overview', link: '/getting-started/overview/' },
-                        { label: 'Local demo (quickstart)', link: '/getting-started/local-demo/' },
-                        { label: 'Production deployments', link: '/getting-started/production/' },
-                    ],
-                },
-                {
-                    label: 'Overview',
-                    autogenerate: {
-                        directory: 'overview'
-                    },
-                    collapsed: true,
-                },
-                {
-                    label: 'Concepts',
-                    autogenerate: {
-                        directory: 'concepts'
-                    },
-                    collapsed: true
-                },
-                {
-                    label: 'How‑to Guides',
-                    autogenerate: {
-                        directory: 'how-to-guides'
-                    },
-                    collapsed: true
-                },
-                {
-                    label: 'Reference',
-                    autogenerate: {
-                        directory: 'reference'
-                    },
-                    collapsed: true,
-                },
-                {
-                    label: 'Operations & Maintenance',
-                    autogenerate: {
-                        directory: 'operations'
-                    },
-                    collapsed: true,
-                },
-            ],
-
         },
         )],
     vite: {

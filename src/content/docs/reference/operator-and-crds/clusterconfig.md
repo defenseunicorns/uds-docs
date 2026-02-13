@@ -1,5 +1,5 @@
 ---
-title: ClusterConfig CR reference
+title: ClusterConfig CR
 sidebar:
   order: 3
 ---

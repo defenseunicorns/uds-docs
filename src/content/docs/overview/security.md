@@ -1,5 +1,5 @@
 ---
-title: Security overview
+title: Security
 sidebar:
   order: 3
 ---

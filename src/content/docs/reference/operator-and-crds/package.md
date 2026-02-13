@@ -1,7 +1,7 @@
 ---
-title: Package CR reference
+title: Package CR
 sidebar:
-  order: 1
+  order: 2
 ---
 
 ## Package CR reference

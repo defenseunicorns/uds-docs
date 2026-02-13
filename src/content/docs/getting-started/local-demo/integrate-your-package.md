@@ -1,7 +1,7 @@
 ---
 title: Integrate your own package
 sidebar:
-  order: 3
+  order: 4
 ---
 
 ## Integrate your own package into the demo

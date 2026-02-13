@@ -1,5 +1,5 @@
 ---
-title: Reference
+title: UDS Core
 sidebar:
   order: 1
 ---

@@ -1,5 +1,5 @@
 ---
-title: Networking & service mesh reference
+title: Networking & Service Mesh
 sidebar:
   order: 3
 ---

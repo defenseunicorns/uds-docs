@@ -1,5 +1,5 @@
 ---
-title: Identity & access reference
+title: Identity & Access
 sidebar:
   order: 4
 ---

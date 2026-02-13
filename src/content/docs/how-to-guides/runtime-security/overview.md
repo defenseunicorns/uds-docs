@@ -1,7 +1,7 @@
 ---
 title: Runtime security
 sidebar:
-  order: 6
+  order: 1
 ---
 
 ## Runtime security how‑tos

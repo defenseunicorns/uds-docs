@@ -1,7 +1,7 @@
 ---
 title: Environments and clusters
 sidebar:
-  order: 3
+  order: 2
 ---
 
 ## Environments and clusters

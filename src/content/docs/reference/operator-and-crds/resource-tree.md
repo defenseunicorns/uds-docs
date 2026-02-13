@@ -1,7 +1,7 @@
 ---
-title: Resource tree reference
+title: Resource tree
 sidebar:
-  order: 4
+  order: 5
 ---
 
 ## Resource tree reference

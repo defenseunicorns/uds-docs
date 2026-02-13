@@ -1,7 +1,7 @@
 ---
 title: Policy & compliance
 sidebar:
-  order: 8
+  order: 1
 ---
 
 ## Policy & compliance how‑tos

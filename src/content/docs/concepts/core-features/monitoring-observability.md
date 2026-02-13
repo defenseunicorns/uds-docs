@@ -1,7 +1,7 @@
 ---
-title: Monitoring & observability concepts
+title: Monitoring & observability
 sidebar:
-  order: 5
+  order: 3
 ---
 
 ## Monitoring & observability in UDS Core
