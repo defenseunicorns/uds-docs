@@ -16,29 +16,12 @@ This document defines the final Information Architecture (IA) for the UDS docume
 
 ## Quick Summary: What's Changing?
 
-**For Designers:**
-- **Multi-product tabs** at top of sidebar (UDS Core, Registry, Fleet)
-- Clean product switching without changing docsites
-- "Getting Started" and "Overview" always expanded in UDS Core
-- Consistent visual design across all product docs
-
-**For Product Managers:**
-- **One docsite, multiple products** - easier to maintain, consistent UX
-- Clear paths for all personas (platform engineer, buyer/PM)
-- Packaging Applications section in `How To Guides` enables Foundry and customer self-service
-- New products just add a tab - no restructuring needed
-
-**For Marketing:**
-- Each product gets its own branded tab/space
-- Overview sections are marketing-friendly (high-level, accessible)
-- Security and ecosystem messaging integrated naturally
-- No jargon in top-level navigation
-
-**For Engineering:**
-- **Starlight Sidebar Topics plugin** manages multi-product navigation
-- Templates (ADRs) ensure consistent documentation structure
-- No duplication between products - shared concepts link to UDS Core
-- Easy to add new products (just configure new topic)
+- **Complete IA restructure for UDS Core**: sections reorganized (Overview → Getting Started → Concepts → How-To → Reference → Operations) and content moved to new paths—expect URL changes and redirects.
+- **Multi-product tabs** at the sidebar top (UDS Core, Registry, Fleet) with shared search and consistent templates.
+- **Default-expanded “Overview” + “Getting Started”** for UDS Core; predictable navigation (breadcrumbs, sticky TOC, prev/next links).
+- **Task-first organization with Packaging Applications highlighted** to support self-service/Foundry.
+- **Anti-duplication:** shared concepts live in Core; other products link back instead of re-explaining.
+- **Scalable:** adding a product = add a tab + config, no site-wide restructure.
 
 ---
 
@@ -53,20 +36,6 @@ The documentation uses the **Starlight Sidebar Topics** plugin to provide tabbed
 - Clicking a tab switches the sidebar to that product's documentation
 - No page reload, stays in same browser tab
 - Fast, seamless product switching
-
-**Technical implementation:**
-```js
-// astro.config.mjs
-sidebar: {
-  topics: {
-    items: [
-      { label: 'UDS Core', value: 'core' },
-      { label: 'Registry', value: 'registry' },
-      { label: 'Fleet', value: 'fleet' }
-    ]
-  }
-}
-```
 
 ### When to Add a New Product Tab
 
@@ -95,18 +64,6 @@ Product X Documentation
 
 **Anti-Duplication Rule:**
 Product docs should **link to UDS Core docs** for shared concepts (bundles, packages, operators) rather than re-explaining them.
-
-**Example:**
-```markdown
-<!-- In Registry docs -->
-## Publishing Bundles to Registry
-
-For information on creating UDS bundles, see
-[UDS Core: How-To Guides > Packaging Applications](link).
-
-Once you have a bundle, publish it to Registry:
-[Registry-specific instructions...]
-```
 
 ---
 
@@ -173,25 +130,32 @@ UDS Core Documentation
 ├── 📖 How-To Guides (collapsed)
 │   ├── Overview
 │   ├── High Availability
+│   |   ├── How to configure
+|   |   └── etc...
 │   ├── Networking
+│   |   ├── How to configure
+|   |   └── etc...
 │   ├── Identity Access
+│   |   ├── How to configure
+|   |   └── etc...
 │   ├── Logging
+│   |   ├── How to configure
+|   |   └── etc...
 │   ├── Monitoring & Observability
+│   |   ├── How to configure
+|   |   └── etc...
 │   ├── Runtime Security
+│   |   ├── How to configure
+|   |   └── etc...
 │   ├── Backup & Restore
+│   |   ├── How to configure
+|   |   └── etc...
 │   ├── Policy & Compliance
-│   └── Packaging Applications
-│       ├── Overview
-│       ├── Create Your First Package
-│       ├── Package a Helm Chart
-│       ├── Package Multi-Chart Applications
-│       ├── Testing Packages Locally
-│       ├── Publishing Packages
-│       ├── Adding Packages to Bundles
-│       ├── Package Overrides & Variables
-│       ├── Handling External Dependencies
-│       ├── Air-Gapped Packaging
-│       └── Packaging Patterns Library
+│   |   ├── How to configure
+|   |   └── etc...
+│   └── Packaging Applications   (To be added by Foundry)
+│       ├── How to configure
+|       └── etc...
 │
 ├── 📚 Reference (collapsed)
 │   ├── Operator & CRDs
@@ -233,13 +197,13 @@ UDS Core Documentation
 
 **Content:**
 ```
-├── 🏠 Overview (Expanded by default)
-│   ├── UDS Ecosystem
-│   │   └── Describes the full UDS ecosystem (Core, CLI, packages, bundles, Registry, Fleet) and who each part serves.
-│   ├── UDS Core
-│   │   └── High-level introduction to UDS Core: what it is, problems it solves, and who should use it.
-│   └── Security
-│       └── Overview of UDS Core's security posture, built-in protections, and defense-in-depth approach.
+└── 🏠 Overview (Expanded by default)
+    ├── UDS Ecosystem
+    │   └── Describes the full UDS ecosystem (Core, CLI, packages, bundles, Registry, Fleet) and who each part serves.
+    ├── UDS Core
+    │   └── High-level introduction to UDS Core: what it is, problems it solves, and who should use it.
+    └── Security
+        └── Overview of UDS Core's security posture, built-in protections, and defense-in-depth approach.
 ```
 
 **Authoring guidance:**
@@ -255,27 +219,27 @@ UDS Core Documentation
 
 **Content:**
 ```
-├── 🚀 Getting Started (Expanded by default)
-│   ├── Overview
-│   │   └── "Choose your path" landing that compares Demo vs Production options, time, prerequisites, and outcomes.
-│   ├── Local Demo
-│   │   ├── 1. Overview
-│   │   │   └── Sets expectations for the local demo flow and what you'll accomplish on a k3d cluster.
-│   │   ├── 2. Basic Requirements
-│   │   │   └── Lists local prerequisites (Docker/Podman, k3d, kubectl, UDS CLI), system requirements, and quick validation commands.
-│   │   ├── 3. Install and Deploy UDS
-│   │   │   └── Step-by-step deploying UDS Core to local k3d, with expected output and timing.
-│   │   └── 4. Add Your own Package (optional)
-│   │       └── Tutorial to build a simple package (e.g., NGINX), add it to a bundle, deploy, and access via ingress.
-│   └── Production Deployment
-│       ├── 1. Overview
-│       │   └── What the production path delivers, who it's for, and how the checklist-style flow works.
-│       ├── 2. Prerequisites
-│       │   └── Production requirements: supported K8s, networking (DNS/LB/certs), external dependencies, RBAC, capacity planning.
-│       ├── 3. Build your Bundle
-│       │   └── Create a production-ready bundle: choose Core flavor, configure integrations (IdP, DB, storage), set resource limits and overrides.
-│       └── 4. Deploy to Production
-│           └── Deploy the bundle, monitor rollout, handle common issues, and validate components post-deploy.
+└── 🚀 Getting Started (Expanded by default)
+    ├── Overview
+    │   └── "Choose your path" landing that compares Demo vs Production options, time, prerequisites, and outcomes.
+    ├── Local Demo
+    │   ├── 1. Overview
+    │   │   └── Sets expectations for the local demo flow and what you'll accomplish on a k3d cluster.
+    │   ├── 2. Basic Requirements
+    │   │   └── Lists local prerequisites (Docker/Podman, k3d, kubectl, UDS CLI), system requirements, and quick validation commands.
+    │   ├── 3. Install and Deploy UDS
+    │   │   └── Step-by-step deploying UDS Core to local k3d, with expected output and timing.
+    │   └── 4. Add Your own Package (optional)
+    │       └── Tutorial to build a simple package (e.g., NGINX), add it to a bundle, deploy, and access via ingress.
+    └── Production Deployment
+        ├── 1. Overview
+        │   └── What the production path delivers, who it's for, and how the checklist-style flow works.
+        ├── 2. Prerequisites
+        │   └── Production requirements: supported K8s, networking (DNS/LB/certs), external dependencies, RBAC, capacity planning.
+        ├── 3. Build your Bundle
+        │   └── Create a production-ready bundle: choose Core flavor, configure integrations (IdP, DB, storage), set resource limits and overrides.
+        └── 4. Deploy to Production
+            └── Deploy the bundle, monitor rollout, handle common issues, and validate components post-deploy.
 ```
 
 **Industry Standard Pattern:**
@@ -301,40 +265,40 @@ UDS Core Documentation
 
 **Content:**
 ```
-├── 💡 Concepts (collapsed by default)
-│   ├── UDS Core
-│   │   └── Platform overview of how UDS Core works under the hood and how its layers interact.
-│   ├── Core Features
-│   │   ├── Networking & Service Mesh
-│   │   │   └── How Istio-based mesh provides mTLS, traffic management, and ingress/egress architecture.
-│   │   ├── Identity & Authentication
-│   │   │   └── Keycloak-backed SSO model, Authservice protection, and group-based authorization flows.
-│   │   ├── Logging
-│   │   │   └── How logs are aggregated with Loki, what's collected by default, and how apps send logs.
-│   │   ├── Monitoring
-│   │   │   └── Prometheus/Grafana monitoring model, metrics collection out-of-box, and alerting basics.
-│   │   ├── Runtime Security
-│   │   │   └── Falco-based runtime threat detection and how alerts integrate with platform monitoring.
-│   │   ├── Backup & Restore
-│   │   │   └── Velero-based backup strategy, what's backed up, and common restore scenarios.
-│   │   └── Policy & Compliance
-│   │       └── Pepr admission policies, default enforcement, and exemption model for compliance.
-│   ├── Platform
-│   │   ├── Platform Layers & Environments
-│   │   │   └── How infrastructure, Core platform, and applications align across cloud, on-prem, edge, and air-gapped setups.
-│   │   ├── Environments & Clusters
-│   │   │   └── How Core adapts across multiple clusters and environments, and what varies vs. stays consistent.
-│   │   ├── Platform vs Application Layer
-│   │   │   └── Clarifies responsibilities between Core platform services and deployed applications.
-│   │   └── Flavors (Core variants)
-│   │       └── How different Core flavors map to deployment scenarios and constraints.
-│   └── Configuration & Packaging
-│       ├── Overview
-│       │   └── How UDS packaging and configuration work: packages, bundles, operator, overrides, and Zarf relationship.
-│       ├── Bundles
-│       │   └── Bundle structure, how packages combine, and how overrides tailor environments.
-│       └── Core CRDs
-│           └── Role of operator CRDs (Package, Exemption, ClusterConfig) in managing platform behavior.
+└── 💡 Concepts (collapsed by default)
+    ├── UDS Core
+    │   └── Platform overview of how UDS Core works under the hood and how its layers interact.
+    ├── Core Features
+    │   ├── Networking & Service Mesh
+    │   │   └── How Istio-based mesh provides mTLS, traffic management, and ingress/egress architecture.
+    │   ├── Identity & Authentication
+    │   │   └── Keycloak-backed SSO model, Authservice protection, and group-based authorization flows.
+    │   ├── Logging
+    │   │   └── How logs are aggregated with Loki, what's collected by default, and how apps send logs.
+    │   ├── Monitoring
+    │   │   └── Prometheus/Grafana monitoring model, metrics collection out-of-box, and alerting basics.
+    │   ├── Runtime Security
+    │   │   └── Falco-based runtime threat detection and how alerts integrate with platform monitoring.
+    │   ├── Backup & Restore
+    │   │   └── Velero-based backup strategy, what's backed up, and common restore scenarios.
+    │   └── Policy & Compliance
+    │       └── Pepr admission policies, default enforcement, and exemption model for compliance.
+    ├── Platform
+    │   ├── Platform Layers & Environments
+    │   │   └── How infrastructure, Core platform, and applications align across cloud, on-prem, edge, and air-gapped setups.
+    │   ├── Environments & Clusters
+    │   │   └── How Core adapts across multiple clusters and environments, and what varies vs. stays consistent.
+    │   ├── Platform vs Application Layer
+    │   │   └── Clarifies responsibilities between Core platform services and deployed applications.
+    │   └── Flavors (Core variants)
+    │       └── How different Core flavors map to deployment scenarios and constraints.
+    └── Configuration & Packaging
+        ├── Overview
+        │   └── How UDS packaging and configuration work: packages, bundles, operator, overrides, and Zarf relationship.
+        ├── Bundles
+        │   └── Bundle structure, how packages combine, and how overrides tailor environments.
+        └── Core CRDs
+            └── Role of operator CRDs (Package, Exemption, ClusterConfig) in managing platform behavior.
 ```
 
 **Authoring guidance:**
@@ -351,48 +315,27 @@ UDS Core Documentation
 
 **Content:**
 ```
-├── 📖 How-To Guides (collapsed, with "Common Tasks" featured)
-│   ├── Overview
-│   │   └── Sets the stage for task-based guides and how to navigate by goal.
-│   ├── High Availability
-│   │   └── Configure component redundancy, scaling, pod disruption budgets, and resilience patterns for production deployments.
-│   ├── Networking
-│   │   └── Task guides for ingress, egress, custom gateways, and non-HTTP traffic through the mesh.
-│   ├── Identity Access
-│   │   └── Task guides for integrating IdPs, protecting apps with Authservice, group-based auth, device flow, and service accounts.
-│   ├── Logging
-│   │   └── Validate collection, query in Grafana, and manage log retention.
-│   ├── Monitoring & Observability
-│   │   └── Validate metrics, build dashboards, configure alerts, and set up blackbox monitoring.
-│   ├── Runtime Security
-│   │   └── Configure Falco detections, route alerts, and tune security policies.
-│   ├── Backup & Restore
-│   │   └── Configure backup storage, schedules, restores, and volume snapshots.
-│   ├── Policy & Compliance
-│   │   └── Apply Pepr policies and configure exemptions for compliant workloads.
-│   └── Packaging Applications
-│       ├── Overview
-│       │   └── Intro to UDS packaging, when you need a package, and the workflow with bundles/Zarf.
-│       ├── Create Your First Package
-│       │   └── Tutorial to build and test a simple package (e.g., NGINX) with Core integrations.
-│       ├── Package a Helm Chart
-│       │   └── How to wrap an existing Helm chart as a UDS package and handle dependencies.
-│       ├── Package Multi-Chart Applications
-│       │   └── Organize and deploy multi-chart applications within a single package.
-│       ├── Testing Packages Locally
-│       │   └── Validate packages on local k3d, including SSO and ingress checks.
-│       ├── Publishing Packages
-│       │   └── Publish to OCI registries with versioning and auth best practices.
-│       ├── Adding Packages to Bundles
-│       │   └── Build bundles that include packages, configure overrides, and deploy.
-│       ├── Package Overrides & Variables
-│       │   └── Customize packages and bundles per environment using overrides and variables.
-│       ├── Handling External Dependencies
-│       │   └── Manage external services (DBs, APIs, storage) via configuration and secrets.
-│       ├── Air-Gapped Packaging
-│       │   └── Package for disconnected environments, bundling artifacts and registries.
-│       └── Packaging Patterns Library
-│           └── Copy-paste patterns for common app types (stateless, stateful, microservices, etc.).
+└── 📖 How-To Guides (collapsed, with "Common Tasks" featured)
+    ├── Overview
+    │   └── Sets the stage for task-based guides and how to navigate by goal.
+    ├── High Availability
+    │   └── Guides on how to configure component redundancy, scaling, pod disruption budgets, and resilience patterns for production deployments.
+    ├── Networking
+    │   └── Guides on how to configure ingress, egress, custom gateways, and non-HTTP traffic through the mesh.
+    ├── Identity Access
+    │   └── Guides on how to configure integrating IdPs, protecting apps with Authservice, group-based auth, device flow, and service accounts.
+    ├── Logging
+    │   └── Guides on how to configure Validate collection, query in Grafana, and manage log retention.
+    ├── Monitoring & Observability
+    │   └── Guides on how to configure Validate metrics, build dashboards, configure alerts, and set up blackbox monitoring.
+    ├── Runtime Security
+    │   └── Guides on how to configure  Falco detections, route alerts, and tune security policies.
+    ├── Backup & Restore
+    │   └── Guides on how to configure  backup storage, schedules, restores, and volume snapshots.
+    ├── Policy & Compliance
+    │   └── Guides on how to configure Apply Pepr policies and configure exemptions for compliant workloads.
+    └── Packaging Applications
+        └── Guides on how to package applications and integrate with UDS Core
 ```
 
 **Common Tasks Index Page:**
@@ -427,23 +370,23 @@ Every guide follows same structure (see ADR for template details):
 
 **Content:**
 ```
-├── 📚 Reference (collapsed)
-│   ├── Operator & CRDs
-│   │   ├── Overview
-│   │   ├── Package CR
-│   │   ├── Exemption CR
-│   │   ├── ClusterConfig CR
-│   │   └── Resource Tree
-│   ├── UDS Core
-│   │   └── Core-specific reference material (flavors, distributions, etc.)
-│   ├── UDS CLI
-│   │   └── CLI behavior, schema validation, command index (links to CLI repo for full docs)
-│   ├── Network & Service Mesh
-│   │   └── Ingress, egress, gateway configuration reference
-│   ├── Identity & Access
-│   │   └── SSO, client configuration, session management reference
-│   └── Logging
-│       └── Loki storage configuration reference
+└── 📚 Reference (collapsed)
+    ├── Operator & CRDs
+    │   ├── Overview
+    │   ├── Package CR
+    │   ├── Exemption CR
+    │   ├── ClusterConfig CR
+    │   └── Resource Tree
+    ├── UDS Core
+    │   └── Core-specific reference material (flavors, distributions, etc.)
+    ├── UDS CLI
+    │   └── CLI behavior, schema validation, command index (links to CLI repo for full docs)
+    ├── Network & Service Mesh
+    │   └── Ingress, egress, gateway configuration reference
+    ├── Identity & Access
+    │   └── SSO, client configuration, session management reference
+    └── Logging
+        └── Loki storage configuration reference
 ```
 
 **What Belongs Here:**
@@ -471,33 +414,26 @@ Every guide follows same structure (see ADR for template details):
 
 **Content:**
 ```
-├── ⚙️ Operations & Maintenance (collapsed)
-│   ├── Overview
-│   │   └── Introduction to operational concerns and where to find specific guidance.
-│   ├── Upgrades & Configuration Changes
-│   │   ├── Upgrade Overview
-│   │   │   └── General upgrade procedures, pre/post-upgrade checklists, rollback plans.
-│   │   ├── Version-Specific Guides
-│   │   │   └── Detailed guides for each version (breaking changes, migration steps).
-│   │   └── Configuration Changes
-│   │       └── How to apply config changes, pod reload behavior, secret rotation.
-│   └── Troubleshooting & Runbooks
-│       ├── Troubleshooting Overview
-│       │   └── How to use runbooks, escalation paths, getting help.
-│       ├── By Symptom
-│       │   ├── Pods Not Starting
-│       │   ├── Applications Not Accessible
-│       │   ├── Logs Missing
-│       │   ├── Authentication Failures
-│       │   ├── Performance Issues
-│       │   └── Storage Problems
-│       └── By Feature
-│           ├── Networking & Service Mesh
-│           ├── Identity & Authentication
-│           ├── Logging
-│           ├── Monitoring
-│           ├── Backup & Restore
-│           └── Runtime Security
+└──  ⚙️ Operations & Maintenance (collapsed)
+    ├── Overview
+    │   └── Introduction to operational concerns and where to find specific guidance.
+    ├── Upgrades & Configuration Changes
+    │   ├── Upgrade Overview
+    │   │   └── General upgrade procedures, pre/post-upgrade checklists, rollback plans.
+    │   ├── Version-Specific Guides
+    │   │   └── Detailed guides for each version (breaking changes, migration steps).
+    │   └── Configuration Changes
+    │       └── How to apply config changes, pod reload behavior, secret rotation.
+    └── Troubleshooting & Runbooks
+        ├── Troubleshooting Overview
+        │   └── How to use runbooks, escalation paths, getting help.
+        └── By Symptom
+            ├── Pods Not Starting
+            ├── Applications Not Accessible
+            ├── Logs Missing
+            ├── Authentication Failures
+            ├── Performance Issues
+            └── Storage Problems
 ```
 
 **Troubleshooting Runbook Template:**
@@ -521,7 +457,7 @@ Every runbook follows consistent structure (see ADR for template):
 
 ## 5. Other Product Tabs (Example Structure)
 
-### Registry Tab
+### Registry Tab (Examples)
 ```
 UDS Registry Documentation
 ├── Overview
@@ -539,7 +475,7 @@ UDS Registry Documentation
     └── Configuration
 ```
 
-### Fleet Tab
+### Fleet Tab (Examples)
 ```
 UDS Fleet Documentation
 ├── Overview
@@ -674,16 +610,16 @@ UDS Fleet Documentation
 ## Appendix: Persona Mapping
 
 ### Primary Persona: Platform Engineer
-**Needs**: Deploy, configure, maintain UDS Core
-**Primary Sections**: Getting Started (Production), How-To Guides, Operations
-**Secondary Sections**: Concepts, Reference
+- **Needs**: Deploy, configure, maintain UDS Core
+- **Primary Sections**: Getting Started (Production), How-To Guides, Operations
+- **Secondary Sections**: Concepts, Reference
 
 ### Secondary Persona: Buyer/Project Manager
-**Needs**: Understand what UDS Core is and why it matters
-**Primary Sections**: Overview
-**Secondary Sections**: Getting Started (Demo), Concepts
+- **Needs**: Understand what UDS Core is and why it matters
+- **Primary Sections**: Overview
+- **Secondary Sections**: Getting Started (Demo), Concepts
 
 ### Emerging Persona: Package Author
-**Needs**: Package applications for UDS deployment
-**Primary Sections**: Getting Started (Demo), How-To Guides (Packaging)
-**Secondary Sections**: Concepts (Configuration & Packaging), Reference (Operator & CRDs)
+- **Needs**: Package applications for UDS deployment
+- **Primary Sections**: Getting Started (Demo), How-To Guides (Packaging)
+- **Secondary Sections**: Concepts (Configuration & Packaging), Reference (Operator & CRDs)
