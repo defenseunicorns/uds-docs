@@ -1,7 +1,7 @@
 ---
 title: Platform vs application layer
 sidebar:
-  order: 4
+  order: 3
 ---
 
 ## Platform vs application layer

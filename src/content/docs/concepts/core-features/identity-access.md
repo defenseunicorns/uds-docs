@@ -1,7 +1,7 @@
 ---
-title: Identity & access concepts
+title: Identity & access
 sidebar:
-  order: 3
+  order: 2
 ---
 
 ## Identity & access in UDS Core

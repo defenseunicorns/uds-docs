@@ -1,7 +1,7 @@
 ---
 title: Networking & service mesh
 sidebar:
-  order: 2
+  order: 1
 ---
 
 ## Networking & service mesh how‑tos

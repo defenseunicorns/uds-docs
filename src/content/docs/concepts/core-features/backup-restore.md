@@ -1,7 +1,7 @@
 ---
-title: Backup & restore concepts
+title: Backup & restore
 sidebar:
-  order: 7
+  order: 6
 ---
 
 ## Backup & restore in UDS Core

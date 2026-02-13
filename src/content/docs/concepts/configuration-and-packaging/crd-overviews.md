@@ -1,7 +1,7 @@
 ---
-title: Core CRD overviews
+title: Core CRDs
 sidebar:
-  order: 5
+  order: 3
 ---
 
 ## Core CRD overviews

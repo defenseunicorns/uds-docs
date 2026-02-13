@@ -1,7 +1,7 @@
 ---
-title: Configuration & packaging
+title: Overview
 sidebar:
-  order: 3
+  order: 1
 ---
 
 ## Configuration & packaging

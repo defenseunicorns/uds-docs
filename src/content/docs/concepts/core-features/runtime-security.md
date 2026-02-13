@@ -1,7 +1,7 @@
 ---
-title: Runtime security concepts
+title: Runtime security
 sidebar:
-  order: 6
+  order: 5
 ---
 
 ## Runtime security in UDS Core

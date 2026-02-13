@@ -1,5 +1,5 @@
 ---
-title: UDS Core concepts
+title: UDS Core
 sidebar:
   order: 1
 ---

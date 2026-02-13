@@ -1,7 +1,7 @@
 ---
 title: Deploy UDS Core to production
 sidebar:
-  order: 3
+  order: 4
 ---
 
 ## Goals

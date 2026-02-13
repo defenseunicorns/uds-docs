@@ -1,7 +1,7 @@
 ---
-title: Exemption CR reference
+title: Exemption CR
 sidebar:
-  order: 2
+  order: 4
 ---
 
 ## Exemption CR reference

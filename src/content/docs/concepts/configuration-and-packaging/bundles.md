@@ -1,7 +1,7 @@
 ---
-title: Bundles (concepts)
+title: Bundles
 sidebar:
-  order: 4
+  order: 2
 ---
 
 ## Bundles in UDS Core

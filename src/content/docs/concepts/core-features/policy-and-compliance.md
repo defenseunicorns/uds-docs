@@ -1,7 +1,7 @@
 ---
-title: Policy & compliance concepts
+title: Policy & compliance
 sidebar:
-  order: 8
+  order: 7
 ---
 
 ## Policy & compliance in UDS Core

@@ -1,8 +1,7 @@
 ---
 title: Install and Deploy UDS (15m)
-
 sidebar:
-  order: 2
+  order: 3
 ---
 
 ## Getting Started with UDS Bundles

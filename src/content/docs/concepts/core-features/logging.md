@@ -1,5 +1,5 @@
 ---
-title: Logging concepts
+title: Logging
 sidebar:
   order: 4
 ---

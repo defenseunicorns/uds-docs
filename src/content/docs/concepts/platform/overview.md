@@ -1,7 +1,7 @@
 ---
 title: Platform layers & environments
 sidebar:
-  order: 2
+  order: 1
 ---
 
 ## Platform layers & environments
