@@ -4,7 +4,7 @@ title: Best Practices
 draft: true
 ---
 
-
+<!-- Remove from UDS Common once the docs go live: https://github.com/defenseunicorns/uds-common/blob/main/docs/uds-packages/guidelines/testing-guidelines.md-->
 ## Testing Practices for UDS Packages
 This section outlines testing best practices for UDS Packages. These practices are intended to improve consistency, reliability, and quality across packages.
 
