@@ -9,8 +9,6 @@ This guide highlights common roadblocks in UDS Package deployments and outlines 
 ### Package "Stuck" in Deploying State
 A UDS Package may occasionally appear to stall during deployment. This section outlines a common scenario and a practical approach to diagnosing the issue.
 
-When troubleshooting, it is common to inspect `Pods` or `Deployments`. However, in some cases, those resources may not yet exist or may not provide enough detail to explain the delay. In these situations, reviewing namespace `Events` is often the most effective way to identify the underlying issue.
-
 The example below reflects a terminal session with a deployment of the UDS Package `reference-package`, that has remained on the same deployment step for several minutes without progressing.
 
 **Deployment Stalled for 5+ Minutes**
@@ -20,14 +18,14 @@ The example below reflects a terminal session with a deployment of the UDS Packa
 :::tip
 If you prefer a UI-based workflow, you can inspect events using K9s or `uds zarf tools monitor`.
 :::
-#### Troubleshooting Commands
+#### Troubleshooting Command
+When troubleshooting, it is common to inspect `Pods` or `Deployments`. However, in some cases, those resources may not yet exist or may not provide enough detail to explain the delay. In these situations, reviewing namespace `Events` is often the most effective way to identify the underlying issue.
 
-**Executed Command**
 ```sh
 kubectl get events -n reference-package
 ```
 
-**Result**
+**Output**
 ```sh
 LAST SEEN   TYPE      REASON              OBJECT                                    MESSAGE
 8m26s       Warning   FailedCreate        replicaset/reference-package-674cc4c88b   Error creating: admission webhook "pepr-uds-core.pepr.dev" denied the request: Pod level securityContext does not meet the non-root user requirement.
