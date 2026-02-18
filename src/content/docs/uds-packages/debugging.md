@@ -6,10 +6,10 @@ draft: true
 
 This guide highlights common roadblocks in UDS Package deployments and outlines general debugging techniques.
 
-### Package "Stuck" in Deploying State
+### Package Stuck in Helm "Deploying" State
 A UDS Package may occasionally appear to stall during deployment. This section outlines a common scenario and a practical approach to diagnosing the issue.
 
-The example below reflects a terminal session with a deployment of the UDS Package `reference-package`, that has remained on the same deployment step for several minutes without progressing.
+The example below reflects a terminal session with a deployment of the UDS Package `reference-package`, which has remained on the same deployment step for several minutes without progressing.
 
 **Deployment Stalled for 5+ Minutes**
 
@@ -18,11 +18,31 @@ The example below reflects a terminal session with a deployment of the UDS Packa
 :::tip
 If you prefer a UI-based workflow, you can inspect events using K9s or `uds zarf tools monitor`.
 :::
-#### Troubleshooting Command
-When troubleshooting, it is common to inspect `Pods` or `Deployments`. However, in some cases, those resources may not yet exist or may not provide enough detail to explain the delay. In these situations, reviewing namespace `Events` is often the most effective way to identify the underlying issue.
+#### Troubleshooting Commands
+```sh
+helm status reference-package -n reference-package
+```
+
+**Output**
+```sh
+NAME: reference-package
+LAST DEPLOYED: Wed Feb 18 15:03:51 2026
+NAMESPACE: reference-package
+STATUS: pending-install
+REVISION: 1
+DESCRIPTION: Initial install underway
+RESOURCES:
+==> v1/Deployment
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+reference-package   0/1     0            0           109s
+```
+
+When we view the `helm release` we see the release is stuck in a `pending-install` state.
+
+When troubleshooting, it is common to inspect `Pods` or `Deployments`. However, in cases such as this one, those resources may not yet exist or may not provide enough detail to explain the delay. In these situations, reviewing namespace `Events` is often the most effective way to identify the underlying issue.
 
 ```sh
-kubectl get events -n reference-package
+uds zarf tools kubectl get events -n reference-package
 ```
 
 **Output**
@@ -48,10 +68,24 @@ securityContext:
   runAsNonRoot: true
   allowPrivilegeEscalation: false
 ```
+### How to Determine If a Package Violates Pepr Policies
+To inspect Pepr operations running in a cluster, use the [uds monitor pepr](https://uds.defenseunicorns.com/reference/cli/commands/uds_monitor_pepr/) command. This helps identify policy violations related to package requirements.
 
+#### Example: DENIED policy
+```sh
+uds monitor pepr denied
+```
+
+#### Output
+```sh
+ ✗ DENIED    reference-package/reference-package-67dd4655d7-jq9xk                                                                                   
+             Pod level securityContext does not meet the non-root user requirement.
+```
+
+If a package violates Pepr policies, it will be listed with the reason for denial, such as a missing security context or other baseline requirement.
 ### How Can I Remove a Package From the Cluster?
 - List installed packages using [zarf package list](https://docs.zarf.dev/commands/zarf_package_list/)
-- Remove isntalled packages using [zarf package remove](https://docs.zarf.dev/commands/zarf_package_remove/)
+- Remove installed packages using [zarf package remove](https://docs.zarf.dev/commands/zarf_package_remove/)
 
 ### Kubernetes Troubleshooting
 - [Kubernetes Troubleshooting Clusters Guide](https://kubernetes.io/docs/tasks/debug/debug-cluster/)
@@ -68,4 +102,3 @@ A solid understanding of Helm is highly beneficial when troubleshooting deployme
   ```sh
   helm show values oci://ghcr.io/uds-packages/reference-package/helm/reference-package
   ```
-
