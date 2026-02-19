@@ -19,7 +19,7 @@ In the root of the `package` directory, create a new file called `tasks.yaml` an
 
 ```yaml
 includes:
-  - common-setup: https://raw.githubusercontent.com/defenseunicorns/uds-common/v1.23.0/tasks/setup.yaml
+  - common-setup: https://raw.githubusercontent.com/defenseunicorns/uds-common/v1.24.0/tasks/setup.yaml
 ```
 
 ### Integrate Podinfo with UDS Core
