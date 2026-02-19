@@ -52,7 +52,7 @@ LAST SEEN   TYPE      REASON              OBJECT                                
 ```
 This message indicates that the `pepr` admission webhook rejected the request because the application’s Helm chart is configured to run the container as the root user, which violates the enforced non-root security policy.
 
-To resolve this particular issue, update the application’s security configuration in `values/common-values.yaml` (or the appropriate values file for the chart). The exact configuration depends on the chart, but an example is shown below:
+To resolve this particular issue, update the application’s security configuration in the appropriate values file for the chart that deploys the affected image. In this sample instance, it would be `values/common-values.yaml`. When multiple values files are used, each image flavor may define its own security context, so the change may need to be applied in the values file corresponding to the specific image being deployed. An example is shown below:
 
 ```yaml
 podSecurityContext:
