@@ -1,0 +1,38 @@
+---
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.astro';
+---
+
+{/* Render the topics dropdown menu. */}
+<div class="starlight-sidebar-topics-dropdown-container">
+  <div class="starlight-sidebar-topics-dropdown-title">Choose a product</div>
+  <TopicsDropdown />
+</div>
+{/* Render the default sidebar. */}
+<Default><slot /></Default>
+
+{/* Override the default gap in the sidebar content with higher specificity */}
+<style>
+  .starlight-sidebar-topics-dropdown-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sl-color-gray-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .starlight-sidebar-topics-dropdown-dropdown {
+    position: relative;
+    display: block;
+    width: calc(100% - 2 * 2px);
+    margin-inline: 2px;
+    margin-top: 0;
+  }
+
+  /* Change the dropdown menu background color for better visibility */
+  :global(.starlight-sidebar-topics-dropdown-menu) {
+    background-color: var(--sl-color-bg) !important;
+    border: 1px solid var(--sl-color-gray-5) !important;
+  }
+</style>
