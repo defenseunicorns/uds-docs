@@ -35,4 +35,17 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
     background-color: var(--sl-color-bg) !important;
     border: 1px solid var(--sl-color-gray-5) !important;
   }
+
+  /* Add hover effect to dropdown button */
+  :global(.starlight-sidebar-topics-dropdown-button:hover) {
+    background-color: var(--sl-color-gray-5) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Add hover effect to dropdown menu items */
+  :global(.starlight-sidebar-topics-dropdown-item:hover) {
+    background-color: var(--sl-color-gray-4) !important;
+    transform: translateX(4px);
+    border-radius: 0.25rem;
+  }
 </style>
