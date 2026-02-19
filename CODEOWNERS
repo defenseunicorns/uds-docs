@@ -1,6 +1,7 @@
 * @defenseunicorns/uds-core
 
 /src/content/docs/registry/* @defenseunicorns/uds-registry
+/src/content/docs/uds-packages/* @defenseunicorns/uds-foundry
 
 # Additional privileged files
 /CODEOWNERS @jeff-mccoy @daveworth
