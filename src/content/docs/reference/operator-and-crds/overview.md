@@ -1,7 +1,5 @@
 ---
 title: Overview
-sidebar:
-  order: 1
 ---
 
 ## Operator & CRDs reference

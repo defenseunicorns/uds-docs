@@ -1,7 +1,5 @@
 ---
 title: Logging
-sidebar:
-  order: 1
 ---
 
 ## Logging how‑tos

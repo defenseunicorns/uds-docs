@@ -1,7 +1,5 @@
 ---
 title: Monitoring & observability
-sidebar:
-  order: 1
 ---
 
 ## Monitoring & observability how‑tos

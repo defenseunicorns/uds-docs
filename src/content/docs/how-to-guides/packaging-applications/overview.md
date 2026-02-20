@@ -1,7 +1,5 @@
 ---
 title: Packaging Applications
-sidebar:
-  order: 1
 ---
 
 # Packaging Applications

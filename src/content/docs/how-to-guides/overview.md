@@ -1,7 +1,5 @@
 ---
 title: How‑to Guides
-sidebar:
-  order: 1
 ---
 
 ## How‑to Guides
