@@ -53,6 +53,7 @@ export default defineConfig({
     integrations: [
         react(),
         starlight({
+            routeMiddleware: './src/routeData.ts',
             plugins: [
                 starlightLinksValidator(),
                 starlightImageZoom(),
@@ -81,7 +82,7 @@ export default defineConfig({
                 }),
                 starlightSidebarTopics([
                   {
-                    label: 'UDS Core',
+                    label: 'Core',
                     link: '/',
                     items: [
                       {

@@ -28,3 +28,6 @@ For more on creating bundles, see [UDS Core: How-To > Packaging Applications > A
 ### Using Registry as Bundle Source
 Configure UDS CLI to pull from Registry:
 [Product-specific configuration]
+
+## testing multi-product search
+this is a test
