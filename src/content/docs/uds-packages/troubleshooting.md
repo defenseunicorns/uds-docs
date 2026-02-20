@@ -6,7 +6,7 @@ draft: true
 
 This guide highlights common roadblocks in UDS Package deployments and outlines general debugging techniques.
 
-## Package Stuck in Helm "Deploying" State
+## Package Deployment Stuck in Helm "performing Helm install" State
 A UDS Package may occasionally appear to stall during deployment. This section outlines a common scenario and a practical approach to diagnosing the issue.
 
 The example below reflects a terminal session with a deployment of the UDS Package `reference-package`, which has remained on the same deployment step for several minutes without progressing.
