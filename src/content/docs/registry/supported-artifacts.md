@@ -5,6 +5,20 @@ sidebar:
   order: 4
 ---
 
+### Supported Artifacts
+
+Here is a list of the supported artifact types:
+
+- Zarf Packages
+- Docker Images
+- OCI Images
+- Helm Charts
+- OpenTofu Modules
+- OpenTofu Providers
+- OCI Artifacts[^1]
+
+### Supported Features
+
 UDS Registry supports publishing artifacts with standard OCI tooling. For every supported artifact type you can:
 
 - **Push** from the CLI using OCI-compliant tools
@@ -146,29 +160,7 @@ Some artifact types also support additional supply chain features, including SBO
       <td data-label="SBOM scan"><span class="sat-pill sat-soon"><span class="sat-dot"></span>Coming soon</span></td>
       <td data-label="Vulnerability scan"><span class="sat-pill sat-soon"><span class="sat-dot"></span>Coming soon</span></td>
     </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">Helm Charts</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">OpenTofu Modules</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">OpenTofu Providers</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">OCI Artifacts</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
   </tbody>
 </table>
 
-### OCI compatible
-
-In addition to the artifact types listed above, any artifact packaged according to the [Open Container Initiative (OCI) Image specification](https://github.com/opencontainers/image-spec) can be published to and pulled from UDS Registry using OCI-compliant tooling.
+[^1]: Any artifact packaged according to the [Open Container Initiative (OCI) Image specification](https://github.com/opencontainers/image-spec) can be published to and pulled from UDS Registry using OCI-compliant tooling. Refer to [Guidelines for Artifact Usage](https://github.com/opencontainers/image-spec/blob/v1.1.1/manifest.md#guidelines-for-artifact-usage) to learn more.
