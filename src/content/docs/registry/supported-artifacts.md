@@ -5,6 +5,24 @@ sidebar:
   order: 4
 ---
 
+### Supported Artifacts
+
+Here is a list of the supported artifact types:
+
+- Zarf Packages
+- Docker Images
+- OCI Images
+- Helm Charts
+- OpenTofu Modules
+- OpenTofu Providers
+- OCI Artifacts[^1]
+
+**Recommended: Zarf Packages (including UDS Packages).** While UDS Registry can store multiple OCI artifact types, Zarf packages are the preferred, first-class unit of delivery. A Zarf package bundles the application's container images, Helm charts, and manifests into a single deployable artifact, making it the most reliable way to move software across disconnected and mission environments.
+
+UDS Packages build on Zarf (a Zarf package plus UDS-specific integration) and are the recommended format for delivering applications into UDS Core, preserving the metadata and structure needed for secure, repeatable deployments.
+
+### Supported Features
+
 UDS Registry supports publishing artifacts with standard OCI tooling. For every supported artifact type you can:
 
 - **Push** from the CLI using OCI-compliant tools
@@ -14,7 +32,59 @@ UDS Registry supports publishing artifacts with standard OCI tooling. For every 
 Some artifact types also support additional supply chain features, including SBOM and vulnerability scanning. Refer to the table below for details:
 
 <style>
+  /* Markdown footnotes */
+  .sl-markdown-content section[data-footnotes] {
+      margin-top: 5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--sl-color-hairline);
+      font-size: 0.92rem;
+      color: var(--sl-color-gray-3);
+  }
+
+  .sl-markdown-content section[data-footnotes]::before {
+      content: 'Footnotes';
+      display: block;
+      margin-bottom: 0rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--sl-color-gray-2);
+  }
+
+  .sl-markdown-content section[data-footnotes] div {
+      height: 0;
+      margin-top: 1rem;
+  }
+
+  .sl-markdown-content section[data-footnotes] ol {
+      margin-top: 0rem;
+      padding-left: 1.1rem;
+  }
+
+
+  .sl-markdown-content a[data-footnote-ref] {
+      font-size: 0.75em;
+      vertical-align: super;
+      line-height: 0;
+  }
+
+  .sl-markdown-content a[data-footnote-backref] {
+      margin-left: 0.35rem;
+      text-decoration: none;
+      opacity: 0.75;a
+  }
+
   .sat-table {
+    --sat-header-bg: rgba(255,255,255,.03);
+    --sat-row-odd-bg: rgba(255,255,255,.02);
+    --sat-row-hover-bg: rgba(255,255,255,.05);
+    --sat-yes-bg: rgba(34,197,94,.12);
+    --sat-yes-text: rgb(134,239,172);
+    --sat-yes-border: rgba(34,197,94,.25);
+    --sat-soon-bg: rgba(245,158,11,.12);
+    --sat-soon-text: rgb(253,230,138);
+    --sat-soon-border: rgba(245,158,11,.25);
     width: 100%;
     max-width: max-content;
     border-collapse: separate;
@@ -22,6 +92,17 @@ Some artifact types also support additional supply chain features, including SBO
     border: 1px solid var(--sl-color-gray-5, rgba(255,255,255,.12));
     overflow: hidden;
     background: var(--sl-color-black, transparent);
+  }
+  :root[data-theme='light'] .sat-table {
+    --sat-header-bg: rgba(17,24,39,.06);
+    --sat-row-odd-bg: rgba(17,24,39,.03);
+    --sat-row-hover-bg: rgba(17,24,39,.06);
+    --sat-yes-bg: rgba(34,197,94,.16);
+    --sat-yes-text: #14532d;
+    --sat-yes-border: rgba(34,197,94,.35);
+    --sat-soon-bg: rgba(245,158,11,.2);
+    --sat-soon-text: #92400e;
+    --sat-soon-border: rgba(245,158,11,.38);
   }
   .sat-table caption {
     text-align: left;
@@ -33,7 +114,7 @@ Some artifact types also support additional supply chain features, including SBO
     font-weight: 600;
     padding: 0.85rem 1rem;
     border-bottom: 1px solid var(--sl-color-gray-5, rgba(255,255,255,.12));
-    background: rgba(255,255,255,.03);
+    background: var(--sat-header-bg);
     white-space: nowrap;
   }
   .sat-table tbody td {
@@ -41,8 +122,8 @@ Some artifact types also support additional supply chain features, including SBO
     border-bottom: 1px solid var(--sl-color-gray-6, rgba(255,255,255,.08));
     vertical-align: middle;
   }
-  .sat-table tbody tr:nth-child(odd) { background: rgba(255,255,255,.02); }
-  .sat-table tbody tr:hover { background: rgba(255,255,255,.05); }
+  .sat-table tbody tr:nth-child(odd) { background: var(--sat-row-odd-bg); }
+  .sat-table tbody tr:hover { background: var(--sat-row-hover-bg); }
   .sat-table tbody tr:last-child td { border-bottom: 0; }
 
   /* Make the first column stand out a bit */
@@ -69,23 +150,16 @@ Some artifact types also support additional supply chain features, including SBO
 
   /* Variants */
   .sat-yes {
-    background: rgba(34,197,94,.12);
-    color: rgb(134,239,172);
-    border-color: rgba(34,197,94,.25);
+    background: var(--sat-yes-bg);
+    color: var(--sat-yes-text);
+    border-color: var(--sat-yes-border);
   }
   .sat-yes .sat-dot { background: rgb(34,197,94); }
 
-  .sat-no {
-    background: rgba(148,163,184,.10);
-    color: rgb(203,213,225);
-    border-color: rgba(148,163,184,.18);
-  }
-  .sat-no .sat-dot { background: rgb(148,163,184); }
-
   .sat-soon {
-    background: rgba(245,158,11,.12);
-    color: rgb(253,230,138);
-    border-color: rgba(245,158,11,.25);
+    background: var(--sat-soon-bg);
+    color: var(--sat-soon-text);
+    border-color: var(--sat-soon-border);
   }
   .sat-soon .sat-dot { background: rgb(245,158,11); }
 
@@ -146,29 +220,7 @@ Some artifact types also support additional supply chain features, including SBO
       <td data-label="SBOM scan"><span class="sat-pill sat-soon"><span class="sat-dot"></span>Coming soon</span></td>
       <td data-label="Vulnerability scan"><span class="sat-pill sat-soon"><span class="sat-dot"></span>Coming soon</span></td>
     </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">Helm Charts</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">OpenTofu Modules</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">OpenTofu Providers</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
-    <tr>
-      <td class="sat-type" data-label="Artifact Type">OCI Artifacts</td>
-      <td data-label="SBOM scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-      <td data-label="Vulnerability scan"><span class="sat-pill sat-no"><span class="sat-dot"></span>Unsupported</span></td>
-    </tr>
   </tbody>
 </table>
 
-### OCI compatible
-
-In addition to the artifact types listed above, any artifact packaged according to the [Open Container Initiative (OCI) Image specification](https://github.com/opencontainers/image-spec) can be published to and pulled from UDS Registry using OCI-compliant tooling.
+[^1]: Any artifact packaged according to the [Open Container Initiative (OCI) Image specification](https://github.com/opencontainers/image-spec) can be published to and pulled from UDS Registry using OCI-compliant tooling. Refer to [Guidelines for Artifact Usage](https://github.com/opencontainers/image-spec/blob/v1.1.1/manifest.md#guidelines-for-artifact-usage) to learn more.
