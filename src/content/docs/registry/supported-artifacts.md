@@ -28,6 +28,49 @@ UDS Registry supports publishing artifacts with standard OCI tooling. For every 
 Some artifact types also support additional supply chain features, including SBOM and vulnerability scanning. Refer to the table below for details:
 
 <style>
+  /* Markdown footnotes */
+  .sl-markdown-content section[data-footnotes] {
+      margin-top: 5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--sl-color-hairline);
+      font-size: 0.92rem;
+      color: var(--sl-color-gray-3);
+  }
+
+  .sl-markdown-content section[data-footnotes]::before {
+      content: 'Footnotes';
+      display: block;
+      margin-bottom: 0rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--sl-color-gray-2);
+  }
+
+  .sl-markdown-content section[data-footnotes] div {
+      height: 0;
+      margin-top: 1rem;
+  }
+
+  .sl-markdown-content section[data-footnotes] ol {
+      margin-top: 0rem;
+      padding-left: 1.1rem;
+  }
+
+
+  .sl-markdown-content a[data-footnote-ref] {
+      font-size: 0.75em;
+      vertical-align: super;
+      line-height: 0;
+  }
+
+  .sl-markdown-content a[data-footnote-backref] {
+      margin-left: 0.35rem;
+      text-decoration: none;
+      opacity: 0.75;a
+  }
+
   .sat-table {
     --sat-header-bg: rgba(255,255,255,.03);
     --sat-row-odd-bg: rgba(255,255,255,.02);
