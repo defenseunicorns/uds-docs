@@ -1,7 +1,5 @@
 ---
 title: Local demo (quickstart)
-sidebar:
-  order: 1
 ---
 
 ## Local demo quickstart

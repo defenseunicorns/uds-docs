@@ -1,7 +1,5 @@
 ---
 title: UDS Ecosystem
-sidebar:
-  order: 1
 ---
 
 ## What is UDS?
