@@ -3,11 +3,19 @@ import Default from '@astrojs/starlight/components/Sidebar.astro';
 import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.astro';
 ---
 
+{/* Cloak immediately to prevent Starlight restore flicker */}
+<script is:inline>
+  // This runs as soon as the Sidebar markup is parsed.
+  // It prevents the "restore -> then close" flash.
+  document.documentElement.dataset.sidebarCloak = "1";
+</script>
+
 {/* Render the topics dropdown menu. */}
 <div class="starlight-sidebar-topics-dropdown-container">
   <div class="starlight-sidebar-topics-dropdown-title">Choose a product</div>
   <TopicsDropdown />
 </div>
+
 {/* Render the default sidebar. */}
 <Default><slot /></Default>
 
@@ -49,3 +57,190 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
     border-radius: 0.25rem;
   }
 </style>
+
+{/* Global cloak: hide collapsible contents while we normalize open state */}
+<style is:global>
+  html[data-sidebar-cloak="1"] nav details > ul,
+  html[data-sidebar-cloak="1"] nav details > ol {
+    display: none !important;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const closeDescendants = (detailsEl) => {
+      detailsEl.querySelectorAll("details[open]").forEach((d) => {
+        if (d !== detailsEl) d.open = false;
+      });
+    };
+
+    const OVERVIEW_SLUGS = new Set(["overview", "Overview", "index", "Index"]);
+
+    const strip = (href) => href.split("#")[0].split("?")[0];
+
+    const isInsideNestedDetails = (detailsEl, linkEl) => {
+      // If the closest <details> ancestor of the link is not the group itself,
+      // then the link is inside a nested dropdown group.
+      const closestDetails = linkEl.closest("details");
+      return closestDetails && closestDetails !== detailsEl;
+    };
+
+    const findOverviewHref = (detailsEl) => {
+      // Collect links that belong to THIS group level (not inside nested <details>)
+      const linkEls = Array.from(detailsEl.querySelectorAll("a[href]")).filter(
+        (a) => !isInsideNestedDetails(detailsEl, a)
+      );
+
+      const hrefs = linkEls
+        .map((a) => a.getAttribute("href"))
+        .filter(Boolean);
+
+      // Prefer overview/index within this level
+      for (const href of hrefs) {
+        const parts = strip(href).split("/").filter(Boolean);
+        const last = parts[parts.length - 1];
+        if (last && OVERVIEW_SLUGS.has(last)) return href;
+      }
+
+      // Fallback: first non-nested link
+      return hrefs[0] || null;
+    };
+
+    const navigateIfNeeded = (href) => {
+      const target = strip(href);
+      const current = strip(window.location.pathname);
+      if (target !== current) window.location.assign(href);
+    };
+
+    const openOnlyActivePath = (nav) => {
+      // Prefer the current-page link Starlight sets
+      const activeLink =
+        nav.querySelector('a[aria-current="page"]') ||
+        nav.querySelector('a[data-current="true"]');
+
+      // If we can't find it, don't do anything destructive
+      if (!activeLink) return;
+
+      // Collect <details> ancestors containing activeLink
+      const keep = new Set();
+      let el = activeLink;
+      while (el && el !== nav) {
+        if (el instanceof HTMLDetailsElement) keep.add(el);
+        el = el.parentElement;
+      }
+
+      // Open the active chain
+      keep.forEach((d) => (d.open = true));
+
+      // Close everything else (and their descendants)
+      nav.querySelectorAll("details").forEach((d) => {
+        if (!keep.has(d)) {
+          d.open = false;
+          closeDescendants(d);
+        }
+      });
+    };
+
+    const closeSiblingsAtSameLevel = (openedDetails) => {
+      // Your DOM is: ul > li > details, so siblings are OTHER li's details.
+      const myLi = openedDetails.closest("li");
+      if (!myLi) return;
+
+      const levelUl = myLi.parentElement;
+      if (!levelUl || levelUl.tagName !== "UL") return;
+
+      const siblingLis = Array.from(levelUl.children).filter((x) => x.tagName === "LI");
+      for (const li of siblingLis) {
+        if (li === myLi) continue;
+        const sib = li.querySelector(":scope > details");
+        if (sib instanceof HTMLDetailsElement) {
+          sib.open = false;
+          closeDescendants(sib);
+        }
+      }
+    };
+
+    const normalizeAndUncloak = (nav) => {
+      // Run after Starlight has had a chance to restore state,
+      // then clamp it to your desired model and reveal.
+      requestAnimationFrame(() => {
+        openOnlyActivePath(nav);
+        document.documentElement.dataset.sidebarCloak = "0";
+      });
+    };
+
+    const onReady = () => {
+      const nav = document.querySelector("nav");
+      if (!nav) return;
+
+      // Clicking a dropdown header (summary) should OPEN + NAVIGATE to overview/index
+      nav.addEventListener(
+        "click",
+        (e) => {
+          // ignore modifier clicks
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+          const summary = e.target instanceof Element ? e.target.closest("summary") : null;
+          if (!summary) return;
+
+          const details = summary.parentElement;
+          if (!(details instanceof HTMLDetailsElement)) return;
+
+          // If this summary is part of the product selector UI (not the sidebar groups),
+          // bail out. (Extra safety.)
+          if (summary.closest(".starlight-sidebar-topics-dropdown-container")) return;
+
+          const href = findOverviewHref(details);
+          if (!href) return;
+
+          // Prevent native <summary> toggling (which would otherwise collapse if already open)
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+
+          // Ensure open, close siblings (accordion), then navigate
+          details.open = true;
+          closeSiblingsAtSameLevel(details);
+
+          // Optional: clear descendants of siblings (keeps your "reset nested state" behavior)
+          // (closeSiblingsAtSameLevel already calls closeDescendants in your code)
+
+          navigateIfNeeded(href);
+        },
+        true // capture
+      );
+
+      // Accordion behavior: opening a group closes siblings at that level.
+      // Closing a group clears its descendants so state doesn't stick.
+      nav.addEventListener(
+        "toggle",
+        (e) => {
+          const details = e.target;
+          if (!(details instanceof HTMLDetailsElement)) return;
+
+          if (details.open) {
+            closeSiblingsAtSameLevel(details);
+          } else {
+            closeDescendants(details);
+          }
+        },
+        true
+      );
+
+      // Initial load: normalize + uncloak (prevents flicker)
+      normalizeAndUncloak(nav);
+
+      // Client-side navs: re-cloak, then normalize + uncloak
+      document.addEventListener("astro:page-load", () => {
+        document.documentElement.dataset.sidebarCloak = "1";
+        normalizeAndUncloak(nav);
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", onReady, { once: true });
+    } else {
+      onReady();
+    }
+  })();
+</script>
