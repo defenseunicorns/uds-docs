@@ -91,11 +91,12 @@ If a package violates Pepr policies, it will be listed with the reason for denia
 - List installed packages using [zarf package list](https://docs.zarf.dev/commands/zarf_package_list/)
 - Remove installed packages using [zarf package remove](https://docs.zarf.dev/commands/zarf_package_remove/)
 
-## Kubernetes Troubleshooting
+## References
+### Kubernetes Troubleshooting
 - [Kubernetes Troubleshooting Clusters Guide](https://kubernetes.io/docs/tasks/debug/debug-cluster/)
 - [Kubernetes Troubleshooting Applications Guide](https://kubernetes.io/docs/tasks/debug/debug-application/)
 
-## Helm Troubleshooting
+### Helm Troubleshooting
 A solid understanding of Helm is highly beneficial when troubleshooting deployments. The following Helm commands are commonly used during debugging and can help diagnose and resolve issues efficiently.
 
 - [helm template](https://helm.sh/docs/helm/helm_template/) - If you have a helm template you believe is not configured properly.
