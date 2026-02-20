@@ -1,7 +1,5 @@
 ---
 title: Identity & access (SSO)
-sidebar:
-  order: 1
 ---
 
 ## Identity & access how‑tos

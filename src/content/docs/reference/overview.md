@@ -1,7 +1,5 @@
 ---
 title: UDS Core
-sidebar:
-  order: 1
 ---
 
 ## Reference

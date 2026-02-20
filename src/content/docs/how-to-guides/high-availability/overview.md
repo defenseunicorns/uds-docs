@@ -1,7 +1,5 @@
 ---
 title: High availability & resilience
-sidebar:
-  order: 1
 ---
 
 ## High availability & resilience

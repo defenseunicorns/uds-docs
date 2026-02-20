@@ -1,7 +1,5 @@
 ---
 title: Backup & restore
-sidebar:
-  order: 1
 ---
 
 ## Backup & restore how‑tos

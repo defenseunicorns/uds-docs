@@ -1,7 +1,5 @@
 ---
 title: Runtime security
-sidebar:
-  order: 1
 ---
 
 ## Runtime security how‑tos

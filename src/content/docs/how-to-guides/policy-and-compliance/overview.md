@@ -1,7 +1,5 @@
 ---
 title: Policy & compliance
-sidebar:
-  order: 1
 ---
 
 ## Policy & compliance how‑tos
