@@ -17,6 +17,10 @@ Here is a list of the supported artifact types:
 - OpenTofu Providers
 - OCI Artifacts[^1]
 
+**Recommended: Zarf Packages (including UDS Packages).** While UDS Registry can store multiple OCI artifact types, Zarf packages are the preferred, first-class unit of delivery. A Zarf package bundles the application's container images, Helm charts, and manifests into a single deployable artifact, making it the most reliable way to move software across disconnected and mission environments.
+
+UDS Packages build on Zarf (a Zarf package plus UDS-specific integration) and are the recommended format for delivering applications into UDS Core, preserving the metadata and structure needed for secure, repeatable deployments.
+
 ### Supported Features
 
 UDS Registry supports publishing artifacts with standard OCI tooling. For every supported artifact type you can:
