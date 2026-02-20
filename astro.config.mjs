@@ -89,7 +89,7 @@ export default defineConfig({
                           autogenerate: {
                               directory: 'overview'
                           },
-                          collapsed: false,
+                          collapsed: true,
                       },
                       {
                           label: 'Getting Started',
@@ -98,7 +98,7 @@ export default defineConfig({
                               { label: 'Local Demo', autogenerate: {directory: '/getting-started/local-demo/'}, collapsed: true },
                               { label: 'Production Deployment', autogenerate: {directory: '/getting-started/production/'}, collapsed: true },
                           ],
-                          collapsed: false
+                          collapsed: true
                       },
                       {
                           label: 'Concepts',
