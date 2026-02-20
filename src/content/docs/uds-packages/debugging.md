@@ -83,7 +83,7 @@ uds monitor pepr denied
 ```
 
 If a package violates Pepr policies, it will be listed with the reason for denial, such as a missing security context or other baseline requirement.
-### How Can I Remove a Package From the Cluster?
+### Remove a Package From the Cluster
 - List installed packages using [zarf package list](https://docs.zarf.dev/commands/zarf_package_list/)
 - Remove installed packages using [zarf package remove](https://docs.zarf.dev/commands/zarf_package_remove/)
 
@@ -91,7 +91,7 @@ If a package violates Pepr policies, it will be listed with the reason for denia
 - [Kubernetes Troubleshooting Clusters Guide](https://kubernetes.io/docs/tasks/debug/debug-cluster/)
 - [Kubernetes Troubleshooting Applications Guide](https://kubernetes.io/docs/tasks/debug/debug-application/)
 
-### Helm Debugging
+### Helm Troubleshooting
 A solid understanding of Helm is highly beneficial when troubleshooting deployments. The following Helm commands are commonly used during debugging and can help diagnose and resolve issues efficiently.
 
 - [helm template](https://helm.sh/docs/helm/helm_template/) - If you have a helm template you believe is not configured properly.
@@ -102,3 +102,5 @@ A solid understanding of Helm is highly beneficial when troubleshooting deployme
   ```sh
   helm show values oci://ghcr.io/uds-packages/reference-package/helm/reference-package
   ```
+
+For additional guidance, refer to the [Helm Troubleshooting docs](https://helm.sh/docs/v3/faq/troubleshooting/).
