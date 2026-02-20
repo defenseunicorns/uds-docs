@@ -29,6 +29,15 @@ Some artifact types also support additional supply chain features, including SBO
 
 <style>
   .sat-table {
+    --sat-header-bg: rgba(255,255,255,.03);
+    --sat-row-odd-bg: rgba(255,255,255,.02);
+    --sat-row-hover-bg: rgba(255,255,255,.05);
+    --sat-yes-bg: rgba(34,197,94,.12);
+    --sat-yes-text: rgb(134,239,172);
+    --sat-yes-border: rgba(34,197,94,.25);
+    --sat-soon-bg: rgba(245,158,11,.12);
+    --sat-soon-text: rgb(253,230,138);
+    --sat-soon-border: rgba(245,158,11,.25);
     width: 100%;
     max-width: max-content;
     border-collapse: separate;
@@ -36,6 +45,17 @@ Some artifact types also support additional supply chain features, including SBO
     border: 1px solid var(--sl-color-gray-5, rgba(255,255,255,.12));
     overflow: hidden;
     background: var(--sl-color-black, transparent);
+  }
+  :root[data-theme='light'] .sat-table {
+    --sat-header-bg: rgba(17,24,39,.06);
+    --sat-row-odd-bg: rgba(17,24,39,.03);
+    --sat-row-hover-bg: rgba(17,24,39,.06);
+    --sat-yes-bg: rgba(34,197,94,.16);
+    --sat-yes-text: #14532d;
+    --sat-yes-border: rgba(34,197,94,.35);
+    --sat-soon-bg: rgba(245,158,11,.2);
+    --sat-soon-text: #92400e;
+    --sat-soon-border: rgba(245,158,11,.38);
   }
   .sat-table caption {
     text-align: left;
@@ -47,7 +67,7 @@ Some artifact types also support additional supply chain features, including SBO
     font-weight: 600;
     padding: 0.85rem 1rem;
     border-bottom: 1px solid var(--sl-color-gray-5, rgba(255,255,255,.12));
-    background: rgba(255,255,255,.03);
+    background: var(--sat-header-bg);
     white-space: nowrap;
   }
   .sat-table tbody td {
@@ -55,8 +75,8 @@ Some artifact types also support additional supply chain features, including SBO
     border-bottom: 1px solid var(--sl-color-gray-6, rgba(255,255,255,.08));
     vertical-align: middle;
   }
-  .sat-table tbody tr:nth-child(odd) { background: rgba(255,255,255,.02); }
-  .sat-table tbody tr:hover { background: rgba(255,255,255,.05); }
+  .sat-table tbody tr:nth-child(odd) { background: var(--sat-row-odd-bg); }
+  .sat-table tbody tr:hover { background: var(--sat-row-hover-bg); }
   .sat-table tbody tr:last-child td { border-bottom: 0; }
 
   /* Make the first column stand out a bit */
@@ -83,23 +103,16 @@ Some artifact types also support additional supply chain features, including SBO
 
   /* Variants */
   .sat-yes {
-    background: rgba(34,197,94,.12);
-    color: rgb(134,239,172);
-    border-color: rgba(34,197,94,.25);
+    background: var(--sat-yes-bg);
+    color: var(--sat-yes-text);
+    border-color: var(--sat-yes-border);
   }
   .sat-yes .sat-dot { background: rgb(34,197,94); }
 
-  .sat-no {
-    background: rgba(148,163,184,.10);
-    color: rgb(203,213,225);
-    border-color: rgba(148,163,184,.18);
-  }
-  .sat-no .sat-dot { background: rgb(148,163,184); }
-
   .sat-soon {
-    background: rgba(245,158,11,.12);
-    color: rgb(253,230,138);
-    border-color: rgba(245,158,11,.25);
+    background: var(--sat-soon-bg);
+    color: var(--sat-soon-text);
+    border-color: var(--sat-soon-border);
   }
   .sat-soon .sat-dot { background: rgb(245,158,11); }
 
