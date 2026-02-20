@@ -151,7 +151,7 @@ export default defineConfig({
                           autogenerate: {
                               directory: 'registry'
                           },
-                          collapsed: false,
+                          collapsed: true,
                       },
                     ],
                   },
@@ -164,7 +164,7 @@ export default defineConfig({
                           autogenerate: {
                               directory: 'fleet'
                           },
-                          collapsed: false,
+                          collapsed: true,
                       },
                     ],
                   }
