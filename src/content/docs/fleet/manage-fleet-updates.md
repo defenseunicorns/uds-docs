@@ -69,3 +69,6 @@ When adding a new product to Ecosystem Products:
 - [ ] Ensure separate doc site links back to Core for shared concepts
 
 **Note**: Registry and Tactical Edge are shown as examples but will NOT be included in the initial restructure. They may be added later when technical documentation exists for them.
+
+## testing multi-product search
+this is a test
