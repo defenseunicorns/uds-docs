@@ -8,6 +8,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { LikeC4VitePlugin } from 'likec4/vite-plugin';
 import starlightImageZoom from 'starlight-image-zoom';
 import react from '@astrojs/react';
+import starlightGitHubAlerts from 'starlight-github-alerts'
 
 // https://astro.build/config
 export default defineConfig({
@@ -55,6 +56,7 @@ export default defineConfig({
         starlight({
             routeMiddleware: './src/routeData.ts',
             plugins: [
+                starlightGitHubAlerts(),
                 starlightLinksValidator(),
                 starlightImageZoom(),
                 starlightLlmsTxt({
