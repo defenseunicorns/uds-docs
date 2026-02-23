@@ -27,6 +27,14 @@ import Default from '@astrojs/starlight/components/Search.astro';
     // Check if filter already exists
     if (pagefindForm.querySelector('.topic-filter-container')) return;
     
+    // Dynamically detect available topics
+    const availableTopics = detectAvailableTopics();
+    
+    // If there's only UDS Core (or no topics), don't show the filter at all
+    if (availableTopics.length <= 1) {
+      return;
+    }
+    
     // Create filter container
     const filterContainer = document.createElement('div');
     filterContainer.className = 'topic-filter-container';
@@ -39,9 +47,6 @@ import Default from '@astrojs/starlight/components/Search.astro';
     // Create filter buttons container
     const filterButtonsContainer = document.createElement('div');
     filterButtonsContainer.className = 'filter-buttons';
-    
-    // Dynamically detect available topics
-    const availableTopics = detectAvailableTopics();
     
     // Create filter buttons dynamically
     const topics = [
