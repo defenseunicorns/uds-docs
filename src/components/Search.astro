@@ -40,13 +40,18 @@ import Default from '@astrojs/starlight/components/Search.astro';
     const filterButtonsContainer = document.createElement('div');
     filterButtonsContainer.className = 'filter-buttons';
     
-    // Create filter buttons
+    // Dynamically detect available topics
+    const availableTopics = detectAvailableTopics();
+    
+    // Create filter buttons dynamically
     const topics = [
-      { value: '', label: 'All', active: true },
-      { value: 'UDS Core', label: 'UDS Core', active: false },
-      { value: 'Registry', label: 'Registry', active: false },
-      { value: 'Fleet', label: 'Fleet', active: false }
+      { value: '', label: 'All', active: true }
     ];
+    
+    // Add detected topics
+    availableTopics.forEach(topic => {
+      topics.push({ value: topic.label, label: topic.label, active: false });
+    });
     
     topics.forEach(topic => {
       const button = document.createElement('button');
@@ -152,6 +157,31 @@ import Default from '@astrojs/starlight/components/Search.astro';
       }
     `;
     document.head.appendChild(style);
+  }
+  
+  function detectAvailableTopics(): Array<{label: string, path: string}> {
+    const topics = [];
+    
+    // Check for Registry content
+    if (hasContentInPath('/registry/')) {
+      topics.push({ label: 'Registry', path: '/registry/' });
+    }
+    
+    // Check for Fleet content
+    if (hasContentInPath('/fleet/')) {
+      topics.push({ label: 'Fleet', path: '/fleet/' });
+    }
+    
+    // UDS Core is always available (everything else)
+    topics.push({ label: 'UDS Core', path: '/' });
+    
+    return topics;
+  }
+  
+  function hasContentInPath(path: string): boolean {
+    // Check if there are any links in the navigation that match this path
+    const navLinks = document.querySelectorAll('nav a[href*="' + path + '"]');
+    return navLinks.length > 0;
   }
   
   function setupFilterBehavior() {
