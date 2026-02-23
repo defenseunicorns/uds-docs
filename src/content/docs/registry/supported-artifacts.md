@@ -9,7 +9,7 @@ sidebar:
 
 Here is a list of the supported artifact types:
 
-- [Zarf Packages](https://docs.zarf.dev/) (Including [UDS Packages](/structure/packages/))
+- [Zarf Packages](https://docs.zarf.dev/ref/packages/) (Including [UDS Packages](/structure/packages/))
 - Docker Images
 - OCI Images
 - Helm Charts
