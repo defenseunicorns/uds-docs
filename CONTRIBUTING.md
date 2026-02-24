@@ -110,13 +110,17 @@ Recommended file frontmatter for pages (example):
   ```
 - **Notes/Warnings**: Use Starlight callouts, e.g.:
   ```md
-    :::note
-    helpful tip or contextual note.
-    :::
+    > [!NOTE]
+    > Useful information that users should know, even when skimming content.
 
-    :::caution
-    Important caution for users.
-    :::
+    > [!TIP]
+    > Helpful advice for doing things better or more easily.
+
+    > [!WARNING]
+    > Urgent info that needs immediate user attention to avoid problems.
+
+    > [!CAUTION]
+    > Advises about risks or negative outcomes of certain actions.
   ```
 - **Terminology**: Use consistent product names (e.g., “UDS Core”, “UDS CLI”).
 - **Version banners for How‑tos**: If a how‑to guide only applies to certain UDS Core versions, add a short callout

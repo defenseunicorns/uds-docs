@@ -3,9 +3,8 @@ title: LEGACY --Software Factory Bundles
 draft: true
 ---
 
-:::note
-The following UDS Bundles are designed specifically for development and testing environments and are *not intended for production use*.
-:::
+> [!NOTE]
+> The following UDS Bundles are designed specifically for development and testing environments and are *not intended for production use*.
 
 ## [swf-dev](https://github.com/defenseunicorns/uds-software-factory/tree/main/bundles/dev)
 
