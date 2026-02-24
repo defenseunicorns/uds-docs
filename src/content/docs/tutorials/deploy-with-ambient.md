@@ -105,9 +105,8 @@ uds-core-podinfo-waypoint-55547ff65b-2nqsf   1/1     Running   0          3m13s
 
 Notice how the pod only has a single container. The podinfo application has been successfully migrated to Ambient! Also notice the `waypoint` pod which is added here. This waypoint is required to support SSO with Authservice (read more about waypoints [here](https://istio.io/latest/docs/ambient/usage/waypoint/)).
 
-:::note
-Learn more about the changes introduced in Ambient mode [here](https://istio.io/latest/docs/ambient/overview/).
-:::
+> [!NOTE]
+>Learn more about the changes introduced in Ambient mode [here](https://istio.io/latest/docs/ambient/overview/).
 
 You can also validate that all of the other integrations we setup are still present (navigate to https://podinfo.uds.dev/ and login again, etc).
 

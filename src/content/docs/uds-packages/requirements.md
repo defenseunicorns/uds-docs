@@ -8,13 +8,11 @@ draft: true
 
 This document describes the standards for UDS Package Requirements. This is not a _guide_ on how to create a UDS Package, but instead a list of requirements for a UDS Package to be properly and confidently integrated and operated in production environments.
 
-:::note
-This document follows [RFC-2119](https://datatracker.ietf.org/doc/html/rfc2119) for definitions of requirement levels (e.g. MUST, SHOULD and MAY).
-:::
+> [!NOTE]
+> This document follows [RFC-2119](https://datatracker.ietf.org/doc/html/rfc2119) for definitions of requirement levels (e.g. MUST, SHOULD and MAY).
 
-:::note
-For a `Markdown` version of this that is easy to copy, see here.
-:::
+> [!NOTE]
+> For a `Markdown` version of this that is easy to copy, see here.
 
 ## Requirements for UDS Package Integrators
 

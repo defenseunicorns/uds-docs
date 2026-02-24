@@ -7,9 +7,8 @@ sidebar:
 
 This document provides a comprehensive overview of all configuration options available in the UDS Registry Helm chart.
 
-:::tip
-UDS Registry uses sensible defaults, most deployments will need to only require a minimal set of configuration.
-:::
+> [!TIP]
+> UDS Registry uses sensible defaults, most deployments will need to only require a minimal set of configuration.
 
 ## Table of Contents
 
@@ -64,9 +63,9 @@ UDS Registry uses sensible defaults, most deployments will need to only require 
 | `package.serviceMeshMode` | `ambient` | Service mesh mode configuration |
 
 ### Resource Configuration <small>[(example)](#basic-development-setup)</small>
-:::Note
-Default resource values are suitable for uds-core only. Increase for production workloads.
-:::
+> [!NOTE]
+> Default resource values are suitable for uds-core only. Increase for production workloads.
+
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `resources.requests.memory` | `128Mi` | Memory request |
@@ -75,17 +74,16 @@ Default resource values are suitable for uds-core only. Increase for production 
 | `resources.limits.cpu` | `750m` | CPU limit |
 
 ### Storage Configuration <small>[(example)](#basic-development-setup)</small>
-:::Note
-Two storage backends are available:
-- **filesystem** - Uses persistent volumes for storage
-- **s3** - Uses S3-compatible object storage
-:::
-:::Important
-When `haDatabase` is enabled:
-- `ociStorage` must be set to `s3`
-- Database PVC creation is disabled
-- External database must be configured via `database.connectionString`
-:::
+> [!NOTE]
+> Two storage backends are available:
+> - **filesystem** - Uses persistent volumes for storage
+> - **s3** - Uses S3-compatible object storage
+
+> [!CAUTION]
+> When `haDatabase` is enabled:
+> - `ociStorage` must be set to `s3`
+> - Database PVC creation is disabled
+> - External database must be configured via `database.connectionString`
 
 | Parameter | Default | Options | Description |
 |-----------|---------|---------|-------------|
@@ -161,9 +159,8 @@ Use the classification banner to render a header and footer in the UI. The `clas
 | `persistence.registry.pv.extraPvcLabels` | `{}` | Extra PVC labels |
 
 ### Distribution Configuration <small>[(example)](#filesystem-storage-configuration)</small>
-:::Important
-Set a secure random string for production deployments to ensure consistency across replicas.
-:::
+> [!CAUTION]
+> Set a secure random string for production deployments to ensure consistency across replicas.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|

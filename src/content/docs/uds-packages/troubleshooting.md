@@ -15,9 +15,8 @@ The example below reflects a terminal session with a deployment of the UDS Packa
 
 ![Stalled Deployment](.images/stalled-deployment.png)
 
-:::tip
-If you prefer a UI-based workflow, you can inspect events using K9s or `uds zarf tools monitor`.
-:::
+> [!TIP]
+> If you prefer a UI-based workflow, you can inspect events using K9s or `uds zarf tools monitor`.
 
 **Command**
 ```sh

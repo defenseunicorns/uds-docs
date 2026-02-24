@@ -16,6 +16,6 @@ With Your App Your Environment, teams maintain ownership and independence over t
 
 **Deploy Anywhere:** Your App Your Environment packages and delivers your mission application across multiple environments, including cloud, on-premises, and tactical edge.
 
-:::note
-If you are interested in learning more about Your App Your Environment, please [contact us](https://www.defenseunicorns.com/contactus)!
-:::
+> [!NOTE]
+> If you are interested in learning more about Your App Your Environment, please [contact us](https://www.defenseunicorns.com/contactus)!
+

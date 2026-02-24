@@ -46,9 +46,8 @@ Use appropriate tooling to ensure code quality and consistency.
 - [YAML Linting](https://github.com/adrienverge/yamllint): `yamllint`
 - [Shellcheck](https://www.shellcheck.net/) for bash scripts.
 
-:::tip
-By utilizing [uds-common](https://github.com/defenseunicorns/uds-common/blob/main/tasks/lint.yaml), many of the above linting commands can be executed by running `uds run lint:yaml|shell`.
-:::
+> [!TIP]
+> By utilizing [uds-common](https://github.com/defenseunicorns/uds-common/blob/main/tasks/lint.yaml), many of the above linting commands can be executed by running `uds run lint:yaml|shell`.
 
 ### **Best Practices**
 1. **Consistency**: Prefer shared patterns across packages where practical.
