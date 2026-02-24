@@ -90,42 +90,42 @@ export default defineConfig({
               {
                 label: 'Overview',
                 autogenerate: {
-                  directory: 'Overview'
+                  directory: 'overview'
                 },
                 collapsed: true,
               },
               {
                 label: 'Getting Started',
                 autogenerate: {
-                  directory: 'Getting Started'
+                  directory: 'getting-started'
                 },
                 collapsed: true
               },
               {
                 label: 'Concepts',
                 autogenerate: {
-                  directory: 'Concepts'
+                  directory: 'concepts'
                 },
                 collapsed: true
               },
               {
                 label: 'How-to Guides',
                 autogenerate: {
-                  directory: 'How To Guides'
+                  directory: 'how-to-guides'
                 },
                 collapsed: true
               },
               {
                 label: 'Reference',
                 autogenerate: {
-                  directory: 'Reference'
+                  directory: 'reference'
                 },
                 collapsed: true,
               },
               {
                 label: 'Operations & Maintenance',
                 autogenerate: {
-                  directory: 'Operations'
+                  directory: 'operations'
                 },
                 collapsed: true,
               },

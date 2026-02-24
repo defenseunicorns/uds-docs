@@ -35,9 +35,9 @@ repo_key_from_url() {
   echo "${base%.git}"
 }
 
-# # Start clean: remove common destination subdirectories composed from multiple sources
-# rm -rf "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
-# mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
+# Start clean: remove common destination subdirectories composed from multiple sources
+rm -rf "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
+mkdir -p "${TARGET_DIR}/reference" "${TARGET_DIR}/troubleshooting"
 
 clone_repo() {
     repo_url="$1"
@@ -116,9 +116,10 @@ rm -rf "$TARGET_DIR/dev"
 rm -rf "$TARGET_DIR/adr"
 
 ## this allows for naming directories in lowercase and hyphenated formats, still allows for space formatting
-# Run kebab->spaced renaming across all docs (including tutorials)
+# Run kebab->spaced renaming in both reference and tutorials
 BASE_DIRS=(
-  "src/content/docs"
+  "src/content/docs/reference"
+  "src/content/docs/tutorials"
 )
 
 for BASE_DIR in "${BASE_DIRS[@]}"; do
@@ -128,9 +129,6 @@ for BASE_DIR in "${BASE_DIRS[@]}"; do
   find "$BASE_DIR" -type d ! -path "$BASE_DIR" | awk '{ print length, $0 }' | sort -rn | cut -d" " -f2- | while read -r dir; do
     base=$(basename "$dir")
     parent=$(dirname "$dir")
-
-    # Skip LikeC4 assets to preserve expected casing/paths
-    [[ "$dir" == */.c4* ]] && continue
 
     # Skip if already space-formatted and not hyphenated
     [[ "$base" == *" "* && "$base" != *"-"* ]] && continue
