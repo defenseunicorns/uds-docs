@@ -23,9 +23,8 @@ your system has the following:
 WSL has access to 50% of the host machine's available RAM (e.g. 32GB allows WSL access to 16GB), and 100% of its
 available CPUs.
 
-:::note
-WSL's resource allocation defaults can be changed with the creation of a `.wslconfig` or `wsl.config`.
-:::
+> [!NOTE]
+> WSL's resource allocation defaults can be changed with the creation of a `.wslconfig` or `wsl.config`.
 
 Optional, but recommended are the following, as they're used in other examples and tutorials:
 - A code editor of your choice
@@ -45,25 +44,20 @@ you have everything you need.
 If you've done development with Docker in the past, you may already have it installed. If you do, you can likely
 skip the rest of this step.
 
-:::info
-Use of Docker Desktop at a company with greater than 250 employees or $10 million in annual revenue requires a
+> [!NOTE]
+> Use of Docker Desktop at a company with greater than 250 employees or $10 million in annual revenue requires a
 paid subscription. If you don't wish to use Docker Desktop as a result, we would recommend an alternative
 platform such as [colima](https://github.com/abiosoft/colima), which is free and open-source.
-:::
 
 Visit the [Docker Desktop](https://www.docker.com/products/docker-desktop/) website. (Linux users see the Note
 below) and select the correct download version for the Docker Desktop based on your computer's OS.  Once the
 installer is downloaded, navigate to the location it downloaded (usually the Downloads folder) and
 install Docker Desktop.
 
-:::note
-Docker Desktop support on Linux is not as extensive as macOS, and at the time of this writing, the latest Ubuntu
-24.04 LTS is not yet supported. Due to a change in how the latest Ubuntu release restricts the unprivileged
-namespaces, `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` needs to be run at least once.
-Refer to the Ubuntu Blog for more details.
+> [!NOTE]
+> Docker Desktop support on Linux is not as extensive as macOS, and at the time of this writing, the latest Ubuntu 24.04 LTS is not yet supported. Due to a change in how the latest Ubuntu release restricts the unprivileged namespaces, `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` needs to be run at least once. Refer to the Ubuntu Blog for more details.
 
 All of the above said, you do not have to run Docker Desktop on Linux, and can instead install Docker Engine.
-:::
 
 After installation, you can follow OS-specific steps below.
 
@@ -132,11 +126,10 @@ After installation, you can follow OS-specific steps below.
         ```
     </TabItem>
     <TabItem label="Windows">
-        :::caution
-        Your computer needs to be running Windows 10 version 2004 and higher (Build 19041 and higher) or Windows 11.
-        If you are on an older build, there are manual installation steps for older versions of WSL available
+        > [!CAUTION]
+        > Your computer needs to be running Windows 10 version 2004 and higher (Build 19041 and higher) or Windows 11.
+        > If you are on an older build, there are manual installation steps for older versions of WSL available
         [here](https://learn.microsoft.com/en-us/windows/wsl/install-manual).
-        :::
 
         #### Overview
         We will be following [Install WSL | Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/install) for
@@ -166,11 +159,9 @@ After installation, you can follow OS-specific steps below.
 
         `sudo apt update && sudo apt upgrade`
 
-        :::caution
-        Based on end user reports you may need to be on a Linux kernel version of 6.6.x+ in order to have the required
-        kernel modules for Istio (see [prerequisite documentation](https://uds.defenseunicorns.com/reference/uds-core/prerequisites/#istio)).
-        You can update your kernel to the latest prerelease version using `wsl --update --pre-release`.
-        :::
+        > [!CAUTION]
+        > Based on end user reports you may need to be on a Linux kernel version of 6.6.x+ in order to have the required kernel modules for Istio (see [prerequisite documentation](https://uds.defenseunicorns.com/reference/uds-core/prerequisites/#istio)).
+        > You can update your kernel to the latest prerelease version using `wsl --update --pre-release`.
 
         #### WSL Configurations
         By default, WSL will have access 100% of your system's CPU cores and 50% of your memory/RAM.  If you need to
@@ -216,9 +207,8 @@ After installation, you can follow OS-specific steps below.
             you're running. Not all CPUs or Hypervisor software support nested virtualization.
 
 
-        :::tip
-        If you need to update the WSL kernel, use this command:
-        `wsl --update`
-        :::
+        > [!TIP]
+        > If you need to update the WSL kernel, use this command:
+        > `wsl --update`
     </TabItem>
 </Tabs>

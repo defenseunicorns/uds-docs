@@ -26,6 +26,5 @@ Software Factory introduces a declarative packaging of tools for source code man
 | **Mattermost**    | **Online Chat Service:** Mattermost is an open-source, self-hostable online chat service, providing a platform for real-time communication and collaboration within teams.                                                                                                                                                                                                                                                                                                                                                  |
 | **SonarQube**     | **Code Quality:** SonarQube continuously evaluates code quality and identifies issues, helping maintain code integrity and reduce technical debt.                                                                                                                                                                                                                                                                                                                                                                           |
 
-:::note
-If you are interested in learning more about Software Factory or would like to receive a demo, please [contact us](https://www.defenseunicorns.com/contactus)!
-:::
+> [!NOTE]
+> If you are interested in learning more about Software Factory or would like to receive a demo, please [contact us](https://www.defenseunicorns.com/contactus)!

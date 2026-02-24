@@ -15,9 +15,8 @@ UDS maintains a defense-in-depth baseline, providing real security through the e
 - **Runtime security** with realtime detection and alerting on malicious behavior.
 - **Observability & audit**: centralized collection and shipping as well as metrics and dashboards.
 
-:::note
-Security defaults are intentionally restrictive. End users can loosen controls, but changing defaults may reduce your security posture. This should be done carefully and any reductions in security should be documented.
-:::
+> [!NOTE]
+> Security defaults are intentionally restrictive. End users can loosen controls, but changing defaults may reduce your security posture. This should be done carefully and any reductions in security should be documented.
 
 ## Secure Supply Chain
 
@@ -114,9 +113,8 @@ Security defaults are intentionally restrictive. End users can loosen controls, 
 - **Runtime/container security** from Falco, providing real-time threat detection and security monitoring.
 - **Visibility** into suspicious process, network, and file activity with alerts routed to your ops tooling.
 
-:::caution
-- NeuVector has been deprecated, see [official uds-package](https://github.com/uds-packages/neuvector) for continued use.
-:::
+> [!CAUTION]
+> - NeuVector has been deprecated, see [official uds-package](https://github.com/uds-packages/neuvector) for continued use.
 
 **Why it matters:**
 

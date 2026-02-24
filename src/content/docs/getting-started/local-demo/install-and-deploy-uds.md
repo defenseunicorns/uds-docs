@@ -15,9 +15,8 @@ UDS Bundles deployed for development and testing purposes are comprised of a sha
 essential tools, emulating a development environment for convenience. If deploying to a production environment, users 
 have the ability to modify variables and configurations to best fit specific mission needs by creating their own bundle.
 
-:::caution
-These UDS Bundles are designed specifically for development and testing environments and are *not intended for production use*. Additionally, they serve as examples for creating customized bundles.
-:::
+> [!CAUTION]
+> These UDS Bundles are designed specifically for development and testing environments and are *not intended for production use*. Additionally, they serve as examples for creating customized bundles.
 
 For additional information on UDS Bundles, please see the [UDS Bundles reference](https://uds.defenseunicorns.com/reference/bundles/overview/).
 
@@ -34,10 +33,8 @@ following command:
 brew tap defenseunicorns/tap && brew install uds
 ```
 
-:::tip
-You can see all releases of the UDS CLI on the 
-[UDS CLI GitHub repository](https://github.com/defenseunicorns/uds-cli/releases)
-:::
+> [!TIP]
+> You can see all releases of the UDS CLI on the [UDS CLI GitHub repository](https://github.com/defenseunicorns/uds-cli/releases)
 
 ### Step 2: Deploy the UDS Bundle
 
@@ -54,12 +51,10 @@ uds deploy k3d-core-demo:latest
 y
 ```
 
-:::note
-You can also deploy a specific version of the bundle, see all versions of the bundle 
-[here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-demo).
-
-If you deploy a specific version and want to update UDS Core on top of your existing cluster, you can use the `--packages` flag to deploy just core (rather than redeploying the full cluster as well): `uds deploy k3d-core-demo:<new-version> --packages core`.
-:::
+> [!NOTE]
+> You can also deploy a specific version of the bundle, see all versions of the bundle [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-demo).
+>
+> If you deploy a specific version and want to update UDS Core on top of your existing cluster, you can use the `--packages` flag to deploy just core (rather than redeploying the full cluster as well): `uds deploy k3d-core-demo:<new-version> --packages core`.
 
 **Optional:**
 

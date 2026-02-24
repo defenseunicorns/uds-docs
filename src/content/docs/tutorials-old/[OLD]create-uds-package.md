@@ -24,13 +24,11 @@ includes:
 
 You can think of the UDS Operator as the "glue" between your application and the services that are provided by UDS Core. It is a [Kubernetes Operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) that has working knowledge of UDS Core services in the cluster and takes care of integrating your app with those services for you. To register your application with the UDS Operator, you need to create a `Package` Kubernetes Custom Resource. Within the specification of the `Package` resource, you can specify different parameters that dictate how the UDS Operator should integrate your app per its unique requirements. The sections below cover creating a `Package` resource for `podinfo` and integrating `podinfo` with several UDS Core services.
 
-:::note
-The `Package` Custom Kubernetes Resource is different from a [UDS Package](https://uds.defenseunicorns.com/structure/packages/), which is a collection of the Zarf Package for your application and the Kubernetes `Package` Custom Resource.
-:::
+> [!NOTE]
+> The `Package` Custom Kubernetes Resource is different from a [UDS Package](https://uds.defenseunicorns.com/structure/packages/), which is a collection of the Zarf Package for your application and the Kubernetes `Package` Custom Resource.
 
-:::note
-All resources created by the UDS Operator for `podinfo` will have a `uds/package=podinfo` label applied to it.
-:::
+> [!NOTE]
+> All resources created by the UDS Operator for `podinfo` will have a `uds/package=podinfo` label applied to it.
 
 #### Create a Package Resource for Podinfo
 
@@ -164,9 +162,8 @@ NAME      STATUS   SSO CLIENTS            ENDPOINTS             MONITORS   NETWO
 podinfo   Ready    ["uds-core-podinfo"]   ["podinfo.uds.dev"]   []         7                  4                        3m29s
 ```
 
-:::note
-Notice how the count under `NETWORK POLICIES` has increased. The UDS Operator recognized that additional `NetworkPolicies` were required for Keycloak to communicate with `podinfo`, so it automatically created additional `NetworkPolicies` to allow that.
-:::
+> [!NOTE]
+> Notice how the count under `NETWORK POLICIES` has increased. The UDS Operator recognized that additional `NetworkPolicies` were required for Keycloak to communicate with `podinfo`, so it automatically created additional `NetworkPolicies` to allow that.
 
 When navigating to https://podinfo.uds.dev/, you will be redirected to a login screen. Only users that are members of the `/UDS Core/Admin` group in Keycloak are permitted to access the site. Create a test user in that group with the following command (using the uds-common task included above):
 

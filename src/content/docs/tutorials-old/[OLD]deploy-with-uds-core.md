@@ -64,9 +64,8 @@ Run the following command in the same directory as the above `zarf.yaml`. This w
 zarf package create --confirm
 ```
 
-:::note
-The `<arch>` field in the name of your Zarf Package will depend on your system architecture (eg. `zarf-package-podinfo-amd64-0.0.1.tar.zst`).
-:::
+> [!NOTE]
+> The `<arch>` field in the name of your Zarf Package will depend on your system architecture (eg. `zarf-package-podinfo-amd64-0.0.1.tar.zst`).
 
 #### Create the UDS Bundle
 
@@ -139,9 +138,8 @@ packages:
     ref: 0.0.1
 ```
 
-:::note
-Use UDS Core version 0.55.1 or newer. Earlier versions may trigger browser certificate errors when accessing example HTTPS endpoints (for example, https://podinfo.uds.dev) due to an outdated development certificate.
-:::
+> [!NOTE]
+> Use UDS Core version 0.55.1 or newer. Earlier versions may trigger browser certificate errors when accessing example HTTPS endpoints (for example, https://podinfo.uds.dev) due to an outdated development certificate.
 
 UDS Bundles can easily be configured to include additional applications and capabilities. For example, if you would like to deploy [dos-games](https://docs.zarf.dev/tutorials/3-deploy-a-retro-arcade/) instead of `podinfo`, in the `uds-bundle.yaml` simply replace:
 
@@ -159,9 +157,8 @@ with:
   ref: 1.0.0
 ```
 
-:::note
-Most UDS Packages are published as Zarf Packages in an OCI registry. This makes it easier to pull packages down into a UDS Bundle. If no OCI artifact is published for a certain application or capability, a new `zarf.yaml` and Zarf Package must be created. Alternatively, you have the option to publish a Zarf Package to an [OCI compliant registry](https://docs.zarf.dev/tutorials/6-publish-and-deploy/).
-:::
+> [!NOTE]
+> Most UDS Packages are published as Zarf Packages in an OCI registry. This makes it easier to pull packages down into a UDS Bundle. If no OCI artifact is published for a certain application or capability, a new `zarf.yaml` and Zarf Package must be created. Alternatively, you have the option to publish a Zarf Package to an [OCI compliant registry](https://docs.zarf.dev/tutorials/6-publish-and-deploy/).
 
 #### Create and Confirm the UDS Bundle
 
@@ -171,9 +168,8 @@ This process will take a few minutes while UDS CLI pulls down the images that wi
 uds create --confirm
 ```
 
-:::note
-As above, the `<arch>` field in the name of your UDS Bundle will depend on your system architecture (eg. `uds-bundle-podinfo-bundle-amd64-0.0.1.tar.zst`).
-:::
+> [!NOTE]
+> As above, the `<arch>` field in the name of your UDS Bundle will depend on your system architecture (eg. `uds-bundle-podinfo-bundle-amd64-0.0.1.tar.zst`).
 
 #### Deploy
 

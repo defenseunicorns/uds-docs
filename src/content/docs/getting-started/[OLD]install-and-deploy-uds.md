@@ -14,9 +14,8 @@ UDS Bundles deployed for development and testing purposes are comprised of a sha
 essential tools, emulating a development environment for convenience. If deploying to a production environment, users 
 have the ability to modify variables and configurations to best fit specific mission needs by creating their own bundle.
 
-:::caution
-These UDS Bundles are designed specifically for development and testing environments and are *not intended for production use*. Additionally, they serve as examples for creating customized bundles.
-:::
+> [!CAUTION]
+> These UDS Bundles are designed specifically for development and testing environments and are *not intended for production use*. Additionally, they serve as examples for creating customized bundles.
 
 For additional information on UDS Bundles, please see the [UDS Bundles](/structure/bundles/) page.
 
@@ -33,10 +32,8 @@ following command:
 brew tap defenseunicorns/tap && brew install uds
 ```
 
-:::tip
-You can see all releases of the UDS CLI on the 
-[UDS CLI GitHub repository](https://github.com/defenseunicorns/uds-cli/releases)
-:::
+> [!TIP]
+> You can see all releases of the UDS CLI on the [UDS CLI GitHub repository](https://github.com/defenseunicorns/uds-cli/releases)
 
 ### Step 2: Deploy the UDS Bundle
 
@@ -53,12 +50,10 @@ uds deploy k3d-core-demo:latest
 y
 ```
 
-:::note
-You can also deploy a specific version of the bundle, see all versions of the bundle 
-[here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-demo).
-
-If you deploy a specific version and want to update UDS Core, on top of your existing cluster, this can also be done using the [`--packages` flag](/reference/cli/quickstart-and-usage/#specifying-packages-using---packages) to deploy just core (rather than redeploying the full cluster as well): `uds deploy k3d-core-demo:<new-version> --packages core`
-:::
+> [!NOTE]
+> You can also deploy a specific version of the bundle, see all versions of the bundle [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-demo).
+>
+> If you deploy a specific version and want to update UDS Core, on top of your existing cluster, this can also be done using the [`--packages` flag](/reference/cli/quickstart-and-usage/#specifying-packages-using---packages) to deploy just core (rather than redeploying the full cluster as well): `uds deploy k3d-core-demo:<new-version> --packages core`
 
 **Optional:**
 
@@ -92,12 +87,11 @@ for working with UDS Core with *only* Istio, Keycloak, and Pepr installed. To us
 uds deploy k3d-core-slim-dev:latest
 ```
 
-:::note
-You can also deploy a specific version of the bundle, see all versions of the
+> [!NOTE]
+> You can also deploy a specific version of the bundle, see all versions of the
 bundle [here](https://github.com/defenseunicorns/uds-core/pkgs/container/packages%2Fuds%2Fbundles%2Fk3d-core-slim-dev).
-
-If you deploy a specific version and want to update UDS Core, on top of your existing cluster, this can also be done using the [`--packages` flag](/reference/cli/quickstart-and-usage/#specifying-packages-using---packages) to deploy just core (rather than redeploying the full cluster as well): `uds deploy k3d-core-slim-dev:<new-version> --packages core-base,core-identity-authorization`
-:::
+>
+> If you deploy a specific version and want to update UDS Core, on top of your existing cluster, this can also be done using the [`--packages` flag](/reference/cli/quickstart-and-usage/#specifying-packages-using---packages) to deploy just core (rather than redeploying the full cluster as well): `uds deploy k3d-core-slim-dev:<new-version> --packages core-base,core-identity-authorization`
 
 ## Developing UDS Core
 
@@ -135,6 +129,5 @@ The example below runs tests against the metrics-server package:
 UDS_PKG=metrics-server uds run test-single-package
 ```
 
-:::note
-You can specify the `--set FLAVOR=registry1` flag to test using Iron Bank images instead of the upstream images.
-:::
+> [!NOTE]
+> You can specify the `--set FLAVOR=registry1` flag to test using Iron Bank images instead of the upstream images.
