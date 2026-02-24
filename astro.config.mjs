@@ -96,37 +96,23 @@ export default defineConfig({
                       },
                       {
                           label: 'Getting Started',
-                          items: [
-                              { label: 'Overview', link: '/getting-started/overview/' },
-                              { label: 'Local Demo', autogenerate: {directory: '/getting-started/local-demo/'}, collapsed: true },
-                              { label: 'Production Deployment', autogenerate: {directory: '/getting-started/production/'}, collapsed: true },
-                          ],
+                          autogenerate: {
+                              directory: 'getting-started'
+                          },
                           collapsed: true
                       },
                       {
                           label: 'Concepts',
-                          items: [
-                              { label: 'UDS Core Concepts', link: '/concepts/overview/' },
-                              { label: 'Core Features', autogenerate: {directory: '/concepts/core-features/'}, collapsed: true },
-                              { label: 'Platform', autogenerate: {directory: '/concepts/platform/'}, collapsed: true },
-                              { label: 'Configuration & Packaging', autogenerate: {directory: '/concepts/configuration-and-packaging/'}, collapsed: true },
-                          ],
+                          autogenerate: {
+                              directory: 'concepts'
+                          },
                           collapsed: true
                       },
                       {
                           label: 'How-to Guides',
-                          items: [
-                              { label: 'How-to Overview', link: '/how-to-guides/overview/' },
-                              { label: 'Networking', autogenerate: {directory: '/how-to-guides/networking/'}, collapsed: true },
-                              { label: 'Identity Access', autogenerate: {directory: '/how-to-guides/identity-access/'}, collapsed: true },
-                              { label: 'Logging', autogenerate: {directory: '/how-to-guides/logging/'}, collapsed: true },
-                              { label: 'Monitoring & Observability', autogenerate: {directory: '/how-to-guides/monitoring-observability/'}, collapsed: true },
-                              { label: 'Runtime Security', autogenerate: {directory: '/how-to-guides/runtime-security/'}, collapsed: true },
-                              { label: 'Backup & Restore', autogenerate: {directory: '/how-to-guides/backup-restore/'}, collapsed: true },
-                              { label: 'High Availability', autogenerate: {directory: '/how-to-guides/high-availability/'}, collapsed: true },
-                              { label: 'Policy & Compliance', autogenerate: {directory: '/how-to-guides/policy-and-compliance/'}, collapsed: true },
-                              { label: 'Packaging Applications', autogenerate: {directory: '/how-to-guides/packaging-applications/'}, collapsed: true },
-                          ],
+                          autogenerate: {
+                              directory: 'how-to-guides'
+                          },
                           collapsed: true
                       },
                       {
@@ -145,32 +131,6 @@ export default defineConfig({
                       },
                     ],
                   },
-                  {
-                    label: 'Registry',
-                    link: '/registry/',
-                    items: [
-                      {
-                          label: 'Overview',
-                          autogenerate: {
-                              directory: 'registry'
-                          },
-                          collapsed: true,
-                      },
-                    ],
-                  },
-                  {
-                    label: 'Fleet',
-                    link: '/fleet/',
-                    items: [
-                      {
-                          label: 'Overview',
-                          autogenerate: {
-                              directory: 'fleet'
-                          },
-                          collapsed: true,
-                      },
-                    ],
-                  }
                 ]),
             ],
             defaultLocale: 'root',
