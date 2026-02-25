@@ -70,7 +70,7 @@ for repo_info in "${repos[@]}"; do
   if [[ ${OVERRIDES[$key]+_} ]]; then
     local_path="${OVERRIDES[$key]}"
     echo "Using local override for '$key': $local_path"
-    
+
     if [[ ! -d "$local_path/docs" ]]; then
       echo "Warning: override source '$local_path/docs' not found; skipping."
       continue
