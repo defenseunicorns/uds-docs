@@ -88,7 +88,7 @@ metadata:
 packages:
   - name: uds-k3d
     repository: ghcr.io/defenseunicorns/packages/uds-k3d
-    ref: 0.19.4
+    ref: 0.19.5
     overrides:
       uds-dev-stack:
         minio:
@@ -108,11 +108,11 @@ packages:
 
   - name: init
     repository: oci://ghcr.io/zarf-dev/packages/init
-    ref: v0.71.1
+    ref: v0.73.0
 
   - name: core
     repository: oci://ghcr.io/defenseunicorns/packages/uds/core
-    ref: 0.61.0-upstream
+    ref: 0.62.0-upstream
     overrides:
       # Set overrides for k3d dev stack
       pepr-uds-core:
