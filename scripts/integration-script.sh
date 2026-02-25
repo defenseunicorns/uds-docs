@@ -7,7 +7,7 @@ TARGET_DIR="src/content/docs/"
 repos=(
     "https://github.com/defenseunicorns/uds-core/ docs-structure-template ./temp/uds-core base"
     "https://github.com/defenseunicorns/uds-identity-config docs-structure-template ./temp/uds-identity-config overlay"
-    "https://github.com/defenseunicorns/uds-cli docs-structure-template ./temp/cli overlay"
+    "https://github.com/defenseunicorns/uds-cli main ./temp/cli overlay"
     # "https://github.com/defenseunicorns-labs/uds-rke2-demo main ./temp/uds-rke-demo overlay"
 )
 
