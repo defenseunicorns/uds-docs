@@ -140,6 +140,7 @@ export default defineConfig({
     },
     )],
   vite: {
+    resolve: { preserveSymlinks: true },
     plugins: [
       tailwindcss(),
       LikeC4VitePlugin({
