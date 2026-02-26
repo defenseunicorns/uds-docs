@@ -130,6 +130,9 @@ echo "Removing dev and adr directories"
 rm -rf "$TARGET_DIR/dev"
 rm -rf "$TARGET_DIR/adr"
 
+# Remove README.md if present (not needed in docs site)
+rm -f "$TARGET_DIR/README.md"
+
 # Clean up temp folder
 echo "Cleaning up temp directory"
 rm -rf temp
