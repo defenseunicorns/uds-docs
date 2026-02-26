@@ -7,7 +7,8 @@ TARGET_DIR="src/content/docs/"
 repos=(
     "https://github.com/defenseunicorns/uds-core/ main ./temp/uds-core base"
     "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config overlay"
-    "https://github.com/defenseunicorns/uds-cli main ./temp/cli overlay"
+    # TODO: can reinclude this repo once we update the docs there
+    # "https://github.com/defenseunicorns/uds-cli main ./temp/cli overlay"
     # "https://github.com/defenseunicorns-labs/uds-rke2-demo main ./temp/uds-rke-demo overlay"
 )
 
