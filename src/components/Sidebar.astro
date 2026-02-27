@@ -122,16 +122,16 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
           const href = findOverviewHref(details) || findFirstDocHref(details);
           if (!href) return;
 
-          const target = strip(href).replace(/\/$/, "");
-          const current = strip(window.location.pathname).replace(/\/$/, "");
-          if (target === current) return;
-
           // Prevent native toggle, navigate instead
           e.preventDefault();
           e.stopPropagation();
           if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
 
-          window.location.assign(href);
+          details.open = true;
+
+          const target = strip(href).replace(/\/$/, "");
+          const current = strip(window.location.pathname).replace(/\/$/, "");
+          if (target !== current) window.location.assign(href);
         },
         true
       );
