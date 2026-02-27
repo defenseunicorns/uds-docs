@@ -9,6 +9,12 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
   <TopicsDropdown />
 </div>
 
+{/* Clear persisted sidebar state BEFORE Starlight's restore script runs,
+    so the sidebar always reflects the current page's tree on navigation. */}
+<script is:inline>
+  try { sessionStorage.removeItem("sl-sidebar-state"); } catch {}
+</script>
+
 {/* Render the default sidebar. */}
 <Default><slot /></Default>
 
@@ -51,40 +57,8 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
   }
 </style>
 
-<style is:global>
-  /* Hide overview/index pages in the sidebar list */
-  nav a[href$="/overview/"],
-  nav a[href$="/index/"] {
-    display: none !important;
-  }
-</style>
-
 <script is:inline>
   (() => {
-    const closeDescendants = (detailsEl) => {
-      detailsEl.querySelectorAll("details[open]").forEach((d) => {
-        if (d !== detailsEl) d.open = false;
-      });
-    };
-
-    const closeSiblingsAtSameLevel = (openedDetails) => {
-      const myLi = openedDetails.closest("li");
-      if (!myLi) return;
-
-      const levelUl = myLi.parentElement;
-      if (!levelUl || levelUl.tagName !== "UL") return;
-
-      const siblingLis = Array.from(levelUl.children).filter((x) => x.tagName === "LI");
-      for (const li of siblingLis) {
-        if (li === myLi) continue;
-        const sib = li.querySelector(":scope > details");
-        if (sib instanceof HTMLDetailsElement) {
-          sib.open = false;
-          closeDescendants(sib);
-        }
-      }
-    };
-
     const OVERVIEW_SLUGS = new Set(["overview", "Overview", "index", "Index"]);
     const strip = (href) => href.split("#")[0].split("?")[0];
 
@@ -118,33 +92,11 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
       return first?.getAttribute("href") || null;
     };
 
-    const navigateIfNeeded = (href) => {
-      const target = strip(href).replace(/\/$/, "");
-      const current = strip(window.location.pathname).replace(/\/$/, "");
-      if (target !== current) window.location.assign(href);
-    };
-
     const onReady = () => {
       const nav = document.querySelector("nav");
       if (!nav) return;
 
-      // Accordion behavior
-      nav.addEventListener(
-        "toggle",
-        (e) => {
-          const details = e.target;
-          if (!(details instanceof HTMLDetailsElement)) return;
-
-          if (details.open) {
-            closeSiblingsAtSameLevel(details);
-          } else {
-            closeDescendants(details);
-          }
-        },
-        true
-      );
-
-      // Click dropdown header to navigate to overview/index (even if overview is hidden)
+      // Only the label text navigates; clicking anywhere else on the row just toggles
       nav.addEventListener(
         "click",
         (e) => {
@@ -156,22 +108,30 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
           // Don’t interfere with the product dropdown UI
           if (summary.closest(".starlight-sidebar-topics-dropdown-container")) return;
 
+          // Only navigate if the click landed on the group label text
+          const clickedLabel =
+            e.target instanceof Element &&
+            (e.target.closest(".group-label") || e.target.classList.contains("group-label"));
+          if (!clickedLabel) return;
+
           const details = summary.parentElement;
           if (!(details instanceof HTMLDetailsElement)) return;
 
-          // 1) Prefer an explicit overview/index link if it exists (not hidden)
+          // 1) Prefer an explicit overview/index link if it exists
           // 2) Otherwise derive it from the first visible child link
           const href = findOverviewHref(details) || findFirstDocHref(details);
           if (!href) return;
 
-          // Take over <summary> click so it doesn't just toggle
+          // Prevent native toggle, navigate instead
           e.preventDefault();
           e.stopPropagation();
           if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
 
           details.open = true;
-          closeSiblingsAtSameLevel(details);
-          navigateIfNeeded(href);
+
+          const target = strip(href).replace(/\/$/, "");
+          const current = strip(window.location.pathname).replace(/\/$/, "");
+          if (target !== current) window.location.assign(href);
         },
         true
       );
