@@ -34,3 +34,8 @@ temp/
 
 # uds-core .c4 folder
 *.c4
+
+# Ignore cloned docs, while including top level pages like 404.md
+src/content/docs/*
+!src/content/docs/*.md
+!src/content/docs/*.mdx
