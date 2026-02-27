@@ -1,11 +1,12 @@
 #!/bin/bash
+set -e
 
 TARGET_DIR="src/content/docs/"
 
 # UDS Core is the base - copied first
 # Other repos overlay on top without deleting uds-core files
 repos=(
-    "https://github.com/defenseunicorns/uds-core/ main ./temp/uds-core base"
+    "https://github.com/defenseunicorns/uds-core main ./temp/uds-core base"
     "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config overlay"
     # TODO: can reinclude this repo once we update the docs there
     # "https://github.com/defenseunicorns/uds-cli main ./temp/cli overlay"
@@ -81,7 +82,7 @@ for repo_info in "${repos[@]}"; do
     if [[ "$mode" == "base" ]]; then
       echo "Copying base docs from $local_path/docs/ to $TARGET_DIR"
       # For base, we can be more aggressive about clearing
-      rsync -rt --delete "$local_path/docs/" "$TARGET_DIR/"
+      rsync -rt --delete --exclude='404.md' "$local_path/docs/" "$TARGET_DIR/"
     else
       echo "Overlaying docs from $local_path/docs/ onto $TARGET_DIR"
       # For overlay, preserve existing files (no --delete)
@@ -103,7 +104,7 @@ for repo_info in "${repos[@]}"; do
   if [[ "$mode" == "base" ]]; then
     echo "Copying base docs from ${target_dir}/docs/ to $TARGET_DIR"
     # For base (uds-core), use --delete to ensure clean slate
-    rsync -rt --delete "${target_dir}/docs/" "$TARGET_DIR/"
+    rsync -rt --delete --exclude='404.md' "${target_dir}/docs/" "$TARGET_DIR/"
   else
     echo "Overlaying docs from ${target_dir}/docs/ onto $TARGET_DIR"
     # For overlay repos, preserve existing files (no --delete)
