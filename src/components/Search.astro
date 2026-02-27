@@ -1,0 +1,275 @@
+---
+import Default from '@astrojs/starlight/components/Search.astro';
+---
+
+<!-- Default Search Component -->
+<Default />
+
+<script>
+  let currentFilter = '';
+  
+  // Initialize topic filter functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const waitForPagefindUI = () => {
+      const pagefindForm = document.querySelector('.pagefind-ui__form');
+      if (pagefindForm) {
+        injectTopicFilter(pagefindForm);
+        setupFilterBehavior();
+      } else {
+        setTimeout(waitForPagefindUI, 100);
+      }
+    };
+    
+    waitForPagefindUI();
+  });
+  
+  function injectTopicFilter(pagefindForm: Element) {
+    // Check if filter already exists
+    if (pagefindForm.querySelector('.topic-filter-container')) return;
+    
+    // Dynamically detect available topics
+    const availableTopics = detectAvailableTopics();
+    
+    // If there's only UDS Core (or no topics), don't show the filter at all
+    if (availableTopics.length <= 1) {
+      return;
+    }
+    
+    // Create filter container
+    const filterContainer = document.createElement('div');
+    filterContainer.className = 'topic-filter-container';
+    
+    // Create filter label
+    const filterLabel = document.createElement('span');
+    filterLabel.textContent = 'Filter Docs: ';
+    filterLabel.className = 'filter-label';
+    
+    // Create filter buttons container
+    const filterButtonsContainer = document.createElement('div');
+    filterButtonsContainer.className = 'filter-buttons';
+    
+    // Create filter buttons dynamically
+    const topics = [
+      { value: '', label: 'All', active: true }
+    ];
+    
+    // Add detected topics
+    availableTopics.forEach(topic => {
+      topics.push({ value: topic.label, label: topic.label, active: false });
+    });
+    
+    topics.forEach(topic => {
+      const button = document.createElement('button');
+      button.textContent = topic.label;
+      button.className = `filter-button ${topic.active ? 'active' : ''}`;
+      button.setAttribute('data-topic', topic.value);
+      
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons
+        filterButtonsContainer.querySelectorAll('.filter-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        button.classList.add('active');
+        
+        // Update current filter and apply it
+        currentFilter = topic.value;
+        applyFilterToResults();
+      });
+      
+      filterButtonsContainer.appendChild(button);
+    });
+    
+    filterContainer.appendChild(filterLabel);
+    filterContainer.appendChild(filterButtonsContainer);
+    
+    // Insert the filter after the search input (below the search bar)
+    const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input');
+    if (searchInput) {
+      searchInput.parentNode?.insertBefore(filterContainer, searchInput.nextSibling);
+    } else {
+      // Fallback: add to the end of the form
+      pagefindForm.appendChild(filterContainer);
+    }
+    
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .topic-filter-container {
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: var(--sl-color-bg);
+        border-top: 1px solid var(--sl-color-gray-5);
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+      }
+      
+      .filter-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--sl-color-text);
+        white-space: nowrap;
+      }
+      
+      .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      
+      .filter-button {
+        padding: 0.25rem 0.75rem;
+        border: 1px solid var(--sl-color-gray-5);
+        border-radius: 0.375rem;
+        background-color: var(--sl-color-bg);
+        color: var(--sl-color-text);
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+      
+      .filter-button:hover {
+        border-color: var(--sl-color-gray-4);
+        background-color: var(--sl-color-gray-6);
+      }
+      
+      .filter-button.active {
+        background-color: var(--sl-color-gray-7);
+        border-color: var(--sl-color-gray-4);
+        color: var(--sl-color-text);
+      }
+      
+      .filter-button.active:hover {
+        background-color: var(--sl-color-gray-8);
+        border-color: var(--sl-color-gray-3);
+      }
+      
+      .filter-button:focus {
+        outline: 2px solid var(--sl-color-accent);
+        outline-offset: 1px;
+      }
+      
+      /* No results message styling */
+      .no-filtered-results {
+        padding: 1rem;
+        text-align: center;
+        color: var(--sl-color-gray-2);
+        font-style: italic;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  function detectAvailableTopics(): Array<{label: string, path: string}> {
+    const topics = [];
+    
+    // Check for Registry content
+    if (hasContentInPath('/registry/')) {
+      topics.push({ label: 'Registry', path: '/registry/' });
+    }
+    
+    // Check for Fleet content
+    if (hasContentInPath('/fleet/')) {
+      topics.push({ label: 'Fleet', path: '/fleet/' });
+    }
+    
+    // UDS Core is always available (everything else)
+    topics.push({ label: 'UDS Core', path: '/' });
+    
+    return topics;
+  }
+  
+  function hasContentInPath(path: string): boolean {
+    // Check if there are any links in the navigation that match this path
+    const navLinks = document.querySelectorAll('nav a[href*="' + path + '"]');
+    return navLinks.length > 0;
+  }
+  
+  function setupFilterBehavior() {
+    // Watch for changes in search results
+    const observer = new MutationObserver(() => {
+      if (currentFilter) {
+        setTimeout(applyFilterToResults, 100);
+      }
+    });
+    
+    // Observe the results container
+    const resultsContainer = document.querySelector('.pagefind-ui__results');
+    if (resultsContainer) {
+      observer.observe(resultsContainer, { childList: true, subtree: true });
+    }
+  }
+  
+  function applyFilterToResults() {
+    if (!currentFilter) {
+      // Show all results
+      document.querySelectorAll('.pagefind-ui__result').forEach(result => {
+        (result as HTMLElement).style.display = '';
+      });
+      removeNoResultsMessage();
+      return;
+    }
+    
+    // Get all result elements and filter them
+    const results = document.querySelectorAll('.pagefind-ui__result');
+    let visibleCount = 0;
+    
+    results.forEach(result => {
+      const resultElement = result as HTMLElement;
+      const link = result.querySelector('a');
+      
+      if (link) {
+        const href = link.getAttribute('href') || '';
+        const shouldShow = isResultMatchingFilter(href, currentFilter);
+        
+        if (shouldShow) {
+          resultElement.style.display = '';
+          visibleCount++;
+        } else {
+          resultElement.style.display = 'none';
+        }
+      }
+    });
+    
+    // Show or hide "no results" message
+    if (visibleCount === 0) {
+      showNoResultsMessage(currentFilter);
+    } else {
+      removeNoResultsMessage();
+    }
+  }
+  
+  function isResultMatchingFilter(href: string, filter: string): boolean {
+    switch (filter) {
+      case 'Registry':
+        return href.includes('/registry/');
+      case 'Fleet':
+        return href.includes('/fleet/');
+      case 'UDS Core':
+        return !href.includes('/registry/') && !href.includes('/fleet/');
+      default:
+        return true;
+    }
+  }
+  
+  function showNoResultsMessage(filter: string) {
+    const resultsContainer = document.querySelector('.pagefind-ui__results');
+    if (resultsContainer && !resultsContainer.querySelector('.no-filtered-results')) {
+      const noResultsMsg = document.createElement('div');
+      noResultsMsg.className = 'pagefind-ui__message no-filtered-results';
+      noResultsMsg.textContent = `No results found for "${filter}" topic`;
+      resultsContainer.appendChild(noResultsMsg);
+    }
+  }
+  
+  function removeNoResultsMessage() {
+    const noResultsMsg = document.querySelector('.no-filtered-results');
+    if (noResultsMsg) {
+      noResultsMsg.remove();
+    }
+  }
+</script>

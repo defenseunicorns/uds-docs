@@ -17,8 +17,7 @@ you build and tag the image as `uds-docs`:
 `docker build -t uds-docs:latest .`
 
 > [!NOTE]
-> The above image is based on [node:lts](https://hub.docker.com/_/node) and 
-[nginx-unprivileged](https://hub.docker.com/r/nginxinc/nginx-unprivileged).
+> The above image is based on [node:lts](https://hub.docker.com/_/node) and [nginx-unprivileged](https://hub.docker.com/r/nginxinc/nginx-unprivileged).
 
 This project uses TailwindCSS.
 

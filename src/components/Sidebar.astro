@@ -1,0 +1,186 @@
+---
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.astro';
+---
+
+{/* Render the topics dropdown menu. */}
+<div class="starlight-sidebar-topics-dropdown-container">
+  <div class="starlight-sidebar-topics-dropdown-title">Choose a product</div>
+  <TopicsDropdown />
+</div>
+
+{/* Render the default sidebar. */}
+<Default><slot /></Default>
+
+{/* Override the default gap in the sidebar content with higher specificity */}
+<style>
+  .starlight-sidebar-topics-dropdown-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sl-color-gray-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .starlight-sidebar-topics-dropdown-dropdown {
+    position: relative;
+    display: block;
+    width: calc(100% - 2 * 2px);
+    margin-inline: 2px;
+    margin-top: 0;
+  }
+
+  /* Change the dropdown menu background color for better visibility */
+  :global(.starlight-sidebar-topics-dropdown-menu) {
+    background-color: var(--sl-color-bg) !important;
+    border: 1px solid var(--sl-color-gray-5) !important;
+  }
+
+  /* Add hover effect to dropdown button */
+  :global(.starlight-sidebar-topics-dropdown-button:hover) {
+    background-color: var(--sl-color-gray-5) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Add hover effect to dropdown menu items */
+  :global(.starlight-sidebar-topics-dropdown-item:hover) {
+    background-color: var(--sl-color-gray-4) !important;
+    transform: translateX(4px);
+    border-radius: 0.25rem;
+  }
+</style>
+
+<style is:global>
+  /* Hide overview/index pages in the sidebar list */
+  nav a[href$="/overview/"],
+  nav a[href$="/index/"] {
+    display: none !important;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const closeDescendants = (detailsEl) => {
+      detailsEl.querySelectorAll("details[open]").forEach((d) => {
+        if (d !== detailsEl) d.open = false;
+      });
+    };
+
+    const closeSiblingsAtSameLevel = (openedDetails) => {
+      const myLi = openedDetails.closest("li");
+      if (!myLi) return;
+
+      const levelUl = myLi.parentElement;
+      if (!levelUl || levelUl.tagName !== "UL") return;
+
+      const siblingLis = Array.from(levelUl.children).filter((x) => x.tagName === "LI");
+      for (const li of siblingLis) {
+        if (li === myLi) continue;
+        const sib = li.querySelector(":scope > details");
+        if (sib instanceof HTMLDetailsElement) {
+          sib.open = false;
+          closeDescendants(sib);
+        }
+      }
+    };
+
+    const OVERVIEW_SLUGS = new Set(["overview", "Overview", "index", "Index"]);
+    const strip = (href) => href.split("#")[0].split("?")[0];
+
+    const isInsideNestedDetails = (detailsEl, linkEl) => {
+      const closestDetails = linkEl.closest("details");
+      return closestDetails && closestDetails !== detailsEl;
+    };
+
+    // 1) Returns overview/index href ONLY if it exists at THIS group level.
+    const findOverviewHref = (detailsEl) => {
+      const linkEls = Array.from(detailsEl.querySelectorAll("a[href]")).filter(
+        (a) => !isInsideNestedDetails(detailsEl, a)
+      );
+
+      const hrefs = linkEls.map((a) => a.getAttribute("href")).filter(Boolean);
+
+      for (const href of hrefs) {
+        const parts = strip(href).split("/").filter(Boolean);
+        const last = parts[parts.length - 1];
+        if (last && OVERVIEW_SLUGS.has(last)) return href;
+      }
+
+      return null;
+    };
+
+    // 2) Returns the first non-nested doc link in this group (fallback)
+    const findFirstDocHref = (detailsEl) => {
+      const first = Array.from(detailsEl.querySelectorAll("a[href]")).find(
+        (a) => !isInsideNestedDetails(detailsEl, a)
+      );
+      return first?.getAttribute("href") || null;
+    };
+
+    const navigateIfNeeded = (href) => {
+      const target = strip(href).replace(/\/$/, "");
+      const current = strip(window.location.pathname).replace(/\/$/, "");
+      if (target !== current) window.location.assign(href);
+    };
+
+    const onReady = () => {
+      const nav = document.querySelector("nav");
+      if (!nav) return;
+
+      // Accordion behavior
+      nav.addEventListener(
+        "toggle",
+        (e) => {
+          const details = e.target;
+          if (!(details instanceof HTMLDetailsElement)) return;
+
+          if (details.open) {
+            closeSiblingsAtSameLevel(details);
+          } else {
+            closeDescendants(details);
+          }
+        },
+        true
+      );
+
+      // Click dropdown header to navigate to overview/index (even if overview is hidden)
+      nav.addEventListener(
+        "click",
+        (e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+          const summary = e.target instanceof Element ? e.target.closest("summary") : null;
+          if (!summary) return;
+
+          // Don’t interfere with the product dropdown UI
+          if (summary.closest(".starlight-sidebar-topics-dropdown-container")) return;
+
+          const details = summary.parentElement;
+          if (!(details instanceof HTMLDetailsElement)) return;
+
+          // 1) Prefer an explicit overview/index link if it exists (not hidden)
+          // 2) Otherwise derive it from the first visible child link
+          const href = findOverviewHref(details) || findFirstDocHref(details);
+          if (!href) return;
+
+          // Take over <summary> click so it doesn't just toggle
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+
+          details.open = true;
+          closeSiblingsAtSameLevel(details);
+          navigateIfNeeded(href);
+        },
+        true
+      );
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", onReady, { once: true });
+    } else {
+      onReady();
+    }
+  })();
+</script>
