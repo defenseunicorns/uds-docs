@@ -206,12 +206,16 @@ import Default from '@astrojs/starlight/components/Search.astro';
     // Watch for changes in search results.
     // We observe the form's parent (not .pagefind-ui__results) because the results
     // container doesn't exist in the DOM until after the first search is performed.
+    let isInjecting = false;
     const observer = new MutationObserver(() => {
+      if (isInjecting) return;
       setTimeout(() => {
+        isInjecting = true;
         injectBreadcrumbs();
         if (currentFilter) {
           applyFilterToResults();
         }
+        isInjecting = false;
       }, 50);
     });
 
