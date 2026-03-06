@@ -113,4 +113,11 @@ export const PRODUCTS: ProductConfig[] = [
       count: 2,
     },
   },
+  {
+    id: 'fleet-no-versioning',
+    label: 'Fleet (No Versioning)',
+    link: '/fleet-no-versioning/',
+    contentDir: 'fleet-no-versioning',
+    unlistedPaths: ['/fleet-no-versioning/index'],
+  },
 ];
