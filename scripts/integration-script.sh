@@ -3,19 +3,11 @@ set -e
 
 TARGET_DIR="src/content/docs/"
 
-# UDS Core is the base - copied first
-# Other repos overlay on top without deleting uds-core files
-repos=(
-    "https://github.com/defenseunicorns/uds-core main ./temp/uds-core base"
-    "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config overlay"
-    # TODO: can reinclude this repo once we update the docs there
-    # "https://github.com/defenseunicorns/uds-cli main ./temp/cli overlay"
-    # "https://github.com/defenseunicorns-labs/uds-rke2-demo main ./temp/uds-rke-demo overlay"
-)
-
 mkdir -p temp
 
-# DOCS_OVERRIDES="uds-core=/abs/path;uds-cli=/abs/path2"
+# DOCS_OVERRIDES="uds-core=/abs/path;uds-identity-config=/abs/path2"
+# Keys are repo names (e.g. "uds-core" from "defenseunicorns/uds-core").
+# When set, the local path is used instead of cloning from GitHub.
 
 declare -A OVERRIDES
 if [[ -n "${DOCS_OVERRIDES:-}" ]]; then
@@ -27,92 +19,90 @@ if [[ -n "${DOCS_OVERRIDES:-}" ]]; then
   done
 fi
 
-repo_key_from_url() {
-  local url="$1"
-  # strip trailing slashes, then take the last segment and drop .git
-  url="${url%/}"
-  local base="${url##*/}"
-  echo "${base%.git}"
-}
-
 clone_repo() {
-    repo_url="$1"
-    branch="$2"
-    target_dir="$3"
+    local repo_url="$1"
+    local branch="$2"
+    local target_dir="$3"
 
-    # Remove existing cloned directory if it exists
     if [ -d "$target_dir" ]; then
         echo "Removing existing cloned dir: $target_dir"
         rm -rf "$target_dir"
     fi
 
-    # Clone the repository with specific branch/tag
     git clone --branch "$branch" --depth 1 --single-branch "$repo_url" "$target_dir"
 }
 
-# Clean target directory for fresh start (but preserve any manually created structure during transition)
+# --- Step 1: Read product config and clone latest docs ---
+# discover-versions.mjs reads products.ts, discovers versions, and writes .versions JSON
+# which contains sources, versions, and all metadata the rest of this script needs.
+echo "Reading product config and discovering versions..."
+node scripts/discover-versions.mjs
+
 echo "Preparing target directory: $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 
-# Process repositories in order
-for repo_info in "${repos[@]}"; do
-  IFS=' ' read -r -a repo <<< "$repo_info"
-  repo_url="${repo[0]}"
-  branch="${repo[1]}"
-  target_dir="${repo[2]}"
-  mode="${repo[3]:-overlay}" # 'base' or 'overlay'
+# Collect all non-root product contentDirs so the base rsync --delete doesn't wipe them.
+# NOTE: This only protects product dirs — versioned dirs (e.g. v0-61/) are safe because
+# they are created in Step 2 *after* the base rsync runs here. Do not reorder steps.
+PRODUCT_EXCLUDES=()
+if [[ -f .versions ]]; then
+  while IFS= read -r dir; do
+    [[ -n "$dir" ]] && PRODUCT_EXCLUDES+=(--exclude="$dir/")
+  done < <(jq -r 'to_entries[] | select(.value.contentDir != "") | .value.contentDir' .versions)
+fi
 
-  key="$(repo_key_from_url "$repo_url")"
-  # Fallback if URL produced an empty key
-  if [[ -z "$key" ]]; then
-    key="${target_dir##*/}"
-  fi
+# Clone or copy a single content source into the target directory.
+# Args: mode repo_full branch docs_path target
+process_source() {
+  local mode="$1" repo_full="$2" branch="$3" docs_path="$4" target="$5"
+  local override_key="${repo_full##*/}"
 
-  # Local override path
-  if [[ ${OVERRIDES[$key]+_} ]]; then
-    local_path="${OVERRIDES[$key]}"
-    echo "Using local override for '$key': $local_path"
-
-    if [[ ! -d "$local_path/docs" ]]; then
-      echo "Warning: override source '$local_path/docs' not found; skipping."
-      continue
-    fi
-
-    # Copy from docs/ directory in repo to target
-    if [[ "$mode" == "base" ]]; then
-      echo "Copying base docs from $local_path/docs/ to $TARGET_DIR"
-      # For base, we can be more aggressive about clearing
-      # TODO: remove fleet/fleet-no-versioning excludes once those products have their own content source
-      rsync -rt --delete --exclude='404.md' --exclude='fleet/' --exclude='fleet-no-versioning/' "$local_path/docs/" "$TARGET_DIR/"
-    else
-      echo "Overlaying docs from $local_path/docs/ onto $TARGET_DIR"
-      # For overlay, preserve existing files (no --delete)
-      rsync -rt "$local_path/docs/" "$TARGET_DIR/"
-    fi
-    continue
-  fi
-
-  # Default: clone and copy
-  clone_repo "$repo_url" "$branch" "$target_dir"
-  echo "Cloned ${repo_url}@${branch} into ${target_dir}"
-
-  if [[ ! -d "${target_dir}/docs" ]]; then
-    echo "Warning: source '${target_dir}/docs' not found; skipping."
-    continue
-  fi
-
-  # Copy from docs/ directory in repo to target
+  local rsync_args=(-rt --exclude='404.md')
   if [[ "$mode" == "base" ]]; then
-    echo "Copying base docs from ${target_dir}/docs/ to $TARGET_DIR"
-    # For base (uds-core), use --delete to ensure clean slate
-    # TODO: remove fleet/fleet-no-versioning excludes once those products have their own content source
-    rsync -rt --delete --exclude='404.md' --exclude='fleet/' --exclude='fleet-no-versioning/' "${target_dir}/docs/" "$TARGET_DIR/"
-  else
-    echo "Overlaying docs from ${target_dir}/docs/ onto $TARGET_DIR"
-    # For overlay repos, preserve existing files (no --delete)
-    rsync -rt "${target_dir}/docs/" "$TARGET_DIR/"
+    rsync_args+=(--delete "${PRODUCT_EXCLUDES[@]}")
   fi
-done
+
+  if [[ ${OVERRIDES[$override_key]+_} ]]; then
+    local local_path="${OVERRIDES[$override_key]}"
+    echo "Using local override for '$override_key': $local_path"
+    if [[ ! -d "$local_path/$docs_path" ]]; then
+      echo "Warning: override source '$local_path/$docs_path' not found; skipping."
+      return
+    fi
+    rsync "${rsync_args[@]}" "$local_path/$docs_path/" "$target"
+  else
+    local temp_dir="./temp/${override_key}"
+    clone_repo "https://github.com/${repo_full}" "$branch" "$temp_dir"
+    echo "Cloned ${repo_full}@${branch}"
+    if [[ ! -d "${temp_dir}/$docs_path" ]]; then
+      echo "Warning: source '${temp_dir}/$docs_path' not found; skipping."
+      return
+    fi
+    rsync "${rsync_args[@]}" "${temp_dir}/$docs_path/" "$target"
+  fi
+}
+
+# Process content sources from .versions (populated from products.ts source/overlays config).
+# Sources are sorted globally: all base sources run before any overlay, regardless of product.
+# This is safe because each product targets its own contentDir (no cross-product conflicts).
+if [[ -f .versions ]]; then
+  # Emit all sources as tab-separated lines: mode repo branch docsPath contentDir
+  # Sorted so base sources come before overlay sources.
+  while IFS=$'\t' read -r mode repo_full branch docs_path content_dir; do
+    if [[ -n "$content_dir" ]]; then
+      target="${TARGET_DIR}${content_dir}/"
+    else
+      target="$TARGET_DIR"
+    fi
+    process_source "$mode" "$repo_full" "$branch" "$docs_path" "$target"
+  done < <(jq -r '
+    [to_entries[] | .value as $v |
+     ($v.sources // [])[] |
+     [.mode, .repo, .branch, .docsPath, $v.contentDir]
+    ] | sort_by(if .[0] == "base" then 0 else 1 end)[]
+    | @tsv
+  ' .versions)
+fi
 
 # Copy LikeC4 model if present in uds-core
 uds_core_override="${OVERRIDES[uds-core]:-}"
@@ -128,13 +118,7 @@ elif [[ -d "./temp/uds-core/docs/.c4" ]]; then
   cp -r "./temp/uds-core/docs/.c4/." "${TARGET_DIR}/.c4/"
 fi
 
-# --- Per-product version discovery & cloning ---
-# discover-versions.mjs reads products.ts, queries GitHub API, writes .versions JSON.
-echo "Discovering versions..."
-node scripts/discover-versions.mjs
-
-# .versions is a JSON object keyed by product id, e.g.:
-# { "core": { "versions": ["v0.61.1", ...], "repo": "...", "contentDir": "", "docsPath": "docs" } }
+# --- Step 2: Clone archived versioned docs ---
 
 # Remove any stale versioned directories from previous builds
 find "$TARGET_DIR" -maxdepth 1 -type d -name 'v[0-9]*' -exec rm -rf {} + 2>/dev/null || true
@@ -144,20 +128,17 @@ for product_dir in "$TARGET_DIR"*/; do
   find "$product_dir" -maxdepth 1 -type d -name 'v[0-9]*' -exec rm -rf {} + 2>/dev/null || true
 done
 
-# Read product versioning config from .versions JSON and clone each.
-# .versions now contains all metadata (repo, contentDir, docsPath, versions) per product,
-# so we don't need to parse products.ts from bash at all.
+# Clone each archived version from .versions metadata
 if [[ -f .versions ]]; then
   for product_id in $(jq -r 'keys[]' .versions); do
-    repo_full=$(jq -r --arg id "$product_id" '.[$id].repo' .versions)
+    repo_full=$(jq -r --arg id "$product_id" '.[$id].versionRepo // empty' .versions)
     content_dir=$(jq -r --arg id "$product_id" '.[$id].contentDir' .versions)
-    docs_path=$(jq -r --arg id "$product_id" '.[$id].docsPath' .versions)
-    versions_csv=$(jq -r --arg id "$product_id" '.[$id].versions | join(",")' .versions)
+    docs_path=$(jq -r --arg id "$product_id" '.[$id].versionDocsPath // "docs"' .versions)
+    versions_csv=$(jq -r --arg id "$product_id" '.[$id].versions // [] | join(",")' .versions)
 
-    [[ -z "$versions_csv" || "$versions_csv" == "null" ]] && continue
-    [[ -z "$repo_full" || "$repo_full" == "null" ]] && continue
+    [[ -z "$versions_csv" ]] && continue
+    [[ -z "$repo_full" ]] && continue
 
-    # Override key is the repo name (e.g. "uds-core" from "defenseunicorns/uds-core")
     override_key="${repo_full##*/}"
 
     echo "Cloning versioned docs for $product_id from $repo_full..."
@@ -186,7 +167,7 @@ if [[ -f .versions ]]; then
         rsync -rt --delete --exclude='404.md' "$local_override/${docs_path}/" "$version_dir/"
       else
         repo_url="https://github.com/${repo_full}"
-        if ! clone_repo "$repo_url" "$ver" "$temp_ver_dir" 2>&1; then
+        if ! clone_repo "$repo_url" "$ver" "$temp_ver_dir"; then
           echo "Warning: could not clone ${product_id} at tag '${ver}'; skipping."
           continue
         fi
@@ -236,6 +217,8 @@ MDEOF
     done
   done
 fi
+
+# --- Step 3: Cleanup ---
 
 # Remove dev and adr directories if present (not for public docs site)
 echo "Removing dev and adr directories"

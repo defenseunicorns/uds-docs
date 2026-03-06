@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Discovers archived versions for each product that has `versioning` configured
- * in src/products.ts. Writes .versions JSON with all metadata the build needs.
+ * Reads product configuration from src/products.ts, discovers archived versions
+ * for each product that has `versioning` configured, and writes .versions JSON
+ * with all metadata the integration script and astro.config.mjs need.
  *
  * Usage:
  *   node scripts/discover-versions.mjs
@@ -24,10 +25,20 @@ const productsSource = readFileSync(new URL('../src/products.ts', import.meta.ur
 function parseProducts(source) {
   // Only evaluate the PRODUCTS array — skip all function/interface definitions.
   // This avoids having to strip every possible TS type annotation from function signatures.
-  const match = source.match(/export\s+const\s+PRODUCTS\s*(?::\s*ProductConfig\[\])?\s*=\s*(\[[\s\S]*\]);/);
+  // Non-greedy match: stops at the first `];` that closes the array, rather than
+  // greedily consuming to the last `];` in the file.
+  const match = source.match(/export\s+const\s+PRODUCTS\s*(?::\s*ProductConfig\[\])?\s*=\s*(\[[\s\S]*?\]);/);
   if (!match) throw new Error('Could not find PRODUCTS array in products.ts');
-  // The array literal is plain JS (no type annotations inside object literals)
-  const fn = new Function(`return ${match[1]};`);
+  const arrayLiteral = match[1];
+  // Safety check: the extracted literal must be a plain data structure (objects, arrays,
+  // strings, numbers, booleans). Reject anything that looks like executable code.
+  if (/\b(import|require|await|yield|function|eval)\b|=>|`/.test(arrayLiteral)) {
+    throw new Error(
+      'PRODUCTS array contains non-literal expressions (imports, functions, template literals, etc.). ' +
+      'Keep the array as plain data — see the comment at the top of this file.'
+    );
+  }
+  const fn = new Function(`return ${arrayLiteral};`);
   return fn();
 }
 
@@ -81,37 +92,71 @@ async function main() {
   const output = {};
 
   for (const product of PRODUCTS) {
-    if (!product.versioning) continue;
+    const entry = {
+      contentDir: product.contentDir,
+    };
 
-    // Allow per-product env override: VERSIONS_core=v0.61.0,v0.60.0
-    const envKey = `VERSIONS_${product.id}`;
-    const envVal = process.env[envKey]?.trim();
-    let versions;
-
-    if (envVal) {
-      versions = envVal.split(',').map(v => v.trim()).filter(Boolean);
-      console.log(`${product.id}: using ${envKey} = ${versions.join(', ')}`);
-    } else if (product.id === 'core' && process.env.VERSIONS_TO_BUILD?.trim()) {
-      // Legacy compat — prefer VERSIONS_core going forward
-      versions = process.env.VERSIONS_TO_BUILD.split(',').map(v => v.trim()).filter(Boolean);
-      console.warn(`⚠ VERSIONS_TO_BUILD is deprecated (applies to core only). Use VERSIONS_core instead.`);
-      console.log(`${product.id}: using VERSIONS_TO_BUILD = ${versions.join(', ')}`);
-    } else {
-      console.log(`${product.id}: discovering versions from ${product.versioning.repo}...`);
-      versions = await discoverVersions(
-        product.versioning.repo,
-        product.versioning.count ?? 5,
-      );
-      console.log(`${product.id}: found ${versions.join(', ') || '(none)'}`);
+    // Content sources — read from product.source and product.overlays
+    if (product.source || product.overlays?.length) {
+      const sources = [];
+      if (product.source) {
+        sources.push({
+          repo: product.source.repo,
+          branch: product.source.branch ?? 'main',
+          docsPath: product.source.docsPath ?? 'docs',
+          mode: product.source.mode ?? 'overlay',
+        });
+      }
+      for (const overlay of product.overlays ?? []) {
+        sources.push({
+          repo: overlay.repo,
+          branch: overlay.branch ?? 'main',
+          docsPath: overlay.docsPath ?? 'docs',
+          mode: 'overlay',
+        });
+      }
+      entry.sources = sources;
     }
 
-    // Write everything the integration script and astro.config.mjs need
-    output[product.id] = {
-      versions,
-      repo: product.versioning.repo,
-      contentDir: product.contentDir,
-      docsPath: product.versioning.docsPath ?? 'docs',
-    };
+    // Version discovery
+    if (product.versioning) {
+      // Resolve versioning repo: explicit > source.repo > required
+      const versionRepo = product.versioning.repo
+        ?? product.source?.repo
+        ?? null;
+
+      if (!versionRepo) {
+        console.error(`${product.id}: versioning configured but no repo found (set versioning.repo or source.repo)`);
+        // Still write the product entry so its sources are processed by the integration script.
+      } else {
+        const versionDocsPath = product.versioning.docsPath
+          ?? product.source?.docsPath
+          ?? 'docs';
+
+        // Allow per-product env override: VERSIONS_core=v0.61.0,v0.60.0
+        const envKey = `VERSIONS_${product.id}`;
+        const envVal = process.env[envKey]?.trim();
+        let versions;
+
+        if (envVal) {
+          versions = envVal.split(',').map(v => v.trim()).filter(Boolean);
+          console.log(`${product.id}: using ${envKey} = ${versions.join(', ')}`);
+        } else {
+          console.log(`${product.id}: discovering versions from ${versionRepo}...`);
+          versions = await discoverVersions(
+            versionRepo,
+            product.versioning.count ?? 5,
+          );
+          console.log(`${product.id}: found ${versions.join(', ') || '(none)'}`);
+        }
+
+        entry.versions = versions;
+        entry.versionRepo = versionRepo;
+        entry.versionDocsPath = versionDocsPath;
+      }
+    }
+
+    output[product.id] = entry;
   }
 
   writeFileSync('.versions', JSON.stringify(output, null, 2) + '\n');

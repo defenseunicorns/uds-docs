@@ -13,7 +13,7 @@ import react from '@astrojs/react';
 import starlightGitHubAlerts from 'starlight-github-alerts'
 
 // Read per-product versions from .versions JSON (written by scripts/discover-versions.mjs).
-// Format: { "core": { "versions": [...], "repo": "...", "contentDir": "...", "docsPath": "..." } }
+// Format: { "core": { "versions": [...], "contentDir": "...", "sources": [...], ... } }
 let versionsFile = {};
 try {
   versionsFile = JSON.parse(readFileSync('.versions', 'utf8'));
@@ -78,7 +78,6 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
-      routeMiddleware: './src/routeData.ts',
       plugins: [
         starlightGitHubAlerts(),
         starlightLinksValidator({

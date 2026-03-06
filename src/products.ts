@@ -2,18 +2,32 @@
  * Product configuration — the single place to register products on this docs site.
  *
  * To add a new product:
- *   1. Add an entry here.
+ *   1. Add an entry here (source, versioning, sidebar sections, etc.).
  *   2. Create src/content/docs/{contentDir}/index.md as the product root page.
- *   3. Add content under src/content/docs/{contentDir}/ using the standard section dirs.
- *   4. Add a clone step to scripts/integration-script.sh if docs come from an external repo.
- *   5. Run `npm run build` to verify everything wires up.
+ *   3. Run `npm run build` to verify everything wires up.
  *
  * See CONTRIBUTING.md → "Adding a New Product" for the full walkthrough.
  */
-export interface VersioningConfig {
-  /** GitHub repo in "owner/name" format for version discovery */
+
+export interface ContentSource {
+  /** GitHub repo in "owner/name" format */
   repo: string;
+  /** Branch to clone (default: 'main') */
+  branch?: string;
   /** Path to docs within the repo (default: 'docs') */
+  docsPath?: string;
+  /**
+   * 'base' clones with --delete (clean slate); 'overlay' merges on top.
+   * Exactly one product should use 'base' — typically Core.
+   * Default: 'overlay'
+   */
+  mode?: 'base' | 'overlay';
+}
+
+export interface VersioningConfig {
+  /** GitHub repo in "owner/name" format for version discovery (defaults to source.repo if omitted) */
+  repo?: string;
+  /** Path to docs within the repo (defaults to source.docsPath, then 'docs') */
   docsPath?: string;
   /** Number of archived versions to keep (default: 5) */
   count?: number;
@@ -52,6 +66,10 @@ export interface ProductConfig {
    * and 404 pages. Required so starlightSidebarTopics can associate them.
    */
   unlistedPaths?: string[];
+  /** Where this product's latest docs come from. Omit for products with only local content. */
+  source?: ContentSource;
+  /** Additional repos whose docs are overlaid onto this product's content directory. */
+  overlays?: ContentSource[];
   /** Optional versioning — when set, archived versions are built for this product. */
   versioning?: VersioningConfig;
   /**
@@ -97,8 +115,14 @@ export const PRODUCTS: ProductConfig[] = [
     link: '/',
     contentDir: '',
     unlistedPaths: ['/404'],
-    versioning: {
+    source: {
       repo: 'defenseunicorns/uds-core',
+      mode: 'base',
+    },
+    overlays: [
+      { repo: 'defenseunicorns/uds-identity-config' },
+    ],
+    versioning: {
       count: 5,
     },
   },

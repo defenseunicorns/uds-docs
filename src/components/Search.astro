@@ -5,56 +5,118 @@ import Default from '@astrojs/starlight/components/Search.astro';
 <!-- Default Search Component -->
 <Default />
 
-<script>
-  // Injected at build time from src/products.ts via Vite define.
-  declare const __PRODUCTS__: Array<{ id: string; label: string; link: string }>;
-  declare const __PRODUCT_VERSIONS__: Record<string, string[]>;
+<!-- Search filter styles (injected once server-side to avoid runtime accumulation) -->
+<style is:global>
+  .result-breadcrumb {
+    font-size: 0.9rem;
+    color: var(--sl-color-gray-2);
+    margin: 0 0 0.15rem;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  .topic-filter-container {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--sl-color-bg);
+    border-top: 1px solid var(--sl-color-gray-5);
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--sl-color-text);
+    white-space: nowrap;
+  }
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+    background-color: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+  .filter-button:hover {
+    border-color: var(--sl-color-gray-4);
+    background-color: var(--sl-color-gray-6);
+  }
+  .filter-button.active {
+    background-color: var(--sl-color-text-accent);
+    border-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-invert);
+  }
+  .filter-button.active:hover {
+    background-color: var(--sl-color-text-accent);
+    border-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-invert);
+    opacity: 0.9;
+  }
+  .filter-button:focus {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 1px;
+  }
+  .no-filtered-results {
+    padding: 1rem;
+    text-align: center;
+    color: var(--sl-color-gray-2);
+    font-style: italic;
+  }
+  .version-scope-container {
+    padding: 0.2rem 1rem 0.4rem;
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-2);
+    background: var(--sl-color-bg);
+  }
+  .version-scope-toggle {
+    background: none;
+    border: none;
+    color: var(--sl-color-gray-2);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .version-scope-toggle:hover { color: var(--sl-color-text); }
+  .search-loading { justify-content: center; padding: 1.5rem 0; }
+  .search-spinner {
+    width: 1.25rem; height: 1.25rem;
+    border: 2px solid var(--sl-color-gray-5);
+    border-top-color: var(--sl-color-accent);
+    border-radius: 50%;
+    animation: search-spin 0.6s linear infinite;
+  }
+  @keyframes search-spin { to { transform: rotate(360deg); } }
+  .pagefind-ui__results { transition: opacity 0.1s ease; }
+</style>
 
-  const configuredProducts: Array<{ id: string; label: string; link: string }> =
-    typeof __PRODUCTS__ !== 'undefined' ? __PRODUCTS__ : [];
-  const productVersions: Record<string, string[]> =
-    typeof __PRODUCT_VERSIONS__ !== 'undefined' ? __PRODUCT_VERSIONS__ : {};
+<script>
+  import {
+    products as configuredProducts,
+    productVersions,
+    detectProductAndVersion,
+  } from '../productUtils';
 
   let currentFilter = '';
-  let versionScope: string | null = null; // e.g. 'v0-61', or null for latest
+  let versionScope: string | null = null;
   let currentProductId: string = 'core';
   let searchAllVersions = false;
 
-  /** Determine current product and version scope from the URL. */
-  function detectProductAndVersion(): { productId: string; versionSlug: string | null } {
-    const path = window.location.pathname;
-    const nonCore = configuredProducts.filter(p => p.id !== 'core');
-
-    for (const p of nonCore) {
-      if (path.startsWith(p.link)) {
-        const after = path.slice(p.link.length);
-        const m = after.match(/^(v\d+-\d+)\//);
-        return { productId: p.id, versionSlug: m ? m[1] : null };
-      }
-    }
-
-    // Core: version at top level /v0-61/...
-    const m = path.match(/^\/(v\d+-\d+)\//);
-    return { productId: 'core', versionSlug: m ? m[1] : null };
-  }
-
   // Initialize topic filter functionality
   document.addEventListener('DOMContentLoaded', () => {
-    const detected = detectProductAndVersion();
+    const detected = detectProductAndVersion(window.location.pathname);
     currentProductId = detected.productId;
     versionScope = detected.versionSlug;
-    // Inject breadcrumb styles unconditionally
-    const breadcrumbStyle = document.createElement('style');
-    breadcrumbStyle.textContent = `
-      .result-breadcrumb {
-        font-size: 0.9rem;
-        color: var(--sl-color-gray-2);
-        margin: 0 0 0.15rem;
-        line-height: 1.4;
-        letter-spacing: 0.01em;
-      }
-    `;
-    document.head.appendChild(breadcrumbStyle);
 
     let retries = 0;
     const waitForPagefindUI = () => {
@@ -70,154 +132,68 @@ import Default from '@astrojs/starlight/components/Search.astro';
 
     waitForPagefindUI();
   });
-  
+
   function injectTopicFilter(pagefindForm: Element) {
-    // Check if filter already exists
     if (pagefindForm.querySelector('.topic-filter-container')) return;
-    
-    // Dynamically detect available topics
+
     const availableTopics = detectAvailableTopics();
-    
-    // If there's only UDS Core (or no topics), don't show the filter at all
+
     if (availableTopics.length <= 1) {
       return;
     }
-    
-    // Create filter container
+
     const filterContainer = document.createElement('div');
     filterContainer.className = 'topic-filter-container';
-    
-    // Create filter label
+
     const filterLabel = document.createElement('span');
     filterLabel.textContent = 'Filter Docs: ';
     filterLabel.className = 'filter-label';
-    
-    // Create filter buttons container
+
     const filterButtonsContainer = document.createElement('div');
     filterButtonsContainer.className = 'filter-buttons';
-    
-    // Create filter buttons dynamically
+
     const topics = [
       { value: '', label: 'All', active: true }
     ];
-    
-    // Add detected topics
+
     availableTopics.forEach(topic => {
       topics.push({ value: topic.label, label: topic.label, active: false });
     });
-    
+
     topics.forEach(topic => {
       const button = document.createElement('button');
       button.textContent = topic.label;
       button.className = `filter-button ${topic.active ? 'active' : ''}`;
       button.setAttribute('data-topic', topic.value);
-      
+
       button.addEventListener('click', () => {
-        // Remove active class from all buttons
         filterButtonsContainer.querySelectorAll('.filter-button').forEach(btn => {
           btn.classList.remove('active');
         });
-        
-        // Add active class to clicked button
+
         button.classList.add('active');
-        
-        // Update current filter and apply it
+
         currentFilter = topic.value;
         applyFilterToResults();
       });
-      
+
       filterButtonsContainer.appendChild(button);
     });
-    
+
     filterContainer.appendChild(filterLabel);
     filterContainer.appendChild(filterButtonsContainer);
-    
-    // Insert the filter after the search input (below the search bar)
+
     const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input');
     if (searchInput) {
       searchInput.parentNode?.insertBefore(filterContainer, searchInput.nextSibling);
     } else {
-      // Fallback: add to the end of the form
       pagefindForm.appendChild(filterContainer);
     }
-    
-    // Add styles
-    const style = document.createElement('style');
-    style.textContent = `
-      .topic-filter-container {
-        padding: 0.5rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        background: var(--sl-color-bg);
-        border-top: 1px solid var(--sl-color-gray-5);
-        margin-top: 0.5rem;
-        flex-wrap: wrap;
-      }
-      
-      .filter-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--sl-color-text);
-        white-space: nowrap;
-      }
-      
-      .filter-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-      
-      .filter-button {
-        padding: 0.25rem 0.75rem;
-        border: 1px solid var(--sl-color-gray-5);
-        border-radius: 0.375rem;
-        background-color: var(--sl-color-bg);
-        color: var(--sl-color-text);
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 500;
-      }
-      
-      .filter-button:hover {
-        border-color: var(--sl-color-gray-4);
-        background-color: var(--sl-color-gray-6);
-      }
-      
-      .filter-button.active {
-        background-color: var(--sl-color-text-accent);
-        border-color: var(--sl-color-text-accent);
-        color: var(--sl-color-text-invert);
-      }
-
-      .filter-button.active:hover {
-        background-color: var(--sl-color-text-accent);
-        border-color: var(--sl-color-text-accent);
-        color: var(--sl-color-text-invert);
-        opacity: 0.9;
-      }
-      
-      .filter-button:focus {
-        outline: 2px solid var(--sl-color-accent);
-        outline-offset: 1px;
-      }
-      
-      /* No results message styling */
-      .no-filtered-results {
-        padding: 1rem;
-        text-align: center;
-        color: var(--sl-color-gray-2);
-        font-style: italic;
-      }
-    `;
-    document.head.appendChild(style);
   }
-  
+
   function injectVersionScopeUI(pagefindForm: Element) {
     if (pagefindForm.querySelector('.version-scope-container')) return;
 
-    // Only show the version scope toggle if the current product has archived versions
     const versions = productVersions[currentProductId] ?? [];
     if (versions.length === 0) return;
 
@@ -252,7 +228,6 @@ import Default from '@astrojs/starlight/components/Search.astro';
 
     renderUI();
 
-    // Place below the topic filter bar if present, otherwise below the search input
     const filterBar = pagefindForm.querySelector('.topic-filter-container');
     if (filterBar) {
       filterBar.after(container);
@@ -260,63 +235,23 @@ import Default from '@astrojs/starlight/components/Search.astro';
       const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input');
       searchInput?.parentNode?.insertBefore(container, searchInput.nextSibling);
     }
-
-    const style = document.createElement('style');
-    style.textContent = `
-      .version-scope-container {
-        padding: 0.2rem 1rem 0.4rem;
-        font-size: 0.875rem;
-        color: var(--sl-color-gray-2);
-        background: var(--sl-color-bg);
-      }
-      .version-scope-toggle {
-        background: none;
-        border: none;
-        color: var(--sl-color-gray-2);
-        font-size: 0.875rem;
-        cursor: pointer;
-        padding: 0;
-        text-decoration: underline;
-        text-underline-offset: 2px;
-      }
-      .version-scope-toggle:hover { color: var(--sl-color-text); }
-    `;
-    document.head.appendChild(style);
-  }
-
-  /** Identify which product a result href belongs to and its version slug (if any). */
-  function parseResultProduct(href: string): { productId: string; ver: string | null } {
-    const nonCore = configuredProducts.filter(p => p.id !== 'core');
-    for (const p of nonCore) {
-      if (href.startsWith(p.link)) {
-        const after = href.slice(p.link.length);
-        const m = after.match(/^(v\d+-\d+)\//);
-        return { productId: p.id, ver: m ? m[1] : null };
-      }
-    }
-    const m = href.match(/^\/(v\d+-\d+)\//);
-    return { productId: 'core', ver: m ? m[1] : null };
   }
 
   function isResultInVersionScope(href: string, scope: string | null): boolean {
-    const result = parseResultProduct(href);
-    // Only filter results from the current product — other products pass through.
+    const result = detectProductAndVersion(href);
     if (result.productId !== currentProductId) return true;
-    return scope === null ? result.ver === null : result.ver === scope;
+    return scope === null ? result.versionSlug === null : result.versionSlug === scope;
   }
 
   function detectAvailableTopics(): Array<{label: string, path: string}> {
-    // Check which non-core products have a visible (non-versioned) entry in the
-    // sidebar topics dropdown — this confirms they actually have content built.
     const dropdown = document.querySelector('.starlight-sidebar-topics-dropdown-menu');
     const nonCoreProducts = configuredProducts.filter(p => {
       if (p.id === 'core') return false;
-      if (!dropdown) return true; // no dropdown = single-product site, shouldn't happen
+      if (!dropdown) return true;
       const link = dropdown.querySelector(`a[href="${p.link}"]`);
       return link !== null;
     });
 
-    // Only show the filter UI when there are multiple products to filter between.
     if (nonCoreProducts.length === 0) return [];
 
     const coreProduct = configuredProducts.find(p => p.id === 'core');
@@ -325,34 +260,16 @@ import Default from '@astrojs/starlight/components/Search.astro';
       ...nonCoreProducts.map(p => ({ label: p.label, path: p.link })),
     ];
   }
-  
+
   function setupFilterBehavior(pagefindForm: Element) {
     const pagefindContainer = (pagefindForm.closest('.pagefind-ui') ?? pagefindForm.parentElement ?? pagefindForm) as HTMLElement;
 
-    // Inject loading spinner — shown while Pagefind fetches and we filter results.
     const loadingEl = document.createElement('div');
     loadingEl.className = 'search-loading';
     loadingEl.style.display = 'none';
     loadingEl.innerHTML = '<div class="search-spinner" aria-hidden="true"></div>';
     pagefindContainer.appendChild(loadingEl);
 
-    const spinnerStyle = document.createElement('style');
-    spinnerStyle.textContent = `
-      .search-loading { justify-content: center; padding: 1.5rem 0; }
-      .search-spinner {
-        width: 1.25rem; height: 1.25rem;
-        border: 2px solid var(--sl-color-gray-5);
-        border-top-color: var(--sl-color-accent);
-        border-radius: 50%;
-        animation: search-spin 0.6s linear infinite;
-      }
-      @keyframes search-spin { to { transform: rotate(360deg); } }
-      .pagefind-ui__results { transition: opacity 0.1s ease; }
-    `;
-    document.head.appendChild(spinnerStyle);
-
-    // Show spinner (and hide stale results) the moment the user starts typing —
-    // before Pagefind has fetched anything, so there is never a flash of wrong results.
     const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input') as HTMLInputElement | null;
     searchInput?.addEventListener('input', () => {
       if (searchInput.value.trim()) {
@@ -364,19 +281,16 @@ import Default from '@astrojs/starlight/components/Search.astro';
       }
     });
 
-    // Watch for DOM changes so we know when Pagefind has finished rendering results.
     let isInjecting = false;
     let filterTimer: ReturnType<typeof setTimeout> | undefined;
 
     const observer = new MutationObserver(() => {
       if (isInjecting) return;
-      // Debounce: Pagefind may add results in multiple batches; wait for them to settle.
       clearTimeout(filterTimer);
       filterTimer = setTimeout(() => {
         isInjecting = true;
         injectBreadcrumbs();
         applyFilterToResults();
-        // Reveal filtered results and hide spinner.
         const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
         if (resultsEl) resultsEl.style.opacity = '';
         loadingEl.style.display = 'none';
@@ -388,7 +302,6 @@ import Default from '@astrojs/starlight/components/Search.astro';
   }
 
   function formatBreadcrumb(href: string): string {
-    // Strip product prefix and version prefix from breadcrumbs
     let stripped = href;
     for (const p of configuredProducts.filter(p => p.id !== 'core')) {
       if (stripped.startsWith(p.link)) {
@@ -398,7 +311,6 @@ import Default from '@astrojs/starlight/components/Search.astro';
     }
     stripped = stripped.replace(/^\/(v\d+-\d+)\//, '/');
     const parts = stripped.replace(/^\/|\/$/g, '').split('/');
-    // Drop the last segment (the page slug itself)
     const sectionParts = parts.slice(0, -1);
     if (sectionParts.length === 0) return '';
     return sectionParts
@@ -427,7 +339,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
       }
     });
   }
-  
+
   function applyFilterToResults() {
     const results = document.querySelectorAll('.pagefind-ui__result');
     let visibleCount = 0;
@@ -456,18 +368,17 @@ import Default from '@astrojs/starlight/components/Search.astro';
       removeNoResultsMessage();
     }
   }
-  
+
   function isResultMatchingFilter(href: string, filter: string): boolean {
     const nonCoreProducts = configuredProducts.filter(p => p.id !== 'core');
     const matchedProduct = nonCoreProducts.find(p => p.label === filter);
 
     if (matchedProduct) return href.startsWith(matchedProduct.link);
-    // If the filter matches Core's label, show results not belonging to any non-core product
     const coreLabel = configuredProducts.find(p => p.id === 'core')?.label ?? 'Core';
     if (filter === coreLabel) return !nonCoreProducts.some(p => href.startsWith(p.link));
     return true;
   }
-  
+
   function showNoResultsMessage(filter: string) {
     const resultsContainer = document.querySelector('.pagefind-ui__results');
     if (resultsContainer && !resultsContainer.querySelector('.no-filtered-results')) {
@@ -477,7 +388,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
       resultsContainer.appendChild(noResultsMsg);
     }
   }
-  
+
   function removeNoResultsMessage() {
     const noResultsMsg = document.querySelector('.no-filtered-results');
     if (noResultsMsg) {
