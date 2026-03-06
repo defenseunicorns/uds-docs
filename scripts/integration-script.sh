@@ -203,12 +203,12 @@ if [[ -f .versions ]]; then
       # Create a landing page at the version root
       cat > "${version_dir}/index.md" << EOF
 ---
-title: "${product_id^} ${ver} (Archived)"
+title: "${product_id^} ${ver}"
 sidebar:
   hidden: true
 ---
 
-This is archived documentation for **${product_id^} ${ver}**.
+This is documentation for **${product_id^} ${ver}**.
 
 Use the version picker in the header to navigate between versions, or browse the sidebar to find content.
 EOF
