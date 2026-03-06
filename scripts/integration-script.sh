@@ -82,7 +82,8 @@ for repo_info in "${repos[@]}"; do
     if [[ "$mode" == "base" ]]; then
       echo "Copying base docs from $local_path/docs/ to $TARGET_DIR"
       # For base, we can be more aggressive about clearing
-      rsync -rt --delete --exclude='404.md' "$local_path/docs/" "$TARGET_DIR/"
+      # TODO: remove fleet/fleet-no-versioning excludes once those products have their own content source
+      rsync -rt --delete --exclude='404.md' --exclude='fleet/' --exclude='fleet-no-versioning/' "$local_path/docs/" "$TARGET_DIR/"
     else
       echo "Overlaying docs from $local_path/docs/ onto $TARGET_DIR"
       # For overlay, preserve existing files (no --delete)
@@ -104,7 +105,8 @@ for repo_info in "${repos[@]}"; do
   if [[ "$mode" == "base" ]]; then
     echo "Copying base docs from ${target_dir}/docs/ to $TARGET_DIR"
     # For base (uds-core), use --delete to ensure clean slate
-    rsync -rt --delete --exclude='404.md' "${target_dir}/docs/" "$TARGET_DIR/"
+    # TODO: remove fleet/fleet-no-versioning excludes once those products have their own content source
+    rsync -rt --delete --exclude='404.md' --exclude='fleet/' --exclude='fleet-no-versioning/' "${target_dir}/docs/" "$TARGET_DIR/"
   else
     echo "Overlaying docs from ${target_dir}/docs/ onto $TARGET_DIR"
     # For overlay repos, preserve existing files (no --delete)
