@@ -55,7 +55,21 @@ import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.ast
     transform: translateX(4px);
     border-radius: 0.25rem;
   }
+
 </style>
+
+<script is:inline>
+  // Hide versioned topics from the product dropdown — versions use the VersionPicker instead.
+  // Runs immediately so there's no flash of versioned items in the dropdown.
+  (() => {
+    const versionPattern = /\/v\d+-\d+\//;
+    document.querySelectorAll('.starlight-sidebar-topics-dropdown-menu a').forEach(a => {
+      if (versionPattern.test(a.getAttribute('href') || '')) {
+        a.style.display = 'none';
+      }
+    });
+  })();
+</script>
 
 <script is:inline>
   (() => {

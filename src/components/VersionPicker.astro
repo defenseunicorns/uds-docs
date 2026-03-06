@@ -1,0 +1,134 @@
+---
+// Check if any product has archived versions — if not, skip rendering entirely.
+import { readFileSync } from 'fs';
+let hasVersions = false;
+try {
+  const data = JSON.parse(readFileSync('.versions', 'utf8'));
+  hasVersions = Object.values(data).some((p: any) => (p.versions ?? []).length > 0);
+} catch { /* local dev — no versions */ }
+
+if (!hasVersions) return;
+---
+
+<div class="version-picker not-content">
+  <label for="version-select" class="version-label">Version</label>
+  <select id="version-select" class="version-select">
+    <option value="">Latest</option>
+  </select>
+</div>
+
+<style>
+  .version-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .version-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    white-space: nowrap;
+  }
+  .version-select {
+    font-size: 0.8125rem;
+    background: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    height: 2rem;
+  }
+  .version-select:focus {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 1px;
+  }
+</style>
+
+<script>
+  declare const __PRODUCTS__: Array<{ id: string; label: string; link: string }>;
+  declare const __PRODUCT_VERSIONS__: Record<string, string[]>;
+
+  const products = typeof __PRODUCTS__ !== 'undefined' ? __PRODUCTS__ : [];
+  const productVersions: Record<string, string[]> =
+    typeof __PRODUCT_VERSIONS__ !== 'undefined' ? __PRODUCT_VERSIONS__ : {};
+
+  /** Convert semver tag to URL slug: v0.61.0 → v0-61 */
+  function toSlug(ver: string): string {
+    return ver.replace(/\.\d+$/, '').replace(/\./g, '-');
+  }
+
+  /** Determine which product the current page belongs to. */
+  function getCurrentProduct(): { id: string; link: string } | null {
+    const path = window.location.pathname;
+    // Check non-core products first (more specific paths)
+    const nonCore = products.filter(p => p.id !== 'core');
+    for (const p of nonCore) {
+      if (path.startsWith(p.link)) return p;
+    }
+    // Default to core
+    return products.find(p => p.id === 'core') ?? null;
+  }
+
+  /** Extract the version slug from the URL for a given product. */
+  function getCurrentVersionSlug(product: { id: string; link: string }): string {
+    const path = window.location.pathname;
+    // For core (link '/'), version is at /v0-61/...
+    // For fleet (link '/fleet/'), version is at /fleet/v1-2/...
+    const prefix = product.link;
+    const after = path.startsWith(prefix) ? path.slice(prefix.length) : path;
+    const m = after.match(/^(v\d+-\d+)\//);
+    return m ? m[1] : '';
+  }
+
+  const select = document.getElementById('version-select') as HTMLSelectElement;
+  if (select) {
+    const product = getCurrentProduct();
+    if (!product) {
+      (select.closest('.version-picker') as HTMLElement | null)?.style.setProperty('display', 'none');
+    } else {
+      const versions = productVersions[product.id] ?? [];
+      if (versions.length === 0) {
+        // This product has no archived versions — hide the picker
+        (select.closest('.version-picker') as HTMLElement | null)?.style.setProperty('display', 'none');
+      } else {
+        // Populate version options
+        versions.forEach(ver => {
+          const opt = document.createElement('option');
+          opt.value = toSlug(ver);
+          opt.textContent = ver.replace(/\.\d+$/, '');
+          select.appendChild(opt);
+        });
+
+        // Set current value
+        select.value = getCurrentVersionSlug(product);
+
+        select.addEventListener('change', async () => {
+          const selected = select.value;
+          const prefix = product.link;
+          // Strip the current version prefix from the path
+          const afterPrefix = window.location.pathname.startsWith(prefix)
+            ? window.location.pathname.slice(prefix.length)
+            : window.location.pathname;
+          const strippedPath = afterPrefix.replace(/^v\d+-\d+\//, '');
+
+          const target = selected
+            ? `${prefix}${selected}/${strippedPath}`
+            : `${prefix}${strippedPath}`;
+
+          // Try the exact page first; fall back to the version root if it doesn't exist.
+          try {
+            const res = await fetch(target, { method: 'HEAD' });
+            if (res.ok) {
+              window.location.href = target;
+              return;
+            }
+          } catch { /* network error — fall through to fallback */ }
+
+          // Fallback: navigate to the version root (or product root for "Latest")
+          window.location.href = selected ? `${prefix}${selected}/` : prefix;
+        });
+      }
+    }
+  }
+</script>

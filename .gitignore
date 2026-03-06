@@ -1,5 +1,7 @@
 # build output
 dist/
+# version list written by integration-script.sh at build time
+.versions
 # generated types
 .astro/
 
