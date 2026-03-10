@@ -152,16 +152,16 @@ Products are registered in `src/products.ts`. Each product gets its own sidebar 
 1. **Add an entry to `PRODUCTS` in `src/products.ts`**:
    ```ts
    {
-     id: 'fleet',
-     label: 'Fleet',
-     link: '/fleet/',
-     contentDir: 'fleet',
-     unlistedPaths: ['/fleet/index'],
+     id: 'my-product',
+     label: 'My Product',
+     link: '/my-product/',
+     contentDir: 'my-product',
+     unlistedPaths: ['/my-product/index'],
      source: {                    // optional — where latest docs come from
-       repo: 'defenseunicorns/uds-fleet',
+       repo: 'defenseunicorns/uds-my-product',
      },
      overlays: [                  // optional — additional repos merged on top
-       { repo: 'defenseunicorns/uds-fleet-extras' },
+       { repo: 'defenseunicorns/uds-my-product-extras' },
      ],
      versioning: {                // optional — omit if no archived versions needed
        count: 2,                  // repo defaults to source.repo if omitted

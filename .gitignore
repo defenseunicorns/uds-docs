@@ -41,10 +41,3 @@ temp/
 src/content/docs/*
 !src/content/docs/*.md
 !src/content/docs/*.mdx
-# TODO: temporary — keep example product dirs committed
-!src/content/docs/fleet/
-src/content/docs/fleet/*
-!src/content/docs/fleet/index.md
-!src/content/docs/fleet-no-versioning/
-src/content/docs/fleet-no-versioning/*
-!src/content/docs/fleet-no-versioning/index.md

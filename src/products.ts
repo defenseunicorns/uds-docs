@@ -126,22 +126,4 @@ export const PRODUCTS: ProductConfig[] = [
       count: 5,
     },
   },
-  {
-    id: 'fleet',
-    label: 'Fleet',
-    link: '/fleet/',
-    contentDir: 'fleet',
-    unlistedPaths: ['/fleet/index'],
-    versioning: {
-      repo: 'defenseunicorns/uds-core',
-      count: 2,
-    },
-  },
-  {
-    id: 'fleet-no-versioning',
-    label: 'Fleet (No Versioning)',
-    link: '/fleet-no-versioning/',
-    contentDir: 'fleet-no-versioning',
-    unlistedPaths: ['/fleet-no-versioning/index'],
-  },
 ];
