@@ -122,7 +122,7 @@ fi
 
 # Remove any stale versioned directories from previous builds
 find "$TARGET_DIR" -maxdepth 1 -type d -name 'v[0-9]*' -exec rm -rf {} + 2>/dev/null || true
-# Also clean versioned dirs inside product subdirs (e.g. fleet/v1-2/)
+# Also clean versioned dirs inside product subdirs (e.g. my-product/v1-2/)
 for product_dir in "$TARGET_DIR"*/; do
   [[ -d "$product_dir" ]] || continue
   find "$product_dir" -maxdepth 1 -type d -name 'v[0-9]*' -exec rm -rf {} + 2>/dev/null || true
@@ -151,7 +151,7 @@ if [[ -f .versions ]]; then
       # Build version slug: v0.61.0 → v0-61 (drop patch, dots → hyphens for Astro compat)
       ver_slug="$(echo "$ver" | sed 's/\.[^.]*$//' | tr '.' '-')"
 
-      # Build target path: Core → src/content/docs/v0-61, Fleet → src/content/docs/fleet/v1-2
+      # Build target path: Core → src/content/docs/v0-61, My Product → src/content/docs/my-product/v1-2
       if [[ -n "$content_dir" ]]; then
         version_dir="${TARGET_DIR}${content_dir}/${ver_slug}"
       else

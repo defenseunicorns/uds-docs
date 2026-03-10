@@ -156,7 +156,7 @@ Products are registered in `src/products.ts`. Each product gets its own sidebar 
      label: 'My Product',
      link: '/my-product/',
      contentDir: 'my-product',
-     unlistedPaths: ['/my-product/index'],
+     unlistedPaths: ['/my-product/index', '/my-product/404'],
      source: {                    // optional — where latest docs come from
        repo: 'defenseunicorns/uds-my-product',
      },
@@ -205,7 +205,7 @@ The build pipeline reads everything from `src/products.ts`:
 2. `integration-script.sh` reads `.versions` and:
    - Clones latest docs for each product's `source` (base mode uses `--delete`, overlay mode merges).
    - Clones `overlays` repos and merges them on top.
-   - Clones each archived version tag and copies docs into versioned content directories (e.g. `src/content/docs/v0-61/` for Core, `src/content/docs/fleet/v1-2/` for Fleet).
+   - Clones each archived version tag and copies docs into versioned content directories (e.g. `src/content/docs/v0-61/` for Core, `src/content/docs/my-product/v1-2/` for My Product).
 3. `astro.config.mjs` reads `.versions` and generates a sidebar topic for each archived version.
 4. Version slugs use hyphens (`v0-61`) because Astro's content collection slugger strips dots.
 

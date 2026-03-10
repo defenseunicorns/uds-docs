@@ -66,7 +66,7 @@
         // Set current value
         select.value = detectVersionSlug(window.location.pathname, product) ?? '';
 
-        select.addEventListener('change', async () => {
+        select.addEventListener('change', () => {
           const selected = select.value;
           const prefix = product.link;
           // Strip the current version prefix from the path

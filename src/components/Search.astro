@@ -362,7 +362,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
       }
     });
 
-    if (visibleCount === 0) {
+    if (results.length > 0 && visibleCount === 0) {
       showNoResultsMessage(currentFilter || 'this version');
     } else {
       removeNoResultsMessage();
@@ -384,7 +384,9 @@ import Default from '@astrojs/starlight/components/Search.astro';
     if (resultsContainer && !resultsContainer.querySelector('.no-filtered-results')) {
       const noResultsMsg = document.createElement('div');
       noResultsMsg.className = 'pagefind-ui__message no-filtered-results';
-      noResultsMsg.textContent = `No results found for "${filter}" topic`;
+      noResultsMsg.textContent = currentFilter
+        ? `No results found in "${filter}"`
+        : `No results found in ${filter}`;
       resultsContainer.appendChild(noResultsMsg);
     }
   }

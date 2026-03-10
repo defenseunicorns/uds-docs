@@ -49,11 +49,15 @@ export const DEFAULT_SIDEBAR_SECTIONS: SidebarSection[] = [
 ];
 
 export interface ProductConfig {
-  /** Unique id — must match the starlightSidebarTopics topic id */
+  /**
+   * Unique id — must match the starlightSidebarTopics topic id.
+   * Avoid hyphens: the id is used for env var overrides (VERSIONS_{id})
+   * and hyphens are invalid in shell variable names.
+   */
   id: string;
   /** Display label shown in the product dropdown */
   label: string;
-  /** Root URL for this product (e.g. '/' for Core, '/fleet/' for Fleet) */
+  /** Root URL for this product (e.g. '/' for Core, '/my-product/' for My Product) */
   link: string;
   /**
    * Directory under src/content/docs/ that holds this product's content.
@@ -91,7 +95,7 @@ export function versionSlug(ver: string): string {
 /**
  * Build the versioned content directory path for a product + version.
  * Core (contentDir ''): 'v0-61'
- * Fleet (contentDir 'fleet'): 'fleet/v1-2'
+ * My Product (contentDir 'my-product'): 'my-product/v1-2'
  */
 export function versionedContentDir(product: ProductConfig, ver: string): string {
   const slug = versionSlug(ver);
@@ -101,7 +105,7 @@ export function versionedContentDir(product: ProductConfig, ver: string): string
 /**
  * Build the versioned URL prefix for a product + version.
  * Core (link '/'): '/v0-61/'
- * Fleet (link '/fleet/'): '/fleet/v1-2/'
+ * My Product (link '/my-product/'): '/my-product/v1-2/'
  */
 export function versionedLink(product: ProductConfig, ver: string): string {
   const slug = versionSlug(ver);
