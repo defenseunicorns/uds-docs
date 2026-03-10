@@ -4,10 +4,27 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
+/* Brand Fonts */
+@import '@fontsource-variable/inter';
+
 /* Dark mode colors (default) */
 :root {
     --sl-content-width: 50rem;
     color-scheme: dark;
+
+    /* Body font */
+    --sl-font: 'Inter Variable', sans-serif;
+
+    /* Keep body text at normal weight */
+    p, li, a, td, th, dd, dt, span, label, blockquote {
+        font-weight: 300;
+    }
+
+    /* Restore card title weight (overridden by above rule) */
+    .card .title,
+    .card .title span {
+        font-weight: 600;
+    }
 
     a,
     a:hover {
