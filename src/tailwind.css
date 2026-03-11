@@ -15,7 +15,7 @@
     /* Body font */
     --sl-font: 'Inter Variable', sans-serif;
 
-    /* Keep body text at normal weight */
+    /* Keep body text at light weight (300) */
     p, li, a, td, th, dd, dt, span, label, blockquote {
         font-weight: 300;
     }
