@@ -87,6 +87,10 @@
     --sl-color-accent-high: #312e81;
 }
 
+.card {
+    border-radius: 0.75rem;
+}
+
 /* Adjust selector based on actual DOM. Inspect the search result markup. */
 [data-pagefind-ui-meta="product"] {
   display: inline-block;
