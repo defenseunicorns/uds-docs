@@ -47,6 +47,7 @@ export default defineConfig({
         '/reference/deployment/secret-pod-reload/': '/reference/deployment/pod-reload/',
         '/reference/configuration/single-sign-on/recoving-lost-credentials/': '/reference/configuration/single-sign-on/recovering-lost-credentials/',
         '/reference/configuration/private-pki/': '/reference/configuration/trust-management/private-pki/',
+        '/reference/configuration/observability/blackbox-exporter/': '/reference/configuration/observability/uptime/',
     },
 
     integrations: [
