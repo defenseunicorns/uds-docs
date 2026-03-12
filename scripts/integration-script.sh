@@ -33,7 +33,7 @@ clone_repo() {
 }
 
 # --- Step 1: Read product config and clone latest docs ---
-# discover-versions.mjs reads products.ts, discovers versions, and writes .versions JSON
+# discover-versions.mjs reads products.json, discovers versions, and writes .versions JSON
 # which contains sources, versions, and all metadata the rest of this script needs.
 echo "Reading product config and discovering versions..."
 node scripts/discover-versions.mjs
@@ -82,7 +82,7 @@ process_source() {
   fi
 }
 
-# Process content sources from .versions (populated from products.ts source/overlays config).
+# Process content sources from .versions (populated from products.json source config).
 # Sources are sorted globally: all base sources run before any overlay, regardless of product.
 # This is safe because each product targets its own contentDir (no cross-product conflicts).
 if [[ -f .versions ]]; then

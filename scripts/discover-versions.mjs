@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Reads product configuration from src/products.ts, discovers archived versions
+ * Reads product configuration from src/products.json, discovers archived versions
  * for each product that has `versioning` configured, and writes .versions JSON
  * with all metadata the integration script and astro.config.mjs need.
  *
@@ -12,37 +12,7 @@
  */
 import { readFileSync, writeFileSync } from 'fs';
 
-// Parse products.ts — extract the PRODUCTS array and evaluate it as plain JS.
-//
-// IMPORTANT: The PRODUCTS array in products.ts must remain plain data literals
-// (strings, numbers, booleans, objects, arrays). Do NOT use:
-//   - Computed values, function calls, or variable references inside the array
-//   - Template literals or imported constants
-//   - Spread operators or conditional expressions
-// Any of these will cause this eval to fail silently or throw at build time.
-const productsSource = readFileSync(new URL('../src/products.ts', import.meta.url), 'utf8');
-
-function parseProducts(source) {
-  // Only evaluate the PRODUCTS array — skip all function/interface definitions.
-  // This avoids having to strip every possible TS type annotation from function signatures.
-  // Non-greedy match: stops at the first `];` that closes the array, rather than
-  // greedily consuming to the last `];` in the file.
-  const match = source.match(/export\s+const\s+PRODUCTS\s*(?::\s*ProductConfig\[\])?\s*=\s*(\[[\s\S]*?\]);/);
-  if (!match) throw new Error('Could not find PRODUCTS array in products.ts');
-  const arrayLiteral = match[1];
-  // Safety check: the extracted literal must be a plain data structure (objects, arrays,
-  // strings, numbers, booleans). Reject anything that looks like executable code.
-  if (/\b(import|require|await|yield|function|eval)\b|=>|`/.test(arrayLiteral)) {
-    throw new Error(
-      'PRODUCTS array contains non-literal expressions (imports, functions, template literals, etc.). ' +
-      'Keep the array as plain data — see the comment at the top of this file.'
-    );
-  }
-  const fn = new Function(`return ${arrayLiteral};`);
-  return fn();
-}
-
-const PRODUCTS = parseProducts(productsSource);
+const PRODUCTS = JSON.parse(readFileSync(new URL('../src/products.json', import.meta.url), 'utf8'));
 
 /** Extract the minor version key from a semver tag: v0.61.1 → v0.61 */
 function minorKey(tag) {
@@ -96,26 +66,14 @@ async function main() {
       contentDir: product.contentDir,
     };
 
-    // Content sources — read from product.source and product.overlays
-    if (product.source || product.overlays?.length) {
-      const sources = [];
-      if (product.source) {
-        sources.push({
-          repo: product.source.repo,
-          branch: product.source.branch ?? 'main',
-          docsPath: product.source.docsPath ?? 'docs',
-          mode: product.source.mode ?? 'overlay',
-        });
-      }
-      for (const overlay of product.overlays ?? []) {
-        sources.push({
-          repo: overlay.repo,
-          branch: overlay.branch ?? 'main',
-          docsPath: overlay.docsPath ?? 'docs',
-          mode: 'overlay',
-        });
-      }
-      entry.sources = sources;
+    // Content sources — read from product.source
+    if (product.source) {
+      entry.sources = [{
+        repo: product.source.repo,
+        branch: product.source.branch ?? 'main',
+        docsPath: product.source.docsPath ?? 'docs',
+        mode: product.source.mode ?? 'overlay',
+      }];
     }
 
     // Version discovery

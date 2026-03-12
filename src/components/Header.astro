@@ -24,6 +24,37 @@ import VersionPicker from './VersionPicker.astro';
   </div>
 </div>
 
+<script>
+  import { products, productVersions, versionSlug, detectProduct, detectVersionSlug } from '../productUtils';
+
+  function updateGitHubLink() {
+    const githubLink = document.querySelector('a[href*="github.com/defenseunicorns"]') as HTMLAnchorElement | null;
+    if (!githubLink) return;
+
+    const product = detectProduct(window.location.pathname);
+    if (!product) return;
+
+    const productConfig = products.find(p => p.id === product.id);
+    const repo = productConfig?.githubRepo;
+    if (!repo) return;
+
+    const currentVersionSlug = detectVersionSlug(window.location.pathname, product);
+    if (currentVersionSlug) {
+      const versions = productVersions[product.id] ?? [];
+      const fullVersion = versions.find(v => versionSlug(v) === currentVersionSlug);
+      if (fullVersion) {
+        githubLink.href = `https://github.com/${repo}/tree/${fullVersion}`;
+        return;
+      }
+    }
+
+    githubLink.href = `https://github.com/${repo}`;
+  }
+
+  updateGitHubLink();
+  document.addEventListener('astro:page-load', updateGitHubLink);
+</script>
+
 <style>
   @layer starlight.core {
     .header {

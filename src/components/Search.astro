@@ -71,23 +71,6 @@ import Default from '@astrojs/starlight/components/Search.astro';
     color: var(--sl-color-gray-2);
     font-style: italic;
   }
-  .version-scope-container {
-    padding: 0.2rem 1rem 0.4rem;
-    font-size: 0.875rem;
-    color: var(--sl-color-gray-2);
-    background: var(--sl-color-bg);
-  }
-  .version-scope-toggle {
-    background: none;
-    border: none;
-    color: var(--sl-color-gray-2);
-    font-size: 0.875rem;
-    cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-  .version-scope-toggle:hover { color: var(--sl-color-text); }
   .search-loading { justify-content: center; padding: 1.5rem 0; }
   .search-spinner {
     width: 1.25rem; height: 1.25rem;
@@ -103,27 +86,17 @@ import Default from '@astrojs/starlight/components/Search.astro';
 <script>
   import {
     products as configuredProducts,
-    productVersions,
-    detectProductAndVersion,
   } from '../productUtils';
 
   let currentFilter = '';
-  let versionScope: string | null = null;
-  let currentProductId: string = 'core';
-  let searchAllVersions = false;
 
   // Initialize topic filter functionality
   document.addEventListener('DOMContentLoaded', () => {
-    const detected = detectProductAndVersion(window.location.pathname);
-    currentProductId = detected.productId;
-    versionScope = detected.versionSlug;
-
     let retries = 0;
     const waitForPagefindUI = () => {
       const pagefindForm = document.querySelector('.pagefind-ui__form');
       if (pagefindForm) {
         injectTopicFilter(pagefindForm);
-        injectVersionScopeUI(pagefindForm);
         setupFilterBehavior(pagefindForm);
       } else if (retries++ < 50) {
         setTimeout(waitForPagefindUI, 100);
@@ -189,58 +162,6 @@ import Default from '@astrojs/starlight/components/Search.astro';
     } else {
       pagefindForm.appendChild(filterContainer);
     }
-  }
-
-  function injectVersionScopeUI(pagefindForm: Element) {
-    if (pagefindForm.querySelector('.version-scope-container')) return;
-
-    const versions = productVersions[currentProductId] ?? [];
-    if (versions.length === 0) return;
-
-    const container = document.createElement('div');
-    container.className = 'version-scope-container';
-
-    const renderUI = () => {
-      container.innerHTML = '';
-      const label = document.createElement('span');
-      label.className = 'version-scope-label';
-
-      const displayVersion = versionScope ? versionScope.replace(/-/g, '.') : 'Latest';
-
-      if (searchAllVersions) {
-        label.textContent = 'Searching: All versions · ';
-        const btn = document.createElement('button');
-        btn.className = 'version-scope-toggle';
-        btn.textContent = `${displayVersion} only`;
-        btn.addEventListener('click', () => { searchAllVersions = false; renderUI(); applyFilterToResults(); });
-        container.appendChild(label);
-        container.appendChild(btn);
-      } else {
-        label.textContent = `Searching: ${displayVersion} · `;
-        const btn = document.createElement('button');
-        btn.className = 'version-scope-toggle';
-        btn.textContent = 'All versions';
-        btn.addEventListener('click', () => { searchAllVersions = true; renderUI(); applyFilterToResults(); });
-        container.appendChild(label);
-        container.appendChild(btn);
-      }
-    };
-
-    renderUI();
-
-    const filterBar = pagefindForm.querySelector('.topic-filter-container');
-    if (filterBar) {
-      filterBar.after(container);
-    } else {
-      const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input');
-      searchInput?.parentNode?.insertBefore(container, searchInput.nextSibling);
-    }
-  }
-
-  function isResultInVersionScope(href: string, scope: string | null): boolean {
-    const result = detectProductAndVersion(href);
-    if (result.productId !== currentProductId) return true;
-    return scope === null ? result.versionSlug === null : result.versionSlug === scope;
   }
 
   function detectAvailableTopics(): Array<{label: string, path: string}> {
@@ -351,9 +272,8 @@ import Default from '@astrojs/starlight/components/Search.astro';
       if (link) {
         const href = link.getAttribute('href') || '';
         const matchesProduct = !currentFilter || isResultMatchingFilter(href, currentFilter);
-        const matchesVersion = searchAllVersions || isResultInVersionScope(href, versionScope);
 
-        if (matchesProduct && matchesVersion) {
+        if (matchesProduct) {
           resultElement.style.display = '';
           visibleCount++;
         } else {
@@ -363,7 +283,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
     });
 
     if (results.length > 0 && visibleCount === 0) {
-      showNoResultsMessage(currentFilter || 'this version');
+      showNoResultsMessage(currentFilter);
     } else {
       removeNoResultsMessage();
     }
@@ -384,9 +304,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
     if (resultsContainer && !resultsContainer.querySelector('.no-filtered-results')) {
       const noResultsMsg = document.createElement('div');
       noResultsMsg.className = 'pagefind-ui__message no-filtered-results';
-      noResultsMsg.textContent = currentFilter
-        ? `No results found in "${filter}"`
-        : `No results found in ${filter}`;
+      noResultsMsg.textContent = `No results found in "${filter}"`;
       resultsContainer.appendChild(noResultsMsg);
     }
   }

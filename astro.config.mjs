@@ -111,6 +111,7 @@ export default defineConfig({
           ...versionedTopics,
         ], { topics: topicsOption }),
       ],
+      routeMiddleware: './src/routeData.ts',
       defaultLocale: 'root',
       locales: {
         root: {
@@ -156,7 +157,7 @@ export default defineConfig({
       // Per-product archived versions for VersionPicker & Search
       __PRODUCT_VERSIONS__: JSON.stringify(productVersions),
       // Product registry for client-side components (VersionPicker, Search)
-      __PRODUCTS__: JSON.stringify(PRODUCTS.map(({ id, label, link }) => ({ id, label, link }))),
+      __PRODUCTS__: JSON.stringify(PRODUCTS.map(({ id, label, link, source }) => ({ id, label, link, githubRepo: source?.repo ?? null }))),
     },
     plugins: [
       tailwindcss(),

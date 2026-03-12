@@ -6,10 +6,10 @@
  * in astro.config.mjs.
  */
 
-declare const __PRODUCTS__: Array<{ id: string; label: string; link: string }>;
+declare const __PRODUCTS__: Array<{ id: string; label: string; link: string; githubRepo: string | null }>;
 declare const __PRODUCT_VERSIONS__: Record<string, string[]>;
 
-export const products: Array<{ id: string; label: string; link: string }> =
+export const products: Array<{ id: string; label: string; link: string; githubRepo: string | null }> =
   typeof __PRODUCTS__ !== 'undefined' ? __PRODUCTS__ : [];
 
 export const productVersions: Record<string, string[]> =

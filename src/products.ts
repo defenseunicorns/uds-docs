@@ -2,12 +2,14 @@
  * Product configuration — the single place to register products on this docs site.
  *
  * To add a new product:
- *   1. Add an entry here (source, versioning, sidebar sections, etc.).
+ *   1. Add an entry to src/products.json (source, versioning, sidebar sections, etc.).
  *   2. Create src/content/docs/{contentDir}/index.md as the product root page.
  *   3. Run `npm run build` to verify everything wires up.
  *
  * See CONTRIBUTING.md → "Adding a New Product" for the full walkthrough.
  */
+
+import productsData from './products.json';
 
 export interface ContentSource {
   /** GitHub repo in "owner/name" format */
@@ -72,8 +74,6 @@ export interface ProductConfig {
   unlistedPaths?: string[];
   /** Where this product's latest docs come from. Omit for products with only local content. */
   source?: ContentSource;
-  /** Additional repos whose docs are overlaid onto this product's content directory. */
-  overlays?: ContentSource[];
   /** Optional versioning — when set, archived versions are built for this product. */
   versioning?: VersioningConfig;
   /**
@@ -112,22 +112,4 @@ export function versionedLink(product: ProductConfig, ver: string): string {
   return product.contentDir ? `/${product.contentDir}/${slug}/` : `/${slug}/`;
 }
 
-export const PRODUCTS: ProductConfig[] = [
-  {
-    id: 'core',
-    label: 'Core',
-    link: '/',
-    contentDir: '',
-    unlistedPaths: ['/404'],
-    source: {
-      repo: 'defenseunicorns/uds-core',
-      mode: 'base',
-    },
-    overlays: [
-      { repo: 'defenseunicorns/uds-identity-config' },
-    ],
-    versioning: {
-      count: 5,
-    },
-  },
-];
+export const PRODUCTS: ProductConfig[] = productsData as unknown as ProductConfig[];
