@@ -7,34 +7,59 @@ const frontmatter = {
     title: "Unicorn Delivery Service",
     description: "Explore guides and tutorials for the Unicorn Delivery Service platform",
     template: "splash",
-    hero: {
-        title: "Unicorn Delivery Service",
-        tagline: "A secure software delivery product built for National Security missions.",
-        image: {
-            html: '<img src="/assets/doug.svg" alt="Doug the Unicorn" class="hero-logo" />'
-        }
-    },
     prev: false,
     next: false
 } as const;
 
 ---
 <style>
+    /* Hide the auto-generated page title and its divider since our logo replaces it */
+    :global(.main-pane .content-panel:has(h1#_top)) {
+        display: none;
+    }
+    :global(.main-pane .content-panel:has(h1#_top) + .content-panel) {
+        border-top: none;
+    }
+
+    /* Custom hero */
+    .custom-hero {
+        text-align: center;
+        padding: 2rem 0 1.5rem;
+    }
+
+    .custom-hero .hero-logo {
+        max-width: 28rem;
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+    }
+
+    .custom-hero .tagline {
+        font-family: 'Teko', sans-serif;
+        font-size: 2rem;
+        line-height: 1.75rem;
+        margin-top: 1rem;
+        color: var(--sl-color-gray-2);
+    }
+
+    /* Theme-aware hero logo */
+    .hero-logo-light { display: none; }
+    .hero-logo-dark { display: block; }
+
     :root[data-theme='light'] {
-        h1, h2 {
+        h2 {
             font-family: "Teko", sans-serif;
             color: #122248;
         }
+
+        .hero-logo-light { display: block; }
+        .hero-logo-dark { display: none; }
     }
 
     :root[data-theme='dark'] {
-        h1, h2 {
+        h2 {
             font-family: "Teko", sans-serif;
             color: rgba(36,176,255);
-        }
-
-        .card {
-            background-color: rgb(31 41 55);
         }
     }
 
@@ -46,50 +71,6 @@ const frontmatter = {
             padding: 0;
         }
 
-        .hero {
-            display: grid;
-            align-items: center;
-            gap: 1rem;
-            padding-bottom: 1rem;
-            padding-top: 1rem;
-        }
-
-        .hero > img,
-        .hero > .hero-html {
-            object-fit: contain;
-            width: min(60%, 20rem);
-            height: auto;
-            margin-inline: auto;
-        }
-
-        .hero-logo {
-            max-height: 232.4px;
-            width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .stack {
-            text-align: center;
-            align-items: center;
-        }
-
-        .copy {
-            text-align: left;
-            font-family: "Teko", sans-serif;
-            gap: 0;
-        }
-
-        .copy > * {
-            max-width: 80ch;
-        }
-
-        .copy > .tagline {
-            font-size: 24px;
-            line-height: 2rem;
-        }
-
         @media (min-width: 70rem) {
             .card-grid {
                 grid-template-columns: 1fr 1fr;
@@ -98,22 +79,12 @@ const frontmatter = {
         }
 
         @media (max-width: 50rem) {
-            .hero {
-                img {
-                    width: 10rem;
-                }
+            .custom-hero .hero-logo {
+                max-width: 18rem;
             }
 
-            .copy {
-                font-size: 32px;
-                font-family: "Teko", sans-serif;
-                gap: 0;
-            }
-
-            .copy > .tagline {
-                font-size: 20px;
-                text-align: center;
-                line-height: 2rem;
+            .custom-hero .tagline {
+                font-size: 1.1rem;
             }
         }
     }
@@ -160,10 +131,10 @@ const frontmatter = {
 
     .callout {
         padding: 0.9rem 1rem;
-        border: 1px solid var(--sl-color-hairline, #e5e7eb);
+        border: 1px solid var(--sl-color-hairline);
         border-radius: 0.75rem;
         font-size: 0.95rem;
-        background: var(--sl-color-bg-alt, rgba(17,24,39,0.5));
+        background: var(--sl-color-card);
     }
 
     .callout-links {
@@ -199,6 +170,12 @@ const frontmatter = {
 </style>
 
 <StarlightPage frontmatter={frontmatter} hasSidebar={true}>
+    <div class="custom-hero">
+        <h1 class="sr-only">UDS Core</h1>
+        <img src="/assets/UDS_Core_Logo_White.svg" alt="UDS Core" class="hero-logo hero-logo-dark" />
+        <img src="/assets/UDS_Core_Logo_Dark.svg" alt="UDS Core" class="hero-logo hero-logo-light" />
+        <p class="tagline">A secure software delivery product built for National Security missions.</p>
+    </div>
     <div class="space-y-8">
         <CardGrid>
             <Card title="Overview">

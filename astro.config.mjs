@@ -129,8 +129,8 @@ export default defineConfig({
         './src/tailwind.css',
       ],
       logo: {
-        light: './src/assets/light-logo.svg',
-        dark: './src/assets/dark-logo.svg',
+        light: './src/assets/UDS_Logo_Dark.svg',
+        dark: './src/assets/UDS_Logo_White.svg',
         alt: 'Unicorn Delivery Service'
       },
       components: {
