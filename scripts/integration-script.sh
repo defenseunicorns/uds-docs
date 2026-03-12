@@ -134,6 +134,30 @@ rm -rf "$TARGET_DIR/adr"
 # Remove README.md if present (not needed in docs site)
 rm -f "$TARGET_DIR/README.md"
 
+# Rename hyphenated subdirectories to Title Case so Starlight uses them as
+# sidebar labels (e.g. "single-sign-on" -> "Single Sign On").
+# Top-level directories (depth 1) are skipped — those are referenced by name
+# in astro.config.mjs autogenerate entries and must stay hyphenated.
+# Processed deepest-first so nested renames don't invalidate parent paths.
+echo "Renaming hyphenated directories to Title Case..."
+while IFS= read -r dir; do
+    base=$(basename "$dir")
+    if [[ "$base" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)+$ ]]; then
+      parent=$(dirname "$dir")
+      new_base=$(echo "$base" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}')
+      new_path="$parent/$new_base"
+      if [[ ! -e "$new_path" ]]; then
+        echo "  $base -> $new_base"
+        mv "$dir" "$new_path"
+      fi
+    fi
+  done < <(find "$TARGET_DIR" -mindepth 2 -depth -type d -not -path '*/.c4*' -not -path '*/.images*')
+
+# Bust Astro's content cache so it rescans renamed directories on next run.
+# The data store caches entries by digest and reuses old file paths on cache
+# hits, so we must clear it along with the derived content-modules.mjs.
+rm -f .astro/content-modules.mjs .astro/data-store.json
+
 # Clean up temp folder
 echo "Cleaning up temp directory"
 rm -rf temp
