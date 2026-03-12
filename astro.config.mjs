@@ -13,7 +13,7 @@ import react from '@astrojs/react';
 import starlightGitHubAlerts from 'starlight-github-alerts'
 
 // Read per-product versions from .versions JSON (written by scripts/discover-versions.mjs).
-// Format: { "core": { "versions": [...], "contentDir": "...", "sources": [...], ... } }
+// Format: { "core": { "versions": [...], "latestTag": "v0.63.0", "contentDir": "...", "sources": [...], ... } }
 let versionsFile = {};
 try {
   versionsFile = JSON.parse(readFileSync('.versions', 'utf8'));
@@ -21,6 +21,9 @@ try {
 // Extract just the version lists keyed by product id (for Vite define + topic generation)
 const productVersions = Object.fromEntries(
   Object.entries(versionsFile).map(([id, data]) => [id, data.versions ?? []])
+);
+const productLatestTags = Object.fromEntries(
+  Object.entries(versionsFile).flatMap(([id, data]) => data.latestTag ? [[id, data.latestTag]] : [])
 );
 
 function makeSidebarItems(prefix = '', sections = DEFAULT_SIDEBAR_SECTIONS) {
@@ -156,6 +159,8 @@ export default defineConfig({
     define: {
       // Per-product archived versions for VersionPicker & Search
       __PRODUCT_VERSIONS__: JSON.stringify(productVersions),
+      // Per-product latest release tags for VersionPicker label
+      __PRODUCT_LATEST_TAGS__: JSON.stringify(productLatestTags),
       // Product registry for client-side components (VersionPicker, Search)
       __PRODUCTS__: JSON.stringify(PRODUCTS.map(({ id, label, link, source }) => ({ id, label, link, githubRepo: source?.repo ?? null }))),
     },

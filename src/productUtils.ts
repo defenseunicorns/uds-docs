@@ -2,18 +2,22 @@
  * Shared client-side utilities for product/version detection from the URL.
  * Used by VersionPicker.astro and Search.astro to avoid duplicating logic.
  *
- * Depends on __PRODUCTS__ and __PRODUCT_VERSIONS__ injected via Vite define
- * in astro.config.mjs.
+ * Depends on __PRODUCTS__, __PRODUCT_VERSIONS__, and __PRODUCT_LATEST_TAGS__
+ * injected via Vite define in astro.config.mjs.
  */
 
 declare const __PRODUCTS__: Array<{ id: string; label: string; link: string; githubRepo: string | null }>;
 declare const __PRODUCT_VERSIONS__: Record<string, string[]>;
+declare const __PRODUCT_LATEST_TAGS__: Record<string, string>;
 
 export const products: Array<{ id: string; label: string; link: string; githubRepo: string | null }> =
   typeof __PRODUCTS__ !== 'undefined' ? __PRODUCTS__ : [];
 
 export const productVersions: Record<string, string[]> =
   typeof __PRODUCT_VERSIONS__ !== 'undefined' ? __PRODUCT_VERSIONS__ : {};
+
+export const productLatestTags: Record<string, string> =
+  typeof __PRODUCT_LATEST_TAGS__ !== 'undefined' ? __PRODUCT_LATEST_TAGS__ : {};
 
 /** Convert semver tag to URL slug: v0.61.0 → v0-61 */
 export function versionSlug(ver: string): string {

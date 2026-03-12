@@ -39,7 +39,7 @@
 </style>
 
 <script>
-  import { productVersions, versionSlug, detectProduct, detectVersionSlug } from '../productUtils';
+  import { productVersions, productLatestTags, versionSlug, detectProduct, detectVersionSlug } from '../productUtils';
 
   const select = document.getElementById('version-select') as HTMLSelectElement;
   if (select) {
@@ -54,6 +54,13 @@
         // Show the picker (hidden by default to prevent FOUC)
         const picker = select.closest('.version-picker') as HTMLElement | null;
         if (picker) picker.style.display = '';
+
+        // Label the default "Latest" option with the release tag when known
+        const latestTag = productLatestTags[product.id];
+        const latestOption = select.querySelector('option[value=""]') as HTMLOptionElement | null;
+        if (latestOption && latestTag) {
+          latestOption.textContent = `Latest (${latestTag.replace(/\.\d+$/, '')})`;
+        }
 
         // Populate version options
         versions.forEach(ver => {

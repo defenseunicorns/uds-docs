@@ -25,7 +25,7 @@ async function discoverVersions(repo, count = 5) {
     headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
 
-  // Fetch enough releases to find `count` distinct minor versions after skipping latest
+  // Fetch enough releases to find `count` archived minor versions plus the latest
   const res = await fetch(
     `https://api.github.com/repos/${repo}/releases?per_page=${(count + 1) * 5}`,
     { headers }
@@ -33,7 +33,7 @@ async function discoverVersions(repo, count = 5) {
 
   if (!res.ok) {
     console.error(`Warning: GitHub API returned ${res.status} for ${repo}`);
-    return [];
+    return { latestTag: null, archived: [] };
   }
 
   const releases = await res.json();
@@ -54,8 +54,11 @@ async function discoverVersions(repo, count = 5) {
     }
   }
 
-  // Skip index 0 (latest minor, already committed to repo) and take the next `count`
-  return uniqueMinors.slice(1, count + 1);
+  // Index 0 is the latest release tag; the rest are archived versions.
+  return {
+    latestTag: uniqueMinors[0] ?? null,
+    archived: uniqueMinors.slice(1, count + 1),
+  };
 }
 
 async function main() {
@@ -96,19 +99,27 @@ async function main() {
         const envVal = process.env[envKey]?.trim();
         let versions;
 
+        let latestTag = null;
         if (envVal) {
           versions = envVal.split(',').map(v => v.trim()).filter(Boolean);
           console.log(`${product.id}: using ${envKey} = ${versions.join(', ')}`);
         } else {
           console.log(`${product.id}: discovering versions from ${versionRepo}...`);
-          versions = await discoverVersions(
+          ({ latestTag, archived: versions } = await discoverVersions(
             versionRepo,
             product.versioning.count ?? 5,
-          );
-          console.log(`${product.id}: found ${versions.join(', ') || '(none)'}`);
+          ));
+          console.log(`${product.id}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.join(', ') || '(none)'}`);
         }
 
         entry.versions = versions;
+        if (latestTag) entry.latestTag = latestTag;
+
+        // Pin the source branch to the latest release tag so "Latest" docs are
+        // stable and don't change from unreleased commits on main.
+        if (latestTag && entry.sources) {
+          entry.sources[0].branch = latestTag;
+        }
         entry.versionRepo = versionRepo;
         entry.versionDocsPath = versionDocsPath;
       }
