@@ -81,6 +81,9 @@ import Default from '@astrojs/starlight/components/Search.astro';
   }
   @keyframes search-spin { to { transform: rotate(360deg); } }
   .pagefind-ui__results { transition: opacity 0.1s ease; }
+  /* Version filter panel is hidden — version scoping happens automatically based on
+     the currently viewed page. Users never need to select a version in search. */
+  .pagefind-ui__filter-panel { display: none !important; }
 </style>
 
 <script>
@@ -89,6 +92,18 @@ import Default from '@astrojs/starlight/components/Search.astro';
   } from '../productUtils';
 
   let currentFilter = '';
+
+  // Detect the version the user is currently viewing from the page URL.
+  // Current docs have no version slug; archived pages have e.g. "v0-62".
+  function detectPageVersion(path: string): string {
+    const segs = path.split('/');
+    for (const seg of segs) {
+      if (/^v\d+-\d+$/.test(seg)) return seg;
+    }
+    return 'current';
+  }
+
+  const pageVersion = detectPageVersion(window.location.pathname);
 
   // Initialize topic filter functionality
   document.addEventListener('DOMContentLoaded', () => {
@@ -271,9 +286,10 @@ import Default from '@astrojs/starlight/components/Search.astro';
 
       if (link) {
         const href = link.getAttribute('href') || '';
+        const matchesVersion = detectPageVersion(href) === pageVersion;
         const matchesProduct = !currentFilter || isResultMatchingFilter(href, currentFilter);
 
-        if (matchesProduct) {
+        if (matchesVersion && matchesProduct) {
           resultElement.style.display = '';
           visibleCount++;
         } else {
