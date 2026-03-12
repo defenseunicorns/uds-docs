@@ -81,8 +81,8 @@ import Default from '@astrojs/starlight/components/Search.astro';
   }
   @keyframes search-spin { to { transform: rotate(360deg); } }
   .pagefind-ui__results { transition: opacity 0.1s ease; }
-  /* Version filter panel is hidden — version scoping happens automatically based on
-     the currently viewed page. Users never need to select a version in search. */
+  /* Version filter panel is hidden — version scoping is applied programmatically.
+     Users never need to see or interact with the filter panel directly. */
   .pagefind-ui__filter-panel { display: none !important; }
 </style>
 
@@ -162,7 +162,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
         button.classList.add('active');
 
         currentFilter = topic.value;
-        applyFilterToResults();
+        applyProductFilter();
       });
 
       filterButtonsContainer.appendChild(button);
@@ -226,10 +226,16 @@ import Default from '@astrojs/starlight/components/Search.astro';
       filterTimer = setTimeout(() => {
         isInjecting = true;
         injectBreadcrumbs();
-        applyFilterToResults();
-        const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
-        if (resultsEl) resultsEl.style.opacity = '';
-        loadingEl.style.display = 'none';
+        // Activate the native pagefind version filter. If it wasn't already checked,
+        // pagefind re-runs the search — the next observer fire will show results.
+        const willRerun = activateVersionFilter(pagefindContainer);
+        if (!willRerun) {
+          // Version filter already applied (or unavailable) — apply product filter and show results.
+          applyProductFilter();
+          const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
+          if (resultsEl) resultsEl.style.opacity = '';
+          loadingEl.style.display = 'none';
+        }
         isInjecting = false;
       }, 50);
     });
@@ -276,29 +282,35 @@ import Default from '@astrojs/starlight/components/Search.astro';
     });
   }
 
-  function applyFilterToResults() {
+  // Activate the native pagefind version filter for the current page's version.
+  // Returns true if the filter was just applied (pagefind will re-run the search);
+  // returns false if it was already active or the filter panel isn't available yet.
+  function activateVersionFilter(container: HTMLElement): boolean {
+    const input = container.querySelector(
+      `.pagefind-ui__filter-panel input[value="${pageVersion}"]`
+    ) as HTMLInputElement | null;
+    if (!input || input.checked) return false;
+    input.click();
+    return true;
+  }
+
+  // Apply the active product filter (Core/Fleet buttons) via DOM hiding.
+  // Version filtering is handled natively by pagefind; this only handles product scope.
+  function applyProductFilter() {
     const results = document.querySelectorAll('.pagefind-ui__result');
     let visibleCount = 0;
 
     results.forEach(result => {
-      const resultElement = result as HTMLElement;
       const link = result.querySelector('a');
-
       if (link) {
         const href = link.getAttribute('href') || '';
-        const matchesVersion = detectPageVersion(href) === pageVersion;
-        const matchesProduct = !currentFilter || isResultMatchingFilter(href, currentFilter);
-
-        if (matchesVersion && matchesProduct) {
-          resultElement.style.display = '';
-          visibleCount++;
-        } else {
-          resultElement.style.display = 'none';
-        }
+        const visible = !currentFilter || isResultMatchingFilter(href, currentFilter);
+        (result as HTMLElement).style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
       }
     });
 
-    if (results.length > 0 && visibleCount === 0) {
+    if (currentFilter && results.length > 0 && visibleCount === 0) {
       showNoResultsMessage(currentFilter);
     } else {
       removeNoResultsMessage();
