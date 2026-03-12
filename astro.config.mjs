@@ -23,6 +23,7 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
+      pagination: false,
       routeMiddleware: './src/routeData.ts',
       plugins: [
         starlightGitHubAlerts(),
