@@ -71,7 +71,7 @@ const topicsOption = Object.fromEntries([
 // https://astro.build/config
 export default defineConfig({
   site: 'https://uds.defenseunicorns.com/docs/',
-
+  prefetch: true,
   redirects:
   {
     '/docs': '/',
@@ -81,6 +81,11 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
+<<<<<<< versioned-docs
+=======
+      pagination: false,
+      routeMiddleware: './src/routeData.ts',
+>>>>>>> main
       plugins: [
         starlightGitHubAlerts(),
         starlightLinksValidator({
