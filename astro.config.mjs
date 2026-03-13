@@ -81,11 +81,8 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
-<<<<<<< versioned-docs
-=======
       pagination: false,
       routeMiddleware: './src/routeData.ts',
->>>>>>> main
       plugins: [
         starlightGitHubAlerts(),
         starlightLinksValidator({
