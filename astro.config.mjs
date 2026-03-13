@@ -49,7 +49,7 @@ const versionedTopics = PRODUCTS.flatMap(product => {
   const versions = productVersions[product.id] ?? [];
   return versions.map(ver => ({
     id: `${product.id}-${versionSlug(ver)}`,
-    label: `${product.label} ${ver.replace(/\.\d+$/, '')}`,
+    label: product.label,
     link: versionedLink(product, ver),
     items: makeSidebarItems(versionedContentDir(product, ver), product.sidebarSections),
   }));
@@ -63,7 +63,7 @@ const topicsOption = Object.fromEntries([
     const versions = productVersions[product.id] ?? [];
     return versions.map(ver => {
       const contentDir = versionedContentDir(product, ver);
-      return [`${product.id}-${versionSlug(ver)}`, [`/${contentDir}/404`]];
+      return [`${product.id}-${versionSlug(ver)}`, [`/${contentDir}/404`, `/${contentDir}`]];
     });
   }),
 ]);
@@ -116,7 +116,6 @@ export default defineConfig({
           ...versionedTopics,
         ], { topics: topicsOption }),
       ],
-      routeMiddleware: './src/routeData.ts',
       defaultLocale: 'root',
       locales: {
         root: {

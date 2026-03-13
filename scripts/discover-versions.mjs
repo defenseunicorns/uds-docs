@@ -107,7 +107,7 @@ async function main() {
           console.log(`${product.id}: discovering versions from ${versionRepo}...`);
           ({ latestTag, archived: versions } = await discoverVersions(
             versionRepo,
-            product.versioning.count ?? 5,
+            product.versioning.archiveCount ?? 5,
           ));
           console.log(`${product.id}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.join(', ') || '(none)'}`);
         }

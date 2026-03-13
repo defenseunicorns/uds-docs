@@ -87,8 +87,8 @@
             : `${prefix}${strippedPath}`;
 
           // Navigate directly to the target URL. If the page doesn't exist,
-          // the 404 page's redirect script will send the user to the correct
-          // versioned 404 page (which shows the right sidebar context).
+          // the root 404 page will fetch the versioned 404 and swap in its
+          // sidebar, so the user sees the correct sidebar context for that version.
           window.location.href = target;
         });
       }

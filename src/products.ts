@@ -31,8 +31,8 @@ export interface VersioningConfig {
   repo?: string;
   /** Path to docs within the repo (defaults to source.docsPath, then 'docs') */
   docsPath?: string;
-  /** Number of archived versions to keep (default: 5) */
-  count?: number;
+  /** Number of archived versions to keep, not including latest (default: 5) */
+  archiveCount?: number;
 }
 
 export interface SidebarSection {
