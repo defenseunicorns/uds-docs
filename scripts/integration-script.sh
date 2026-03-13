@@ -100,11 +100,6 @@ for repo_info in "${repos[@]}"; do
   clone_repo "$repo_url" "$branch" "$target_dir"
   echo "Cloned ${repo_url}@${branch} into ${target_dir}"
 
-  local rsync_args=(-rt --exclude='404.md')
-  if [[ "$mode" == "base" ]]; then
-    rsync_args+=(--delete "${PRODUCT_EXCLUDES[@]}")
-  fi
-
   echo "Copying docs ($mode) from ${target_dir}/docs/"
   copy_docs "${target_dir}/docs" "$mode"
 done
