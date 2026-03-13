@@ -13,7 +13,7 @@ import starlightGitHubAlerts from 'starlight-github-alerts'
 // https://astro.build/config
 export default defineConfig({
   site: 'https://uds.defenseunicorns.com/docs/',
-
+  prefetch: true,
   redirects:
   {
     '/docs': '/',
