@@ -5,227 +5,254 @@ import Default from '@astrojs/starlight/components/Search.astro';
 <!-- Default Search Component -->
 <Default />
 
+<!-- Search filter styles (injected once server-side to avoid runtime accumulation) -->
+<style is:global>
+  .result-breadcrumb {
+    font-size: 0.9rem;
+    color: var(--sl-color-gray-2);
+    margin: 0 0 0.15rem;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  .topic-filter-container {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--sl-color-bg);
+    border-top: 1px solid var(--sl-color-gray-5);
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--sl-color-text);
+    white-space: nowrap;
+  }
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+    background-color: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+  .filter-button:hover {
+    border-color: var(--sl-color-gray-4);
+    background-color: var(--sl-color-gray-6);
+  }
+  .filter-button.active {
+    background-color: var(--sl-color-text-accent);
+    border-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-invert);
+  }
+  .filter-button.active:hover {
+    background-color: var(--sl-color-text-accent);
+    border-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-invert);
+    opacity: 0.9;
+  }
+  .filter-button:focus {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 1px;
+  }
+  .no-filtered-results {
+    padding: 1rem;
+    text-align: center;
+    color: var(--sl-color-gray-2);
+    font-style: italic;
+  }
+  .search-loading { justify-content: center; padding: 1.5rem 0; }
+  .search-spinner {
+    width: 1.25rem; height: 1.25rem;
+    border: 2px solid var(--sl-color-gray-5);
+    border-top-color: var(--sl-color-accent);
+    border-radius: 50%;
+    animation: search-spin 0.6s linear infinite;
+  }
+  @keyframes search-spin { to { transform: rotate(360deg); } }
+  .pagefind-ui__results { transition: opacity 0.1s ease; }
+  /* Version filter panel is hidden — version scoping is applied programmatically.
+     Users never need to see or interact with the filter panel directly. */
+  .pagefind-ui__filter-panel { display: none !important; }
+</style>
+
 <script>
+  import {
+    products as configuredProducts,
+  } from '../productUtils';
+
   let currentFilter = '';
-  
+
+  // Detect the version the user is currently viewing from the page URL.
+  // Current docs have no version slug; archived pages have e.g. "v0-62".
+  function detectPageVersion(path: string): string {
+    const segs = path.split('/');
+    for (const seg of segs) {
+      if (/^v\d+-\d+$/.test(seg)) return seg;
+    }
+    return 'current';
+  }
+
+  const pageVersion = detectPageVersion(window.location.pathname);
+
   // Initialize topic filter functionality
   document.addEventListener('DOMContentLoaded', () => {
-    // Inject breadcrumb styles unconditionally
-    const breadcrumbStyle = document.createElement('style');
-    breadcrumbStyle.textContent = `
-      .result-breadcrumb {
-        font-size: 0.9rem;
-        color: var(--sl-color-gray-2);
-        margin: 0 0 0.15rem;
-        line-height: 1.4;
-        letter-spacing: 0.01em;
-      }
-    `;
-    document.head.appendChild(breadcrumbStyle);
-
+    let retries = 0;
     const waitForPagefindUI = () => {
       const pagefindForm = document.querySelector('.pagefind-ui__form');
       if (pagefindForm) {
         injectTopicFilter(pagefindForm);
         setupFilterBehavior(pagefindForm);
-      } else {
+      } else if (retries++ < 50) {
         setTimeout(waitForPagefindUI, 100);
       }
     };
 
     waitForPagefindUI();
   });
-  
+
   function injectTopicFilter(pagefindForm: Element) {
-    // Check if filter already exists
     if (pagefindForm.querySelector('.topic-filter-container')) return;
-    
-    // Dynamically detect available topics
+
     const availableTopics = detectAvailableTopics();
-    
-    // If there's only UDS Core (or no topics), don't show the filter at all
+
     if (availableTopics.length <= 1) {
       return;
     }
-    
-    // Create filter container
+
     const filterContainer = document.createElement('div');
     filterContainer.className = 'topic-filter-container';
-    
-    // Create filter label
+
     const filterLabel = document.createElement('span');
     filterLabel.textContent = 'Filter Docs: ';
     filterLabel.className = 'filter-label';
-    
-    // Create filter buttons container
+
     const filterButtonsContainer = document.createElement('div');
     filterButtonsContainer.className = 'filter-buttons';
-    
-    // Create filter buttons dynamically
+
     const topics = [
       { value: '', label: 'All', active: true }
     ];
-    
-    // Add detected topics
+
     availableTopics.forEach(topic => {
       topics.push({ value: topic.label, label: topic.label, active: false });
     });
-    
+
     topics.forEach(topic => {
       const button = document.createElement('button');
       button.textContent = topic.label;
       button.className = `filter-button ${topic.active ? 'active' : ''}`;
       button.setAttribute('data-topic', topic.value);
-      
+
       button.addEventListener('click', () => {
-        // Remove active class from all buttons
         filterButtonsContainer.querySelectorAll('.filter-button').forEach(btn => {
           btn.classList.remove('active');
         });
-        
-        // Add active class to clicked button
+
         button.classList.add('active');
-        
-        // Update current filter and apply it
+
         currentFilter = topic.value;
-        applyFilterToResults();
+        applyProductFilter();
       });
-      
+
       filterButtonsContainer.appendChild(button);
     });
-    
+
     filterContainer.appendChild(filterLabel);
     filterContainer.appendChild(filterButtonsContainer);
-    
-    // Insert the filter after the search input (below the search bar)
+
     const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input');
     if (searchInput) {
       searchInput.parentNode?.insertBefore(filterContainer, searchInput.nextSibling);
     } else {
-      // Fallback: add to the end of the form
       pagefindForm.appendChild(filterContainer);
     }
-    
-    // Add styles
-    const style = document.createElement('style');
-    style.textContent = `
-      .topic-filter-container {
-        padding: 0.5rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        background: var(--sl-color-bg);
-        border-top: 1px solid var(--sl-color-gray-5);
-        margin-top: 0.5rem;
-        flex-wrap: wrap;
-      }
-      
-      .filter-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--sl-color-text);
-        white-space: nowrap;
-      }
-      
-      .filter-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-      
-      .filter-button {
-        padding: 0.25rem 0.75rem;
-        border: 1px solid var(--sl-color-gray-5);
-        border-radius: 0.375rem;
-        background-color: var(--sl-color-bg);
-        color: var(--sl-color-text);
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 500;
-      }
-      
-      .filter-button:hover {
-        border-color: var(--sl-color-gray-4);
-        background-color: var(--sl-color-gray-6);
-      }
-      
-      .filter-button.active {
-        background-color: var(--sl-color-gray-7);
-        border-color: var(--sl-color-gray-4);
-        color: var(--sl-color-text);
-      }
-      
-      .filter-button.active:hover {
-        background-color: var(--sl-color-gray-8);
-        border-color: var(--sl-color-gray-3);
-      }
-      
-      .filter-button:focus {
-        outline: 2px solid var(--sl-color-accent);
-        outline-offset: 1px;
-      }
-      
-      /* No results message styling */
-      .no-filtered-results {
-        padding: 1rem;
-        text-align: center;
-        color: var(--sl-color-gray-2);
-        font-style: italic;
-      }
-    `;
-    document.head.appendChild(style);
   }
-  
+
   function detectAvailableTopics(): Array<{label: string, path: string}> {
-    const topics = [];
-    
-    // Check for Registry content
-    if (hasContentInPath('/registry/')) {
-      topics.push({ label: 'Registry', path: '/registry/' });
-    }
-    
-    // Check for Fleet content
-    if (hasContentInPath('/fleet/')) {
-      topics.push({ label: 'Fleet', path: '/fleet/' });
-    }
-    
-    // UDS Core is always available (everything else)
-    topics.push({ label: 'UDS Core', path: '/' });
-    
-    return topics;
+    const dropdown = document.querySelector('.starlight-sidebar-topics-dropdown-menu');
+    const nonCoreProducts = configuredProducts.filter(p => {
+      if (p.id === 'core') return false;
+      if (!dropdown) return true;
+      const link = dropdown.querySelector(`a[href="${p.link}"]`);
+      return link !== null;
+    });
+
+    if (nonCoreProducts.length === 0) return [];
+
+    const coreProduct = configuredProducts.find(p => p.id === 'core');
+    return [
+      { label: coreProduct?.label ?? 'Core', path: '/' },
+      ...nonCoreProducts.map(p => ({ label: p.label, path: p.link })),
+    ];
   }
-  
-  function hasContentInPath(path: string): boolean {
-    // Check if there are any links in the navigation that match this path
-    const navLinks = document.querySelectorAll('nav a[href*="' + path + '"]');
-    return navLinks.length > 0;
-  }
-  
+
   function setupFilterBehavior(pagefindForm: Element) {
-    // Watch for changes in search results.
-    // We observe the form's parent (not .pagefind-ui__results) because the results
-    // container doesn't exist in the DOM until after the first search is performed.
+    const pagefindContainer = (pagefindForm.closest('.pagefind-ui') ?? pagefindForm.parentElement ?? pagefindForm) as HTMLElement;
+
+    const loadingEl = document.createElement('div');
+    loadingEl.className = 'search-loading';
+    loadingEl.style.display = 'none';
+    loadingEl.innerHTML = '<div class="search-spinner" aria-hidden="true"></div>';
+    pagefindContainer.appendChild(loadingEl);
+
+    const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input') as HTMLInputElement | null;
+    searchInput?.addEventListener('input', () => {
+      if (searchInput.value.trim()) {
+        const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
+        if (resultsEl) resultsEl.style.opacity = '0';
+        loadingEl.style.display = 'flex';
+      } else {
+        loadingEl.style.display = 'none';
+      }
+    });
+
     let isInjecting = false;
+    let filterTimer: ReturnType<typeof setTimeout> | undefined;
+
     const observer = new MutationObserver(() => {
       if (isInjecting) return;
-      setTimeout(() => {
+      clearTimeout(filterTimer);
+      filterTimer = setTimeout(() => {
         isInjecting = true;
         injectBreadcrumbs();
-        if (currentFilter) {
-          applyFilterToResults();
+        // Activate the native pagefind version filter. If it wasn't already checked,
+        // pagefind re-runs the search — the next observer fire will show results.
+        const willRerun = activateVersionFilter(pagefindContainer);
+        if (!willRerun) {
+          // Version filter already applied (or unavailable) — apply product filter and show results.
+          applyProductFilter();
+          const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
+          if (resultsEl) resultsEl.style.opacity = '';
+          loadingEl.style.display = 'none';
         }
         isInjecting = false;
       }, 50);
     });
 
-    const container = pagefindForm.closest('.pagefind-ui') ?? pagefindForm.parentElement ?? pagefindForm;
-    observer.observe(container, { childList: true, subtree: true });
+    observer.observe(pagefindContainer, { childList: true, subtree: true });
   }
 
   function formatBreadcrumb(href: string): string {
-    const parts = href.replace(/^\/|\/$/g, '').split('/');
-    // Drop the last segment (the page slug itself)
+    let stripped = href;
+    for (const p of configuredProducts.filter(p => p.id !== 'core')) {
+      if (stripped.startsWith(p.link)) {
+        stripped = '/' + stripped.slice(p.link.length);
+        break;
+      }
+    }
+    stripped = stripped.replace(/^\/(v\d+-\d+)\//, '/');
+    const parts = stripped.replace(/^\/|\/$/g, '').split('/');
     const sectionParts = parts.slice(0, -1);
     if (sectionParts.length === 0) return '';
     return sectionParts
@@ -254,69 +281,62 @@ import Default from '@astrojs/starlight/components/Search.astro';
       }
     });
   }
-  
-  function applyFilterToResults() {
-    if (!currentFilter) {
-      // Show all results
-      document.querySelectorAll('.pagefind-ui__result').forEach(result => {
-        (result as HTMLElement).style.display = '';
-      });
-      removeNoResultsMessage();
-      return;
-    }
-    
-    // Get all result elements and filter them
+
+  // Activate the native pagefind version filter for the current page's version.
+  // Returns true if the filter was just applied (pagefind will re-run the search);
+  // returns false if it was already active or the filter panel isn't available yet.
+  function activateVersionFilter(container: HTMLElement): boolean {
+    const input = container.querySelector(
+      `.pagefind-ui__filter-panel input[value="${pageVersion}"]`
+    ) as HTMLInputElement | null;
+    if (!input || input.checked) return false;
+    input.click();
+    return true;
+  }
+
+  // Apply the active product filter (Core/Fleet buttons) via DOM hiding.
+  // Version filtering is handled natively by pagefind; this only handles product scope.
+  function applyProductFilter() {
     const results = document.querySelectorAll('.pagefind-ui__result');
     let visibleCount = 0;
-    
+
     results.forEach(result => {
-      const resultElement = result as HTMLElement;
       const link = result.querySelector('a');
-      
       if (link) {
         const href = link.getAttribute('href') || '';
-        const shouldShow = isResultMatchingFilter(href, currentFilter);
-        
-        if (shouldShow) {
-          resultElement.style.display = '';
-          visibleCount++;
-        } else {
-          resultElement.style.display = 'none';
-        }
+        const visible = !currentFilter || isResultMatchingFilter(href, currentFilter);
+        (result as HTMLElement).style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
       }
     });
-    
-    // Show or hide "no results" message
-    if (visibleCount === 0) {
+
+    if (currentFilter && results.length > 0 && visibleCount === 0) {
       showNoResultsMessage(currentFilter);
     } else {
       removeNoResultsMessage();
     }
   }
-  
+
   function isResultMatchingFilter(href: string, filter: string): boolean {
-    switch (filter) {
-      case 'Registry':
-        return href.includes('/registry/');
-      case 'Fleet':
-        return href.includes('/fleet/');
-      case 'UDS Core':
-        return !href.includes('/registry/') && !href.includes('/fleet/');
-      default:
-        return true;
-    }
+    const nonCoreProducts = configuredProducts.filter(p => p.id !== 'core');
+    const matchedProduct = nonCoreProducts.find(p => p.label === filter);
+
+    if (matchedProduct) return href.startsWith(matchedProduct.link);
+    const coreLabel = configuredProducts.find(p => p.id === 'core')?.label ?? 'Core';
+    if (filter === coreLabel) return !nonCoreProducts.some(p => href.startsWith(p.link));
+    return true;
   }
-  
+
   function showNoResultsMessage(filter: string) {
     const resultsContainer = document.querySelector('.pagefind-ui__results');
     if (resultsContainer && !resultsContainer.querySelector('.no-filtered-results')) {
       const noResultsMsg = document.createElement('div');
       noResultsMsg.className = 'pagefind-ui__message no-filtered-results';
-      noResultsMsg.textContent = `No results found for "${filter}" topic`;
+      noResultsMsg.textContent = `No results found in "${filter}"`;
       resultsContainer.appendChild(noResultsMsg);
     }
   }
-  
+
   function removeNoResultsMessage() {
     const noResultsMsg = document.querySelector('.no-filtered-results');
     if (noResultsMsg) {

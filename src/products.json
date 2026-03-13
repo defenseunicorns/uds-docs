@@ -1,0 +1,16 @@
+[
+  {
+    "id": "core",
+    "label": "Core",
+    "link": "/",
+    "contentDir": "",
+    "unlistedPaths": ["/404"],
+    "source": {
+      "repo": "defenseunicorns/uds-core",
+      "mode": "base"
+    },
+    "versioning": {
+      "archiveCount": 1
+    }
+  }
+]

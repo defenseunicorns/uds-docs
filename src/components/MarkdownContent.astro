@@ -1,0 +1,13 @@
+---
+import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+
+// Determine the pagefind version filter for this page.
+// Archived pages contain a version slug segment (e.g. "v0-62"); current pages use "current".
+const version = Astro.url.pathname.split('/').find(s => /^v\d+-\d+$/.test(s)) ?? 'current';
+---
+
+<Default {...Astro.props}>
+  {/* Annotate each page with its version so pagefind can filter natively at query time. */}
+  <span data-pagefind-filter={`version:${version}`} aria-hidden="true" style="display:none" />
+  <slot />
+</Default>

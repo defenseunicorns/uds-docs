@@ -1,0 +1,97 @@
+---
+// Version picker is hidden by default to avoid FOUC; the client-side script
+// shows it when the current product has archived versions.
+---
+
+<div class="version-picker not-content" style="display:none">
+  <label for="version-select" class="version-label">Version</label>
+  <select id="version-select" class="version-select">
+    <option value="">Latest</option>
+  </select>
+</div>
+
+<style>
+  .version-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .version-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    white-space: nowrap;
+  }
+  .version-select {
+    font-size: 0.8125rem;
+    background: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    height: 2rem;
+  }
+  .version-select:focus {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 1px;
+  }
+</style>
+
+<script>
+  import { productVersions, productLatestTags, versionSlug, detectProduct, detectVersionSlug } from '../productUtils';
+
+  const select = document.getElementById('version-select') as HTMLSelectElement;
+  if (select) {
+    const product = detectProduct(window.location.pathname);
+    if (!product) {
+      // no matching product — stay hidden
+    } else {
+      const versions = productVersions[product.id] ?? [];
+      if (versions.length === 0) {
+        // This product has no archived versions — stay hidden
+      } else {
+        // Show the picker (hidden by default to prevent FOUC)
+        const picker = select.closest('.version-picker') as HTMLElement | null;
+        if (picker) picker.style.display = '';
+
+        // Label the default "Latest" option with the release tag when known
+        const latestTag = productLatestTags[product.id];
+        const latestOption = select.querySelector('option[value=""]') as HTMLOptionElement | null;
+        if (latestOption && latestTag) {
+          latestOption.textContent = `Latest (${latestTag.replace(/\.\d+$/, '')})`;
+        }
+
+        // Populate version options
+        versions.forEach(ver => {
+          const opt = document.createElement('option');
+          opt.value = versionSlug(ver);
+          opt.textContent = ver.replace(/\.\d+$/, '');
+          select.appendChild(opt);
+        });
+
+        // Set current value
+        select.value = detectVersionSlug(window.location.pathname, product) ?? '';
+
+        select.addEventListener('change', () => {
+          const selected = select.value;
+          const prefix = product.link;
+          // Strip the current version prefix from the path
+          const afterPrefix = window.location.pathname.startsWith(prefix)
+            ? window.location.pathname.slice(prefix.length)
+            : window.location.pathname;
+          const strippedPath = afterPrefix.replace(/^v\d+-\d+\//, '');
+
+          const target = selected
+            ? `${prefix}${selected}/${strippedPath}`
+            : `${prefix}${strippedPath}`;
+
+          // Navigate directly to the target URL. If the page doesn't exist,
+          // the root 404 page will fetch the versioned 404 and swap in its
+          // sidebar, so the user sees the correct sidebar context for that version.
+          window.location.href = target;
+        });
+      }
+    }
+  }
+</script>
