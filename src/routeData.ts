@@ -25,4 +25,5 @@ export const onRequest = defineRouteMiddleware((context) => {
       'data-pagefind-meta': `product:${product}`,
     },
   });
+
 });
