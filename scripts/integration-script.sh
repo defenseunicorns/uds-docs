@@ -6,11 +6,11 @@ TARGET_DIR="src/content/docs/"
 # UDS Core is the base - copied first
 # Other repos overlay on top without deleting uds-core files
 repos=(
-    "https://github.com/defenseunicorns/uds-core main ./temp/uds-core base"
-    "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config overlay"
-    # TODO: can reinclude this repo once we update the docs there
-    # "https://github.com/defenseunicorns/uds-cli main ./temp/cli overlay"
-    # "https://github.com/defenseunicorns-labs/uds-rke2-demo main ./temp/uds-rke-demo overlay"
+  "https://github.com/defenseunicorns/uds-core main ./temp/uds-core base"
+  "https://github.com/defenseunicorns/uds-identity-config main ./temp/uds-identity-config overlay"
+  # TODO: can reinclude this repo once we update the docs there
+  # "https://github.com/defenseunicorns/uds-cli main ./temp/cli overlay"
+  # "https://github.com/defenseunicorns-labs/uds-rke2-demo main ./temp/uds-rke-demo overlay"
 )
 
 mkdir -p temp
@@ -29,28 +29,44 @@ fi
 
 repo_key_from_url() {
   local url="$1"
-  # strip trailing slashes, then take the last segment and drop .git
   url="${url%/}"
   local base="${url##*/}"
   echo "${base%.git}"
 }
 
 clone_repo() {
-    repo_url="$1"
-    branch="$2"
-    target_dir="$3"
+  local repo_url="$1"
+  local branch="$2"
+  local target_dir="$3"
 
-    # Remove existing cloned directory if it exists
-    if [ -d "$target_dir" ]; then
-        echo "Removing existing cloned dir: $target_dir"
-        rm -rf "$target_dir"
-    fi
+  if [ -d "$target_dir" ]; then
+    echo "Removing existing cloned dir: $target_dir"
+    rm -rf "$target_dir"
+  fi
 
-    # Clone the repository with specific branch/tag
-    git clone --branch "$branch" --depth 1 --single-branch "$repo_url" "$target_dir"
+  git clone --branch "$branch" --depth 1 --single-branch "$repo_url" "$target_dir"
 }
 
-# Clean target directory for fresh start (but preserve any manually created structure during transition)
+# Copies a docs/ source directory into TARGET_DIR.
+# mode "base" clears the target first; "overlay" preserves existing files.
+copy_docs() {
+  local src="$1"
+  local mode="$2"
+  if [[ "$mode" == "base" ]]; then
+    rsync -rt --delete --exclude='404.md' "$src/" "$TARGET_DIR/"
+  else
+    rsync -rt "$src/" "$TARGET_DIR/"
+  fi
+}
+
+# Copies a LikeC4 .c4 model directory into TARGET_DIR/.c4.
+copy_c4() {
+  local src="$1"
+  rm -rf "${TARGET_DIR}/.c4"
+  mkdir -p "${TARGET_DIR}/.c4"
+  cp -r "$src/." "${TARGET_DIR}/.c4/"
+}
+
 echo "Preparing target directory: $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 
@@ -63,35 +79,22 @@ for repo_info in "${repos[@]}"; do
   mode="${repo[3]:-overlay}" # 'base' or 'overlay'
 
   key="$(repo_key_from_url "$repo_url")"
-  # Fallback if URL produced an empty key
   if [[ -z "$key" ]]; then
     key="${target_dir##*/}"
   fi
 
-  # Local override path
   if [[ ${OVERRIDES[$key]+_} ]]; then
     local_path="${OVERRIDES[$key]}"
     echo "Using local override for '$key': $local_path"
-
     if [[ ! -d "$local_path/docs" ]]; then
       echo "Warning: override source '$local_path/docs' not found; skipping."
       continue
     fi
-
-    # Copy from docs/ directory in repo to target
-    if [[ "$mode" == "base" ]]; then
-      echo "Copying base docs from $local_path/docs/ to $TARGET_DIR"
-      # For base, we can be more aggressive about clearing
-      rsync -rt --delete --exclude='404.md' "$local_path/docs/" "$TARGET_DIR/"
-    else
-      echo "Overlaying docs from $local_path/docs/ onto $TARGET_DIR"
-      # For overlay, preserve existing files (no --delete)
-      rsync -rt "$local_path/docs/" "$TARGET_DIR/"
-    fi
+    echo "Copying docs ($mode) from $local_path/docs/"
+    copy_docs "$local_path/docs" "$mode"
     continue
   fi
 
-  # Default: clone and copy
   clone_repo "$repo_url" "$branch" "$target_dir"
   echo "Cloned ${repo_url}@${branch} into ${target_dir}"
 
@@ -100,58 +103,82 @@ for repo_info in "${repos[@]}"; do
     continue
   fi
 
-  # Copy from docs/ directory in repo to target
-  if [[ "$mode" == "base" ]]; then
-    echo "Copying base docs from ${target_dir}/docs/ to $TARGET_DIR"
-    # For base (uds-core), use --delete to ensure clean slate
-    rsync -rt --delete --exclude='404.md' "${target_dir}/docs/" "$TARGET_DIR/"
-  else
-    echo "Overlaying docs from ${target_dir}/docs/ onto $TARGET_DIR"
-    # For overlay repos, preserve existing files (no --delete)
-    rsync -rt "${target_dir}/docs/" "$TARGET_DIR/"
-  fi
+  echo "Copying docs ($mode) from ${target_dir}/docs/"
+  copy_docs "${target_dir}/docs" "$mode"
 done
 
 # Copy LikeC4 model if present in uds-core
 uds_core_override="${OVERRIDES[uds-core]:-}"
 if [[ -n "$uds_core_override" && -d "$uds_core_override/docs/.c4" ]]; then
   echo "Copying LikeC4 model from override"
-  rm -rf "${TARGET_DIR}/.c4"
-  mkdir -p "${TARGET_DIR}/.c4"
-  cp -r "$uds_core_override/docs/.c4/." "${TARGET_DIR}/.c4/"
+  copy_c4 "$uds_core_override/docs/.c4"
 elif [[ -d "./temp/uds-core/docs/.c4" ]]; then
   echo "Copying LikeC4 model from uds-core"
-  rm -rf "${TARGET_DIR}/.c4"
-  mkdir -p "${TARGET_DIR}/.c4"
-  cp -r "./temp/uds-core/docs/.c4/." "${TARGET_DIR}/.c4/"
+  copy_c4 "./temp/uds-core/docs/.c4"
 fi
 
 # Remove dev and adr directories if present (not for public docs site)
 echo "Removing dev and adr directories"
-rm -rf "$TARGET_DIR/dev"
-rm -rf "$TARGET_DIR/adr"
+rm -rf "$TARGET_DIR/dev" "$TARGET_DIR/adr"
 
 # Remove README.md if present (not needed in docs site)
 rm -f "$TARGET_DIR/README.md"
 
 # Rename hyphenated subdirectories to Title Case so Starlight uses them as
-# sidebar labels (e.g. "single-sign-on" -> "Single Sign On").
+# sidebar labels (e.g. "single-sign-on" -> "Single Sign-On").
+# Acronyms are preserved (e.g. "uds" -> "UDS", "idam" -> "IdAM").
+# "and" is converted to "&" (e.g. "identity-and-access" -> "Identity & Access").
+# When "&" appears in a dir name, github-slugger strips it and leaves a double
+# hyphen (e.g. "Identity & Access" -> URL slug "identity--access"). We track
+# these renames and rewrite internal links in all markdown files to match.
 # Top-level directories (depth 1) are skipped — those are referenced by name
 # in astro.config.mjs autogenerate entries and must stay hyphenated.
 # Processed deepest-first so nested renames don't invalidate parent paths.
 echo "Renaming hyphenated directories to Title Case..."
+SLUG_RENAMES=()
 while IFS= read -r dir; do
-    base=$(basename "$dir")
-    if [[ "$base" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)+$ ]]; then
-      parent=$(dirname "$dir")
-      new_base=$(echo "$base" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}')
-      new_path="$parent/$new_base"
-      if [[ ! -e "$new_path" ]]; then
-        echo "  $base -> $new_base"
-        mv "$dir" "$new_path"
+  base=$(basename "$dir")
+  if [[ "$base" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)+$ ]]; then
+    new_base=$(echo "$base" | sed -E 's/-/ /g' | awk '{
+      if (tolower($0) == "single sign on") {
+        print "Single Sign-On"
+        next
+      }
+      for (i = 1; i <= NF; i++) {
+        if      (tolower($i) == "uds")  $i = "UDS";
+        else if (tolower($i) == "idam") $i = "IdAM";
+        else if (tolower($i) == "crds") $i = "CRDs";
+        else if (tolower($i) == "and")  $i = "&";
+        else $i = toupper(substr($i,1,1)) substr($i,2)
+      }
+      print
+    }')
+    new_path="$(dirname "$dir")/$new_base"
+    if [[ ! -e "$new_path" ]]; then
+      echo "  $base -> $new_base"
+      mv "$dir" "$new_path"
+      # Track dirs renamed to contain '&': github-slugger strips '&' and
+      # leaves surrounding spaces as hyphens, producing a double hyphen.
+      # "-and-" in the old slug becomes "--" in the URL slug.
+      if [[ "$new_base" == *"&"* ]]; then
+        rel_old="${dir#$TARGET_DIR}"
+        SLUG_RENAMES+=("$rel_old:${rel_old//-and-/--}")
       fi
     fi
-  done < <(find "$TARGET_DIR" -mindepth 2 -depth -type d -not -path '*/.c4*' -not -path '*/.images*')
+  fi
+done < <(find "$TARGET_DIR" -mindepth 2 -depth -type d -not -path '*/.c4*' -not -path '*/.images*')
+
+# Rewrite internal links in all markdown files to use the updated slugs.
+if [[ ${#SLUG_RENAMES[@]} -gt 0 ]]; then
+  echo "Updating internal links for renamed directories..."
+  sed_args=()
+  for entry in "${SLUG_RENAMES[@]}"; do
+    sed_args+=(-e "s|/${entry%%:*}/|/${entry#*:}/|g")
+  done
+  while IFS= read -r file; do
+    sed -i.bak "${sed_args[@]}" "$file" && rm -f "${file}.bak"
+  done < <(find "$TARGET_DIR" -type f \( -name "*.md" -o -name "*.mdx" \))
+fi
 
 # Bust Astro's content cache so it rescans renamed directories on next run.
 # The data store caches entries by digest and reuses old file paths on cache
