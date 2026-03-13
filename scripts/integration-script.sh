@@ -124,6 +124,9 @@ for product_dir in "$TARGET_DIR"*/; do
   find "$product_dir" -maxdepth 1 -type d -name 'v[0-9]*' -exec rm -rf {} + 2>/dev/null || true
 done
 
+# Generate .versions metadata from GitHub releases
+node scripts/discover-versions.mjs
+
 # Clone each archived version from .versions metadata
 if [[ -f .versions ]]; then
   for product_id in $(jq -r 'keys[]' .versions); do
