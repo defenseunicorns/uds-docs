@@ -125,16 +125,24 @@ done
 # Rewrite root-relative internal links for each product to use their contentDir prefix.
 # Upstream docs may reference sections with root-relative paths like /reference/, /overview/, etc.
 # After placing content under /contentDir/, these must become /contentDir/reference/ etc.
-DEFAULT_SECTIONS=(overview getting-started concepts how-to-guides reference operations)
+# Section names are read from sidebarOrder in products.json (supports both string entries and
+# { "dir": "..." } objects).
 
 while IFS= read -r product_id; do
   contentDir=$(jq -r --arg id "$product_id" '.[$id].contentDir' .versions)
   [[ -z "$contentDir" ]] && continue
   [[ ! -d "${TARGET_DIR}${contentDir}" ]] && continue
 
+  # Read sidebarOrder for this product — extract dir names from both string and object entries.
+  mapfile -t sections < <(jq -r --arg id "$product_id" \
+    '(.[] | select(.id == $id) | .sidebarOrder // [])[] | if type == "string" then . else .dir end' \
+    src/products.json)
+
+  [[ ${#sections[@]} -eq 0 ]] && continue
+
   echo "Rewriting root-relative links in ${contentDir} docs to /${contentDir}/ prefix..."
   sed_args=()
-  for section in "${DEFAULT_SECTIONS[@]}"; do
+  for section in "${sections[@]}"; do
     sed_args+=(-e "s|](/${section}/|](/${contentDir}/${section}/|g")
     sed_args+=(-e "s|href=\"/${section}/|href=\"/${contentDir}/${section}/|g")
   done

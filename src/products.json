@@ -2,9 +2,22 @@
   {
     "id": "core",
     "label": "Core",
+<<<<<<< Updated upstream
     "link": "/",
     "contentDir": "",
     "unlistedPaths": ["/404"],
+=======
+    "link": "/core/",
+    "contentDir": "core",
+    "unlistedPaths": ["/core", "/core/404", "/404"],
+    "sidebarOrder": [
+      "getting-started",
+      "concepts",
+      { "dir": "how-to-guides", "label": "How-to Guides" },
+      "reference",
+      { "dir": "operations", "label": "Operations & Maintenance" }
+    ],
+>>>>>>> Stashed changes
     "source": {
       "repo": "defenseunicorns/uds-core",
       "mode": "base"
@@ -12,5 +25,21 @@
     "versioning": {
       "archiveCount": 1
     }
+<<<<<<< Updated upstream
+=======
+  },
+  {
+    "id": "cli",
+    "label": "CLI",
+    "link": "/cli/",
+    "contentDir": "cli",
+    "unlistedPaths": ["/cli", "/cli/404"],
+    "sidebarOrder": ["getting-started", "how-to-guides"],
+    "source": {
+      "repo": "defenseunicorns/uds-cli",
+      "branch": "initial-docs-refresh",
+      "docsPath": "docs"
+    }
+>>>>>>> Stashed changes
   }
 ]

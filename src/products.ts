@@ -2,7 +2,7 @@
  * Product configuration — the single place to register products on this docs site.
  *
  * To add a new product:
- *   1. Add an entry to src/products.json (source, versioning, sidebar sections, etc.).
+ *   1. Add an entry to src/products.json (source, versioning, sidebarOrder, etc.).
  *   2. Create src/content/docs/{contentDir}/index.md as the product root page.
  *   3. Run `npm run build` to verify everything wires up.
  *
@@ -35,21 +35,6 @@ export interface VersioningConfig {
   archiveCount?: number;
 }
 
-export interface SidebarSection {
-  label: string;
-  dir: string;
-}
-
-/** Default sidebar sections shared by most products. */
-export const DEFAULT_SIDEBAR_SECTIONS: SidebarSection[] = [
-  { label: 'Overview',                 dir: 'overview' },
-  { label: 'Getting Started',          dir: 'getting-started' },
-  { label: 'Concepts',                 dir: 'concepts' },
-  { label: 'How-to Guides',            dir: 'how-to-guides' },
-  { label: 'Reference',               dir: 'reference' },
-  { label: 'Operations & Maintenance', dir: 'operations' },
-];
-
 export interface ProductConfig {
   /**
    * Unique id — must match the starlightSidebarTopics topic id.
@@ -77,10 +62,11 @@ export interface ProductConfig {
   /** Optional versioning — when set, archived versions are built for this product. */
   versioning?: VersioningConfig;
   /**
-   * Sidebar sections for this product. Defaults to DEFAULT_SIDEBAR_SECTIONS.
-   * Override this to use different section labels/dirs for a specific product.
+   * Ordered list of directories to show in the sidebar.
+   * Only listed directories appear; unlisted ones (e.g. .c4, version dirs) are excluded.
+   * If omitted, directories are auto-discovered (with dot-dirs and version dirs filtered out).
    */
-  sidebarSections?: SidebarSection[];
+  sidebarOrder?: (string | { dir: string; label: string })[];
 }
 
 /**

@@ -4,7 +4,8 @@ import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
-import { PRODUCTS, DEFAULT_SIDEBAR_SECTIONS, versionSlug, versionedContentDir, versionedLink } from './src/products.ts';
+import { readdirSync } from 'node:fs';
+import { PRODUCTS, versionSlug, versionedContentDir, versionedLink } from './src/products.ts';
 
 import tailwindcss from '@tailwindcss/vite';
 import { LikeC4VitePlugin } from 'likec4/vite-plugin';
@@ -26,9 +27,23 @@ const productLatestTags = Object.fromEntries(
   Object.entries(versionsFile).flatMap(([id, data]) => data.latestTag ? [[id, data.latestTag]] : [])
 );
 
-function makeSidebarItems(prefix = '', sections = DEFAULT_SIDEBAR_SECTIONS) {
-  return sections
-    .filter(({ dir }) => !prefix || existsSync(`./src/content/docs/${prefix}/${dir}`))
+function titleCase(name) {
+  return name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function makeSidebarItems(prefix = '', sidebarOrder) {
+  const base = `./src/content/docs/${prefix}`;
+  // When sidebarOrder is defined, use it as an explicit allowlist + ordering.
+  // Otherwise, auto-discover directories (filtering out dot-dirs and version dirs).
+  const dirs = sidebarOrder
+    ? sidebarOrder.map(e => typeof e === 'string' ? ({ dir: e, label: titleCase(e) }) : ({ dir: e.dir, label: e.label }))
+    : (existsSync(base)
+        ? readdirSync(base, { withFileTypes: true })
+            .filter(d => d.isDirectory() && !d.name.startsWith('.') && !/^v\d+-\d+$/.test(d.name))
+            .map(d => ({ dir: d.name, label: titleCase(d.name) }))
+        : []);
+  return dirs
+    .filter(({ dir }) => !prefix || existsSync(`${base}/${dir}`))
     .map(({ label, dir }) => ({
       label,
       autogenerate: { directory: prefix ? `${prefix}/${dir}` : dir },
@@ -41,7 +56,7 @@ const productTopics = PRODUCTS.map((product) => ({
   id: product.id,
   label: product.label,
   link: product.link,
-  items: makeSidebarItems(product.contentDir, product.sidebarSections),
+  items: makeSidebarItems(product.contentDir, product.sidebarOrder),
 }));
 
 // One sidebar topic per archived version of each product.
@@ -51,7 +66,7 @@ const versionedTopics = PRODUCTS.flatMap(product => {
     id: `${product.id}-${versionSlug(ver)}`,
     label: product.label,
     link: versionedLink(product, ver),
-    items: makeSidebarItems(versionedContentDir(product, ver), product.sidebarSections),
+    items: makeSidebarItems(versionedContentDir(product, ver), product.sidebarOrder),
   }));
 });
 
@@ -102,11 +117,20 @@ export default defineConfig({
             { label: 'Zarf Docs', url: 'https://docs.zarf.dev/' },
           ],
           customSets: [
+<<<<<<< Updated upstream
             { label: 'Getting Started', paths: ['getting-started/**'], description: 'Install and first steps.' },
             { label: 'Concepts', paths: ['concepts/**'], description: 'How UDS Core works and its major features.' },
             { label: 'Operations & Maintenance', paths: ['operations/**'], description: 'Day-2 operations, upgrades, and runbooks.' },
           ],
           promote: ['index*', 'getting-started/**', 'overview/**', 'concepts/**', 'reference/cli/**', 'operations/**'],
+=======
+            { label: 'Getting Started', paths: ['core/getting-started/**'], description: 'Install and first steps.' },
+            { label: 'Concepts', paths: ['core/concepts/**'], description: 'How UDS Core works and its major features.' },
+            { label: 'Operations & Maintenance', paths: ['core/operations-and-maintenance/**'], description: 'Day-2 operations, upgrades, and runbooks.' },
+            { label: 'CLI', paths: ['cli/**'], description: 'UDS CLI reference and usage.' },
+          ],
+          promote: ['index*', 'core/getting-started/**', 'core/overview/**', 'core/concepts/**', 'core/reference/cli/**', 'core/operations-and-maintenance/**', 'cli/**'],
+>>>>>>> Stashed changes
           minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
           pageSeparator: '\n\n-----\n\n',
           rawContent: true,
