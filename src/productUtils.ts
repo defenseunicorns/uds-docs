@@ -26,12 +26,12 @@ export function versionSlug(ver: string): string {
 
 /** Determine which product the current page belongs to based on URL. */
 export function detectProduct(path: string): { id: string; label: string; link: string } | null {
-  // Check non-root products first (more specific paths)
-  const nonRoot = products.filter(p => p.link !== '/');
-  for (const p of nonRoot) {
+  // Sort by link length descending so more specific prefixes match first.
+  const sorted = [...products].sort((a, b) => b.link.length - a.link.length);
+  for (const p of sorted) {
     if (path.startsWith(p.link)) return p;
   }
-  return products.find(p => p.link === '/') ?? null;
+  return null;
 }
 
 /** Extract the version slug from the URL for a given product. */
@@ -42,8 +42,8 @@ export function detectVersionSlug(path: string, product: { link: string }): stri
 }
 
 /** Determine both product and version from a URL path. */
-export function detectProductAndVersion(path: string): { productId: string; versionSlug: string | null } {
+export function detectProductAndVersion(path: string): { productId: string | null; versionSlug: string | null } {
   const product = detectProduct(path);
-  if (!product) return { productId: products.find(p => p.link === '/')?.id ?? '', versionSlug: null };
+  if (!product) return { productId: null, versionSlug: null };
   return { productId: product.id, versionSlug: detectVersionSlug(path, product) };
 }

@@ -5,7 +5,7 @@ import '@fontsource/teko';
 
 const frontmatter = {
     title: "Unicorn Delivery Service",
-    description: "Explore guides and tutorials for the Unicorn Delivery Service platform",
+    description: "Explore the Unicorn Delivery Service (UDS) platform, a secure, standards-based software delivery system for National Security missions.",
     template: "splash",
     prev: false,
     next: false
@@ -13,7 +13,7 @@ const frontmatter = {
 
 ---
 <style>
-    /* Hide the auto-generated page title and its divider since our logo replaces it */
+    /* Hide the auto-generated page title */
     :global(.main-pane .content-panel:has(h1#_top)) {
         display: none;
     }
@@ -21,17 +21,12 @@ const frontmatter = {
         border-top: none;
     }
 
-    /* Custom hero */
     .custom-hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         text-align: center;
         padding: 2rem 0 1.5rem;
-    }
-
-    .custom-hero .hero-logo {
-        max-width: 28rem;
-        width: 100%;
-        height: auto;
-        margin: 0 auto;
     }
 
     .custom-hero .tagline {
@@ -42,18 +37,11 @@ const frontmatter = {
         color: var(--sl-color-gray-2);
     }
 
-    /* Theme-aware hero logo */
-    .hero-logo-light { display: none; }
-    .hero-logo-dark { display: block; }
-
     :root[data-theme='light'] {
         h2 {
             font-family: "Teko", sans-serif;
             color: #122248;
         }
-
-        .hero-logo-light { display: block; }
-        .hero-logo-dark { display: none; }
     }
 
     :root[data-theme='dark'] {
@@ -63,64 +51,34 @@ const frontmatter = {
         }
     }
 
-    html:where([data-has-sidebar]) {
-        --sl-content-width: 67.5rem;
-
-        .card > .body ul {
-            list-style: none outside none;
-            padding: 0;
+    @media (max-width: 50rem) {
+        .custom-hero .hero-logo {
+            max-width: 18rem;
         }
-
-        @media (min-width: 70rem) {
-            .card-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
-            }
-        }
-
-        @media (max-width: 50rem) {
-            .custom-hero .hero-logo {
-                max-width: 18rem;
-            }
-
-            .custom-hero .tagline {
-                font-size: 1.1rem;
-            }
+        .custom-hero .tagline {
+            font-size: 1.1rem;
         }
     }
-    /* Badge styles added inline, matching Starlight's sidebar */
-    .sl-badge.tip {
-        display: inline-block;
-        border: 1px solid hsl(281, 82%, 63%); /* Exact border */
-        border-radius: 0.25rem;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        line-height: normal; /* Match sidebar line height */
-        color: #fff;
-        background-color: hsl(281, 39%, 22%);
-        overflow-wrap: anywhere;
-        font-size: 0.8125rem;
-        padding: 0.125rem 0.375rem;
-        margin-left: 0.5rem;
+
+    .section-divider {
+        border: none;
+        border-top: 1px solid var(--sl-color-hairline);
+        margin: 2rem 0;
     }
 
-    .sl-badge.small {
-        padding: 0.2rem 0.5rem; /* Adjusted padding */
+    .card-logo {
+        height: 2.5rem;
+        width: auto;
+        margin-bottom: 0.5rem;
+        display: block;
     }
 
-    .doc-links {
-        list-style: none;
-        padding: 0;
-        margin: 0.75rem 0 0;
-        display: grid;
-        gap: 0.35rem;
-    }
+    .card-logo.card-logo-light { display: none; }
+    .card-logo.card-logo-dark { display: block; }
 
-    .doc-links a {
-        text-decoration: none;
-    }
-
-    .doc-links a:hover {
-        text-decoration: underline;
+    :root[data-theme='light'] {
+        .card-logo.card-logo-light { display: block; }
+        .card-logo.card-logo-dark { display: none; }
     }
 
     .callout-stack {
@@ -146,22 +104,21 @@ const frontmatter = {
         font-size: 0.93rem;
     }
 
-    .icon-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        text-decoration: none;
-        font-weight: 600;
+    /* Stretch-link: makes the whole card clickable */
+    :global(.card:has(.card-link)) {
+        position: relative;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
     }
 
-    .icon-link:hover {
-        text-decoration: underline;
+    :global(.card:has(.card-link):hover) {
+        border-color: var(--sl-color-text-accent);
     }
 
-    .icon-link svg {
-        width: 1rem;
-        height: 1rem;
-        display: inline-block;
+    .card-link {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
     }
 
     :global(.content-panel) {
@@ -169,78 +126,74 @@ const frontmatter = {
     }
 </style>
 
-<StarlightPage frontmatter={frontmatter} hasSidebar={true}>
+<StarlightPage frontmatter={frontmatter} hasSidebar={false}>
     <div class="custom-hero">
-        <h1 class="sr-only">UDS Core</h1>
-        <img src="/assets/UDS_Core_Logo_White.svg" alt="UDS Core" class="hero-logo hero-logo-dark" />
-        <img src="/assets/UDS_Core_Logo_Dark.svg" alt="UDS Core" class="hero-logo hero-logo-light" />
-        <p class="tagline">A secure software delivery product built for National Security missions.</p>
+        <h1 class="sr-only">Unicorn Delivery Service</h1>
+        <img src="/assets/UDS_Logo_White.svg" alt="Unicorn Delivery Service" class="hero-logo hero-logo-dark" />
+        <img src="/assets/UDS_Logo_Dark.svg" alt="Unicorn Delivery Service" class="hero-logo hero-logo-light" />
+        <p class="tagline">A secure software delivery platform built for National Security missions.</p>
     </div>
-    <div class="space-y-8">
-        <CardGrid>
-            <Card title="Overview">
-                <p>Start here to understand what UDS Core is and why it exists.</p>
-                <ul class="doc-links">
-                    <li>
-                        <a class="no-underline" href="/ecosystem/">Overview of UDS</a>
-                    </li>
-                    <li>
-                        <a class="no-underline" href="/uds-core/">UDS Core overview</a>
-                    </li>
-                </ul>
-            </Card>
 
-            <Card title="Getting Started">
-                <p>Choose a path to try UDS Core in a demo or production-like environment.</p>
-                <ul class="doc-links">
-                    <li>
-                        <a class="no-underline" href="/getting-started/local-demo/overview/">Local demo (quickstart)</a>
-                    </li>
-                    <li>
-                        <a class="no-underline" href="/getting-started/production/overview/">Production deployments</a>
-                    </li>
-                </ul>
-            </Card>
+    <p>
+        The Unicorn Delivery Service (UDS) is a software delivery platform built for teams operating in secure,
+        constrained, or disconnected environments. It addresses a common challenge in defense and enterprise
+        computing: getting modern software with all its dependencies into environments where internet access is
+        limited or absent, compliance requirements are strict, and one-off platform configurations are a constant
+        maintenance burden.
+    </p>
 
-            <Card title="Concepts & How‑to Guides">
-                <p>Learn how UDS Core works, then apply it with task-focused guides.</p>
-                <ul class="doc-links">
-                    <li>
-                        <a class="no-underline" href="/concepts/overview/">Concepts overview</a>
-                    </li>
-                    <li>
-                        <a class="no-underline" href="/how-to-guides/overview/">How‑to Guides overview</a>
-                    </li>
-                </ul>
-            </Card>
+    <p>
+        UDS provides a consistent, repeatable way to package, deliver, and run software across cloud, on-premises,
+        and tactical edge environments. Whether you are standing up a new system quickly, maintaining an existing
+        platform through software updates, or seeking an Authority to Operate (ATO), UDS gives teams the tooling
+        and evidence to do so with confidence.
+    </p>
 
-            <Card title="Operations & Reference">
-                <p>Operate UDS Core over time and look up exact configuration details.</p>
-                <ul class="doc-links">
-                    <li>
-                        <a class="no-underline" href="/operations/overview/">Operations & Maintenance overview</a>
-                    </li>
-                    <li>
-                        <a class="no-underline" href="/reference/overview/">Reference overview</a>
-                    </li>
-                </ul>
-            </Card>
-        </CardGrid>
-    </div>
+    <ul>
+        <li><strong>Deploy anywhere</strong> - Ship software to classified and unclassified cloud, on-premises, and edge environments from a single artifact.</li>
+        <li><strong>Work disconnected</strong> - Operate fully offline with airgap-native packaging that carries all dependencies with it.</li>
+        <li><strong>Reduce platform one-offs</strong> - Share a common runtime baseline so application teams do not need to reinvent platform concerns for each deployment.</li>
+        <li><strong>Support authorization</strong> - Produce the compliance documentation and evidence needed to facilitate ATO processes.</li>
+        <li><strong>Stay vendor-neutral</strong> - Build on open-source foundations (Zarf, Pepr) with no proprietary lock-in.</li>
+    </ul>
+
+    <hr class="section-divider" />
+
+    <h2>Key Building Blocks</h2>
+
+    <CardGrid>
+        <Card title="UDS Core">
+            <img src="/assets/UDS_Core_Logo_White.svg" alt="UDS Core" class="card-logo card-logo-dark" />
+            <img src="/assets/UDS_Core_Logo_Dark.svg" alt="UDS Core" class="card-logo card-logo-light" />
+            The runtime platform that provides shared, security-hardened services to every application deployed on top of it. Handles networking, identity, logging, monitoring, runtime security, and compliance.
+            <a href="/core/" class="card-link" aria-label="UDS Core"></a>
+        </Card>
+
+        <Card title="UDS CLI">
+            <img src="/assets/UDS_CLI_Logo_White.svg" alt="UDS CLI" class="card-logo card-logo-dark" />
+            <img src="/assets/UDS_CLI_Logo_Dark.svg" alt="UDS CLI" class="card-logo card-logo-light" />
+            The primary interface for packaging, deploying, and managing software on UDS Core. Designed for workflows from local development to production operations.
+            <a href="/cli/" class="card-link" aria-label="UDS CLI"></a>
+        </Card>
+
+        <Card title="UDS Registry">
+            <img src="/assets/UDS_Registry_Logo_White.svg" alt="UDS Registry" class="card-logo card-logo-dark" />
+            <img src="/assets/UDS_Registry_Logo_Dark.svg" alt="UDS Registry" class="card-logo card-logo-light" />
+            A curated catalog of pre-built, scanned, and SBOMed UDS packages. Browse available packages, inspect CVE reports, and pull artifacts to deploy.
+            <a href="https://registry.defenseunicorns.com/" class="card-link" aria-label="UDS Registry" target="_blank" rel="noopener noreferrer"></a>
+        </Card>
+
+        <Card title="Open-Source Foundation">
+            UDS is built on open-source projects created by Defense Unicorns:
+            <p><strong><a href="https://docs.zarf.dev/" target="_blank">Zarf</a></strong> — airgap packaging and delivery for Kubernetes workloads.</p>
+            <p><strong><a href="https://docs.pepr.dev/" target="_blank">Pepr</a></strong> — policy engine and Kubernetes operator automation.</p>
+        </Card>
+    </CardGrid>
+
+    <hr class="section-divider" />
+
     <div class="callout-stack">
-        <div class="callout involve-callout">
-            <strong>Get Involved:</strong>
-            <ul class="callout-links">
-                <li>
-                    <a class="icon-link" href="https://github.com/defenseunicorns/uds-core" target="_blank">
-                        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4.01 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-                        UDS Core on GitHub
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="callout llm-callout">
+        <div class="callout">
             <strong>Docs for LLMs:</strong> machine-readable snapshots for assistants and automation.
             <ul class="callout-links">
                 <li><a href="/llms.txt">llms.txt</a> — listing of available files</li>

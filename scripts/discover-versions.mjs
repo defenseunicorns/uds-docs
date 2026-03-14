@@ -117,7 +117,8 @@ async function main() {
 
         // Pin the source branch to the latest release tag so "Latest" docs are
         // stable and don't change from unreleased commits on main.
-        if (latestTag && entry.sources) {
+        // Only auto-pin if no explicit branch was set in products.json.
+        if (latestTag && entry.sources && !product.source?.branch) {
           entry.sources[0].branch = latestTag;
         }
         entry.versionRepo = versionRepo;

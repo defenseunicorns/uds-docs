@@ -86,7 +86,7 @@ export default defineConfig({
       plugins: [
         starlightGitHubAlerts(),
         starlightLinksValidator({
-          exclude: ({ slug }) => slug === '404' || /(?:^|\/)v\d+-\d+\//.test(slug),
+          exclude: ({ slug }) => /(?:^|\/)404$/.test(slug) || /(?:^|\/)v\d+-\d+\//.test(slug),
         }),
         starlightImageZoom(),
         starlightLlmsTxt({
@@ -102,11 +102,12 @@ export default defineConfig({
             { label: 'Zarf Docs', url: 'https://docs.zarf.dev/' },
           ],
           customSets: [
-            { label: 'Getting Started', paths: ['getting-started/**'], description: 'Install and first steps.' },
-            { label: 'Concepts', paths: ['concepts/**'], description: 'How UDS Core works and its major features.' },
-            { label: 'Operations & Maintenance', paths: ['operations/**'], description: 'Day-2 operations, upgrades, and runbooks.' },
+            { label: 'Getting Started', paths: ['core/getting-started/**'], description: 'Install and first steps.' },
+            { label: 'Concepts', paths: ['core/concepts/**'], description: 'How UDS Core works and its major features.' },
+            { label: 'Operations & Maintenance', paths: ['core/operations/**'], description: 'Day-2 operations, upgrades, and runbooks.' },
+            { label: 'CLI', paths: ['cli/**'], description: 'UDS CLI reference and usage.' },
           ],
-          promote: ['index*', 'getting-started/**', 'overview/**', 'concepts/**', 'reference/cli/**', 'operations/**'],
+          promote: ['index*', 'core/getting-started/**', 'core/overview/**', 'core/concepts/**', 'core/reference/cli/**', 'core/operations/**', 'cli/**'],
           minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
           pageSeparator: '\n\n-----\n\n',
           rawContent: true,
@@ -150,7 +151,7 @@ export default defineConfig({
       social: [
         {
           icon: 'github',
-          href: 'https://github.com/defenseunicorns/uds-core',
+          href: 'https://github.com/defenseunicorns',
           label: 'GitHub'
         }
       ],
