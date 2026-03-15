@@ -16,7 +16,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 {/* Clear persisted sidebar state BEFORE Starlight's restore script runs,
     so the sidebar always reflects the current page's tree on navigation. */}
 <script is:inline>
-  try { sessionStorage.removeItem("sl-sidebar-state"); } catch {}
+  try { sessionStorage.removeItem("sl-sidebar-state"); } catch { /* sessionStorage may throw in private browsing */ }
 </script>
 
 {/* Render the default sidebar. */}
@@ -41,19 +41,18 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
     margin-top: 0;
   }
 
-  /* Change the dropdown menu background color for better visibility */
+  /* Override starlight-sidebar-topics-dropdown plugin styles — !important required
+     because the plugin injects its own styles with high specificity. */
   :global(.starlight-sidebar-topics-dropdown-menu) {
     background-color: var(--sl-color-bg) !important;
     border: 1px solid var(--sl-color-gray-5) !important;
   }
 
-  /* Add hover effect to dropdown button */
   :global(.starlight-sidebar-topics-dropdown-button:hover) {
     background-color: var(--sl-color-gray-5) !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
-  /* Add hover effect to dropdown menu items */
   :global(.starlight-sidebar-topics-dropdown-item:hover) {
     background-color: var(--sl-color-gray-4) !important;
     transform: translateX(4px);
@@ -65,6 +64,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 <script is:inline>
   // Hide versioned topics from the product dropdown — versions use the VersionPicker instead.
   // Runs immediately so there's no flash of versioned items in the dropdown.
+  // Note: version slug pattern must match VERSION_SLUG_PATTERN in productUtils.ts.
   (() => {
     const versionPattern = /\/v\d+-\d+\//;
     document.querySelectorAll('.starlight-sidebar-topics-dropdown-menu a').forEach(a => {
@@ -77,6 +77,10 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 
 <script is:inline>
   (() => {
+    // Sidebar group labels (e.g. "Getting Started") navigate to the section's overview page
+    // when clicked, rather than just toggling the group open/closed. This set defines which
+    // URL slugs count as "overview" pages. Case variants handle renamed directories from
+    // the integration script's title-casing step.
     const OVERVIEW_SLUGS = new Set(["overview", "Overview", "index", "Index"]);
     const strip = (href) => href.split("#")[0].split("?")[0];
 
@@ -114,7 +118,8 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       const nav = document.querySelector("nav");
       if (!nav) return;
 
-      // Only the label text navigates; clicking anywhere else on the row just toggles
+      // Only the label text navigates; clicking anywhere else on the row just toggles.
+      // Keyboard accessible: <summary> fires click on Enter/Space natively.
       nav.addEventListener(
         "click",
         (e) => {

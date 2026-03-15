@@ -25,6 +25,7 @@
       try {
         window.posthog.init('phc_bXFVKWRZnEDUWbXQf3VjlAHeemyJDSsTqkpvDINHGFG', config);
       } catch (error) {
+        console.warn('PostHog: init with window.posthog failed, using fallback', error);
         posthog.init('phc_bXFVKWRZnEDUWbXQf3VjlAHeemyJDSsTqkpvDINHGFG', {api_host: 'https://us.i.posthog.com'});
       }
     }
@@ -53,20 +54,23 @@
           if (distinctId || sessionId) {
             event.preventDefault();
 
-            var hashParams = new URLSearchParams();
+            var trackedUrl = new URL(link.href);
+            // Use hash params for privacy — hash fragments aren't sent to servers.
+            var existingHash = trackedUrl.hash ? trackedUrl.hash.substring(1) : '';
+            var hashParams = new URLSearchParams(existingHash);
             if (distinctId) hashParams.set('distinct_id', distinctId);
             if (sessionId) hashParams.set('session_id', sessionId);
-
-            var trackedUrl = link.href + (link.href.includes('#') ? '&' : '#') + hashParams.toString();
+            trackedUrl.hash = hashParams.toString();
 
             if (link.target === '_blank' || event.ctrlKey || event.metaKey) {
-              window.open(trackedUrl, '_blank');
+              window.open(trackedUrl.href, '_blank');
             } else {
-              window.location.href = trackedUrl;
+              window.location.href = trackedUrl.href;
             }
           }
         }
       } catch (error) {
+        /* intentionally silent — external link tracking is best-effort */
       }
     });
   }

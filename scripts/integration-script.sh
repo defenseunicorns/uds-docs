@@ -2,10 +2,14 @@
 set -e
 
 TARGET_DIR="src/content/docs/"
+CONFIG_DIR=".product-configs"
 
-# DOCS_OVERRIDES="uds-core=/abs/path;uds-identity-config=/abs/path2"
+# DOCS_OVERRIDES="uds-core=/abs/path;uds-cli=/abs/path2"
 # Keys are repo names (e.g. "uds-core" from "defenseunicorns/uds-core").
 # When set, the local path is used instead of cloning from GitHub.
+# Version-specific overrides use repo-name@tag as the key:
+#   DOCS_OVERRIDES="uds-core=/path/to/latest;uds-core@v0.62.0=/path/to/old-version"
+# The version-specific key is checked first; falls back to the repo-level key.
 
 declare -A OVERRIDES
 if [[ -n "${DOCS_OVERRIDES:-}" ]]; then
@@ -30,21 +34,6 @@ clone_repo() {
   git clone --branch "$branch" --depth 1 --single-branch "$repo_url" "$target_dir"
 }
 
-# Copies a docs/ source directory into a target directory.
-# mode "base" clears the target first; "overlay" preserves existing files.
-# $3 = destination directory (defaults to TARGET_DIR)
-copy_docs() {
-  local src="$1"
-  local mode="$2"
-  local dest="${3:-$TARGET_DIR}"
-  mkdir -p "$dest"
-  if [[ "$mode" == "base" ]]; then
-    rsync -rt --delete --force --exclude='404.md' "$src/" "$dest/"
-  else
-    rsync -rt "$src/" "$dest/"
-  fi
-}
-
 # Copies a LikeC4 .c4 model directory into TARGET_DIR/.c4.
 copy_c4() {
   local src="$1"
@@ -53,103 +42,175 @@ copy_c4() {
   cp -r "$src/." "${TARGET_DIR}/.c4/"
 }
 
+# Read upstream docs.config.json and write to .product-configs/.
+# Args: $1=source_dir (containing docs.config.json), $2=repo, $3=config_filename
+write_product_config() {
+  local source_dir="$1"
+  local repo="$2"
+  local config_file="$3"
+  local config_path="${source_dir}/docs.config.json"
+
+  if [[ -f "$config_path" ]]; then
+    # Merge repo into the upstream config
+    jq --arg repo "$repo" '. + {repo: $repo}' "$config_path" > "${CONFIG_DIR}/${config_file}"
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Extract contentDir from a product config file
+get_content_dir() {
+  jq -r '.contentDir' "${CONFIG_DIR}/$1"
+}
+
+# Remove directories not listed in sidebarOrder from a target directory.
+# Only directories in sidebarOrder should be on disk — anything else causes Starlight
+# to find orphaned pages with no sidebar topic. Keeps dot-dirs (.c4, .images) and version dirs.
+# Args: $1=target_dir, $2=config_file_path, $3=label_for_logging
+cleanup_unlisted_dirs() {
+  local target="$1"
+  local config="$2"
+  local label="$3"
+  [[ -f "$config" ]] || return
+  mapfile -t allowed_dirs < <(jq -r '(.sidebarOrder // [])[] | if type == "string" then . else .dir end' "$config")
+  for dir in "$target"/*/; do
+    [[ -d "$dir" ]] || continue
+    local dir_name
+    dir_name=$(basename "$dir")
+    [[ "$dir_name" == .* ]] && continue
+    # Version dir pattern — must match VERSION_SLUG_PATTERN in src/productUtils.ts
+    [[ "$dir_name" =~ ^v[0-9]+-[0-9]+$ ]] && continue
+    local found=false
+    for allowed in "${allowed_dirs[@]}"; do
+      [[ "$dir_name" == "$allowed" ]] && found=true && break
+    done
+    if [[ "$found" == false ]]; then
+      echo "  Removing unlisted directory: ${label}/${dir_name}"
+      rm -rf "$dir"
+    fi
+  done
+}
+
+# Print a formatted error about a missing docs.config.json and exit.
+# Args: $1=location description (e.g. "local override for 'uds-core'" or "defenseunicorns/uds-core@main")
+missing_config_error() {
+  echo ""
+  echo -e "\033[1;31mERROR: docs/docs.config.json not found in ${1}."
+  echo ""
+  echo "  Each product repo must have a docs/docs.config.json file that defines"
+  echo "  the product's id, label, contentDir, and sidebarOrder."
+  echo ""
+  echo -e "  See CONTRIBUTING.md → 'Upstream config file' for the schema and an example.\033[0m"
+  echo ""
+  exit 1
+}
+
 echo "Preparing target directory: $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
+mkdir -p "$CONFIG_DIR"
 mkdir -p temp
 
 # Generate .versions metadata from GitHub releases
-node scripts/discover-versions.mjs
+node scripts/discover-versions.mjs || {
+  echo -e "\033[1;31mERROR: discover-versions.mjs failed. Cannot proceed without .versions.\033[0m"
+  exit 1
+}
 
-# --- Step 1: Clone and copy docs from .versions ---
-# Products and their sources are driven by src/products.json via scripts/discover-versions.mjs.
-# To add or remove a product, edit products.json — no changes needed here.
+# --- Step 1: Clone and copy latest docs ---
 
 if [[ ! -f .versions ]]; then
-  echo "Error: .versions not found. Run 'node scripts/discover-versions.mjs' first."
+  echo -e "\033[1;31mERROR: .versions not found after running discover-versions.mjs.\033[0m"
   exit 1
 fi
 
-while IFS= read -r product_id; do
-  contentDir=$(jq -r --arg id "$product_id" '.[$id].contentDir' .versions)
-  dest_dir="${TARGET_DIR}${contentDir}"
-  source_len=$(jq --arg id "$product_id" '.[$id].sources // [] | length' .versions)
+while IFS= read -r repo; do
+  branch=$(jq -r --arg r "$repo" '.[$r].branch // "main"' .versions)
+  repo_name="${repo##*/}"
+  temp_dir="./temp/${repo_name}"
+  docs_source=""
 
-  for (( si=0; si<source_len; si++ )); do
-    repo_full=$(jq -r --arg id "$product_id" --argjson i "$si" '.[$id].sources[$i].repo' .versions)
-    branch=$(jq -r --arg id "$product_id" --argjson i "$si" '.[$id].sources[$i].branch // "main"' .versions)
-    docsPath=$(jq -r --arg id "$product_id" --argjson i "$si" '.[$id].sources[$i].docsPath // "docs"' .versions)
-    mode=$(jq -r --arg id "$product_id" --argjson i "$si" '.[$id].sources[$i].mode // "overlay"' .versions)
-
-    repo_name="${repo_full##*/}"
-    temp_dir="./temp/${repo_name}"
-
-    if [[ ${OVERRIDES[$repo_name]+_} ]]; then
-      local_path="${OVERRIDES[$repo_name]}"
-      echo "Using local override for '$repo_name': $local_path"
-      if [[ ! -d "$local_path/${docsPath}" ]]; then
-        echo "Warning: override source '$local_path/${docsPath}' not found; skipping."
-        continue
-      fi
-      echo "Copying docs ($mode) from $local_path/${docsPath}/ to $dest_dir"
-      copy_docs "$local_path/${docsPath}" "$mode" "$dest_dir"
-    else
-      clone_repo "https://github.com/${repo_full}" "$branch" "$temp_dir"
-      echo "Cloned ${repo_full}@${branch} into ${temp_dir}"
-      if [[ ! -d "${temp_dir}/${docsPath}" ]]; then
-        echo "Warning: no ${docsPath}/ found in ${repo_full}; skipping."
-        continue
-      fi
-      echo "Copying docs ($mode) from ${temp_dir}/${docsPath}/ to $dest_dir"
-      copy_docs "${temp_dir}/${docsPath}" "$mode" "$dest_dir"
+  if [[ ${OVERRIDES[$repo_name]+_} ]]; then
+    local_path="${OVERRIDES[$repo_name]}"
+    echo "Using local override for '$repo_name': $local_path"
+    if [[ ! -d "$local_path/docs" ]]; then
+      echo "Warning: override source '$local_path/docs' not found; skipping."
+      continue
     fi
-  done
+    docs_source="$local_path/docs"
+    if ! write_product_config "$local_path/docs" "$repo" "${repo_name}.json"; then
+      missing_config_error "local override for '${repo_name}'"
+    fi
+  else
+    clone_repo "https://github.com/${repo}" "$branch" "$temp_dir"
+    echo "Cloned ${repo}@${branch} into ${temp_dir}"
+    if [[ ! -d "${temp_dir}/docs" ]]; then
+      echo "Warning: no docs/ found in ${repo}; skipping."
+      continue
+    fi
+    docs_source="${temp_dir}/docs"
+    if ! write_product_config "${temp_dir}/docs" "$repo" "${repo_name}.json"; then
+      missing_config_error "${repo}@${branch}"
+    fi
+  fi
+
+  contentDir=$(get_content_dir "${repo_name}.json")
+  if [[ -z "$contentDir" || "$contentDir" == "null" ]]; then
+    echo -e "\033[1;31mERROR: contentDir is missing or empty in docs.config.json for ${repo}.\033[0m"
+    exit 1
+  fi
+  dest_dir="${TARGET_DIR}${contentDir}"
+
+  echo "Copying docs from ${docs_source}/ to ${dest_dir}"
+  mkdir -p "$dest_dir"
+  rsync -rt --delete --exclude='404.md' --exclude='docs.config.json' "$docs_source/" "$dest_dir/"
+
+  cleanup_unlisted_dirs "$dest_dir" "${CONFIG_DIR}/${repo_name}.json" "$contentDir"
+
+  # Copy LikeC4 model if present (stays at TARGET_DIR root for the Vite plugin)
+  if [[ -d "${docs_source}/.c4" ]]; then
+    echo "Copying LikeC4 model from ${docs_source}/.c4"
+    copy_c4 "${docs_source}/.c4"
+  fi
 done < <(jq -r 'keys[]' .versions)
 
-# Copy LikeC4 model if present in any cloned temp dir (stays at TARGET_DIR root for the Vite plugin)
-for temp_product_dir in ./temp/*/; do
-  [[ -d "$temp_product_dir" ]] || continue
-  repo_name="${temp_product_dir##./temp/}"
-  repo_name="${repo_name%/}"
-  if [[ ${OVERRIDES[$repo_name]+_} ]]; then
-    c4_src="${OVERRIDES[$repo_name]}/docs/.c4"
-  else
-    c4_src="${temp_product_dir}docs/.c4"
-  fi
-  if [[ -d "$c4_src" ]]; then
-    echo "Copying LikeC4 model from $c4_src"
-    copy_c4 "$c4_src"
-    break
-  fi
-done
-
-# Rewrite root-relative internal links for each product to use their contentDir prefix.
+# --- Step 2: Rewrite root-relative internal links ---
 # Upstream docs may reference sections with root-relative paths like /reference/, /overview/, etc.
 # After placing content under /contentDir/, these must become /contentDir/reference/ etc.
-DEFAULT_SECTIONS=(overview getting-started concepts how-to-guides reference operations)
+# Section names come from the upstream docs.config.json sidebarOrder.
 
-while IFS= read -r product_id; do
-  contentDir=$(jq -r --arg id "$product_id" '.[$id].contentDir' .versions)
+for config_file in "${CONFIG_DIR}"/*.json; do
+  [[ -f "$config_file" ]] || continue
+  # Skip version-specific configs
+  [[ "$config_file" == *".v"* ]] && continue
+
+  contentDir=$(jq -r '.contentDir' "$config_file")
   [[ -z "$contentDir" ]] && continue
   [[ ! -d "${TARGET_DIR}${contentDir}" ]] && continue
 
+  # Extract section dirs from sidebarOrder (handles both string and object entries)
+  mapfile -t sections < <(jq -r '(.sidebarOrder // [])[] | if type == "string" then . else .dir end' "$config_file")
+
+  [[ ${#sections[@]} -eq 0 ]] && continue
+
   echo "Rewriting root-relative links in ${contentDir} docs to /${contentDir}/ prefix..."
   sed_args=()
-  for section in "${DEFAULT_SECTIONS[@]}"; do
+  for section in "${sections[@]}"; do
     sed_args+=(-e "s|](/${section}/|](/${contentDir}/${section}/|g")
     sed_args+=(-e "s|href=\"/${section}/|href=\"/${contentDir}/${section}/|g")
   done
   while IFS= read -r file; do
     sed -i.bak "${sed_args[@]}" "$file" && rm -f "${file}.bak"
-  done < <(find "${TARGET_DIR}${contentDir}" -maxdepth 5 -type f \( -name "*.md" -o -name "*.mdx" \) -not -path '*/v[0-9]*/*')
-done < <(jq -r 'keys[]' .versions)
+  done < <(find "${TARGET_DIR}${contentDir}" -maxdepth 5 -type f \( -name "*.md" -o -name "*.mdx" \) -not -path '*/v[0-9]*-[0-9]*/*')
+done
 
-# Create per-product 404 pages. The root /404 page is associated with the first
-# product's sidebar topic so the dropdown and sidebar render correctly on 404s.
-# Each product also gets its own 404 page so the client-side swap script can
-# fetch it and show the correct sidebar when a non-versioned URL 404s.
+# Create per-product 404 pages.
 echo "Creating per-product 404 pages..."
-while IFS= read -r product_id; do
-  contentDir=$(jq -r --arg id "$product_id" '.[$id].contentDir' .versions)
+for config_file in "${CONFIG_DIR}"/*.json; do
+  [[ -f "$config_file" ]] || continue
+  [[ "$config_file" == *".v"* ]] && continue
+
+  contentDir=$(jq -r '.contentDir' "$config_file")
   [[ -z "$contentDir" ]] && continue
   [[ ! -d "${TARGET_DIR}${contentDir}" ]] && continue
 
@@ -168,31 +229,35 @@ The page you're looking for doesn't exist or may have moved.
 
 Use the sidebar to navigate, or return to the product home.
 MDEOF
-done < <(jq -r 'keys[]' .versions)
+done
 
-# --- Step 2: Clone archived versioned docs ---
+# --- Step 3: Clone archived versioned docs ---
 
-# Remove any stale versioned directories from previous builds
-find "$TARGET_DIR" -maxdepth 1 -type d -name 'v[0-9]*' -exec rm -rf {} + 2>/dev/null || true
-# Also clean versioned dirs inside product subdirs (e.g. my-product/v1-2/)
+# Remove any stale versioned directories from previous builds.
+# Version dir pattern must match VERSION_SLUG_PATTERN in src/productUtils.ts.
+find "$TARGET_DIR" -maxdepth 1 -type d -name 'v[0-9]*-[0-9]*' -exec rm -rf {} + 2>/dev/null || true
+# Also clean versioned dirs inside product subdirs (e.g. core/v0-61/)
 for product_dir in "$TARGET_DIR"*/; do
   [[ -d "$product_dir" ]] || continue
-  find "$product_dir" -maxdepth 1 -type d -name 'v[0-9]*' -exec rm -rf {} + 2>/dev/null || true
+  find "$product_dir" -maxdepth 1 -type d -name 'v[0-9]*-[0-9]*' -exec rm -rf {} + 2>/dev/null || true
 done
 
 # Clone each archived version from .versions metadata
-for product_id in $(jq -r 'keys[]' .versions); do
-  repo_full=$(jq -r --arg id "$product_id" '.[$id].versionRepo // empty' .versions)
-  content_dir=$(jq -r --arg id "$product_id" '.[$id].contentDir' .versions)
-  docs_path=$(jq -r --arg id "$product_id" '.[$id].versionDocsPath // "docs"' .versions)
-  versions_csv=$(jq -r --arg id "$product_id" '.[$id].versions // [] | join(",")' .versions)
-
+while IFS= read -r repo; do
+  versions_csv=$(jq -r --arg r "$repo" '.[$r].versions // [] | join(",")' .versions)
   [[ -z "$versions_csv" ]] && continue
-  [[ -z "$repo_full" ]] && continue
 
-  override_key="${repo_full##*/}"
+  repo_name="${repo##*/}"
 
-  echo "Cloning versioned docs for $product_id from $repo_full..."
+  # We need contentDir from the latest config to know where to put versioned docs
+  latest_config="${CONFIG_DIR}/${repo_name}.json"
+  [[ ! -f "$latest_config" ]] && continue
+  content_dir=$(jq -r '.contentDir' "$latest_config")
+  product_id=$(jq -r '.id' "$latest_config")
+
+  override_key="$repo_name"
+
+  echo "Cloning versioned docs for ${product_id} from ${repo}..."
 
   IFS=',' read -ra vers <<< "$versions_csv"
   for ver in "${vers[@]}"; do
@@ -202,51 +267,69 @@ for product_id in $(jq -r 'keys[]' .versions); do
     # Build version slug: v0.61.0 → v0-61 (drop patch, dots → hyphens for Astro compat)
     ver_slug="$(echo "$ver" | sed 's/\.[^.]*$//' | tr '.' '-')"
 
-    # Build target path: Core → src/content/docs/v0-61, My Product → src/content/docs/my-product/v1-2
+    # Build target path: Core → src/content/docs/core/v0-61
     if [[ -n "$content_dir" ]]; then
       version_dir="${TARGET_DIR}${content_dir}/${ver_slug}"
     else
       version_dir="${TARGET_DIR}${ver_slug}"
     fi
 
-    temp_ver_dir="./temp/${product_id}-${ver}"
-    local_override="${OVERRIDES[$override_key]:-}"
+    temp_ver_dir="./temp/${repo_name}-${ver}"
+    # Check for version-specific override (repo-name@tag) first, then fall back to repo-level
+    local_override="${OVERRIDES[${override_key}@${ver}]:-${OVERRIDES[$override_key]:-}}"
+    ver_docs_source=""
 
     if [[ -n "$local_override" ]]; then
-      echo "Using local override for versioned ${product_id} (${ver})"
-      mkdir -p "$version_dir"
-      rsync -rt --delete --exclude='404.md' "$local_override/${docs_path}/" "$version_dir/"
+      echo "Using local override for versioned ${product_id} (${ver}): $local_override"
+      ver_docs_source="$local_override/docs"
     else
-      repo_url="https://github.com/${repo_full}"
+      repo_url="https://github.com/${repo}"
       if ! clone_repo "$repo_url" "$ver" "$temp_ver_dir"; then
         echo "Warning: could not clone ${product_id} at tag '${ver}'; skipping."
         continue
       fi
-      if [[ ! -d "${temp_ver_dir}/${docs_path}" ]]; then
-        echo "Warning: no ${docs_path}/ found for ${product_id} ${ver}; skipping."
+      if [[ ! -d "${temp_ver_dir}/docs" ]]; then
+        echo "Warning: no docs/ found for ${product_id} ${ver}; skipping."
         continue
       fi
-      mkdir -p "$version_dir"
-      rsync -rt --delete --exclude='404.md' "${temp_ver_dir}/${docs_path}/" "${version_dir}/"
+      ver_docs_source="${temp_ver_dir}/docs"
     fi
+
+    # Write version-specific product config — skip versions without docs.config.json
+    if ! write_product_config "$ver_docs_source" "$repo" "${repo_name}.${ver_slug}.json"; then
+      echo ""
+      echo -e "\033[1;33mWARNING: docs/docs.config.json not found in ${repo}@${ver}."
+      echo "  Skipping archived version ${ver}."
+      echo -e "  To include this version, backport docs/docs.config.json to the ${ver} tag.\033[0m"
+      echo ""
+      continue
+    fi
+
+    mkdir -p "$version_dir"
+    rsync -rt --delete --exclude='404.md' --exclude='docs.config.json' "$ver_docs_source/" "${version_dir}/"
+
+    # Remove directories not in this version's sidebarOrder
+    cleanup_unlisted_dirs "$version_dir" "${CONFIG_DIR}/${repo_name}.${ver_slug}.json" "${content_dir}/${ver_slug}"
 
     # Remove non-public directories
     rm -rf "${version_dir}/dev" "${version_dir}/adr"
     rm -f "${version_dir}/README.md"
 
-    # Create a landing page at the version root
-    cat > "${version_dir}/index.md" << EOF
----
-title: "${product_id^} ${ver}"
-pagefind: false
-sidebar:
-  hidden: true
----
-
-This is documentation for **${product_id^} ${ver}**.
-
-Use the version picker in the header to navigate between versions, or browse the sidebar to find content.
-EOF
+    # Rewrite root-relative links in versioned docs to use /{contentDir}/{versionSlug}/ prefix
+    ver_config="${CONFIG_DIR}/${repo_name}.${ver_slug}.json"
+    if [[ -f "$ver_config" ]]; then
+      mapfile -t ver_sections < <(jq -r '(.sidebarOrder // [])[] | if type == "string" then . else .dir end' "$ver_config")
+      if [[ ${#ver_sections[@]} -gt 0 ]]; then
+        ver_sed_args=()
+        for section in "${ver_sections[@]}"; do
+          ver_sed_args+=(-e "s|](/${section}/|](/${content_dir}/${ver_slug}/${section}/|g")
+          ver_sed_args+=(-e "s|href=\"/${section}/|href=\"/${content_dir}/${ver_slug}/${section}/|g")
+        done
+        while IFS= read -r file; do
+          sed -i.bak "${ver_sed_args[@]}" "$file" && rm -f "${file}.bak"
+        done < <(find "${version_dir}" -maxdepth 5 -type f \( -name "*.md" -o -name "*.mdx" \))
+      fi
+    fi
 
     # Create a 404 page for this version
     cat > "${version_dir}/404.md" << 'MDEOF'
@@ -267,21 +350,18 @@ MDEOF
 
     echo "Versioned docs for ${product_id} ${ver} written to ${version_dir}"
   done
-done
-
-# --- Step 3: Cleanup ---
-
-# Remove dev, adr, and README for all products (not for public docs site)
-echo "Removing dev/adr directories and READMEs"
-while IFS= read -r product_id; do
-  contentDir=$(jq -r --arg id "$product_id" '.[$id].contentDir' .versions)
-  product_dir="${TARGET_DIR}${contentDir}"
-  rm -rf "${product_dir}/dev" "${product_dir}/adr"
-  rm -f "${product_dir}/README.md"
 done < <(jq -r 'keys[]' .versions)
 
-# Remove the ecosystem overview doc — its content lives on the root index.astro page instead
-rm -f "${TARGET_DIR}core/overview/overview.mdx"
+# --- Step 4: Cleanup ---
+
+# Remove README files from product roots (not for public docs site).
+# Unlisted directories (dev, adr, etc.) are already removed by cleanup_unlisted_dirs.
+for config_file in "${CONFIG_DIR}"/*.json; do
+  [[ -f "$config_file" ]] || continue
+  [[ "$config_file" == *".v"* ]] && continue
+  contentDir=$(jq -r '.contentDir' "$config_file")
+  rm -f "${TARGET_DIR}${contentDir}/README.md"
+done
 
 # Rename hyphenated subdirectories to Title Case so Starlight uses them as
 # sidebar labels (e.g. "single-sign-on" -> "Single Sign-On").
@@ -300,6 +380,9 @@ SLUG_RENAMES=()
 while IFS= read -r dir; do
   base=$(basename "$dir")
   if [[ "$base" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)+$ ]]; then
+    # Title-case with special-case handling for acronyms and compound terms.
+    # Add new acronyms here when upstream repos introduce directory names that
+    # need non-standard casing (Starlight uses the directory name as the sidebar label).
     new_base=$(echo "$base" | sed -E 's/-/ /g' | awk '{
       if (tolower($0) == "single sign on") {
         print "Single Sign-On"
@@ -327,7 +410,7 @@ while IFS= read -r dir; do
       fi
     fi
   fi
-done < <(find "$TARGET_DIR" -mindepth 3 -depth -type d -not -path '*/.c4*' -not -path '*/.images*' -not -path '*/v[0-9]*')
+done < <(find "$TARGET_DIR" -depth -mindepth 3 -type d -not -path '*/.c4*' -not -path '*/.images*' -not -path '*/v[0-9]*-[0-9]*/*')
 
 # Rewrite internal links in all markdown files to use the updated slugs.
 if [[ ${#SLUG_RENAMES[@]} -gt 0 ]]; then

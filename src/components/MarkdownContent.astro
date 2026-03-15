@@ -1,9 +1,10 @@
 ---
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+import { VERSION_SLUG_PATTERN } from '../productUtils';
 
 // Determine the pagefind version filter for this page.
 // Archived pages contain a version slug segment (e.g. "v0-62"); current pages use "current".
-const version = Astro.url.pathname.split('/').find(s => /^v\d+-\d+$/.test(s)) ?? 'current';
+const version = Astro.url.pathname.split('/').find(s => VERSION_SLUG_PATTERN.test(s)) ?? 'current';
 ---
 
 <Default {...Astro.props}>

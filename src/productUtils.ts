@@ -6,6 +6,7 @@
  * injected via Vite define in astro.config.mjs.
  */
 
+// Injected at build time by Vite's define plugin in astro.config.mjs.
 declare const __PRODUCTS__: Array<{ id: string; label: string; link: string; githubRepo: string | null }>;
 declare const __PRODUCT_VERSIONS__: Record<string, string[]>;
 declare const __PRODUCT_LATEST_TAGS__: Record<string, string>;
@@ -18,6 +19,13 @@ export const productVersions: Record<string, string[]> =
 
 export const productLatestTags: Record<string, string> =
   typeof __PRODUCT_LATEST_TAGS__ !== 'undefined' ? __PRODUCT_LATEST_TAGS__ : {};
+
+/**
+ * Regex matching a version slug segment (e.g. "v0-61"). Single source of truth.
+ * Also duplicated in bash as `v[0-9]+-[0-9]+` in scripts/integration-script.sh
+ * and as `/\/v\d+-\d+\//` in Sidebar.astro (inline scripts can't import modules).
+ */
+export const VERSION_SLUG_PATTERN = /^v\d+-\d+$/;
 
 /** Convert semver tag to URL slug: v0.61.0 → v0-61 */
 export function versionSlug(ver: string): string {

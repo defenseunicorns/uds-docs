@@ -1,29 +1,10 @@
 [
   {
-    "id": "core",
-    "label": "Core",
-    "link": "/core/",
-    "contentDir": "core",
-    "unlistedPaths": ["/core", "/core/404", "/404"],
-    "source": {
-      "repo": "defenseunicorns/uds-core",
-      "branch": "chance/core-406-make-core-docs-use-their-own-path-v2",
-      "mode": "base"
-    },
-    "versioning": {
-      "archiveCount": 1
-    }
+    "repo": "defenseunicorns/uds-core",
+    "branch": "implement-docs-config"
   },
   {
-    "id": "cli",
-    "label": "CLI",
-    "link": "/cli/",
-    "contentDir": "cli",
-    "unlistedPaths": ["/cli", "/cli/404"],
-    "source": {
-      "repo": "defenseunicorns/uds-cli",
-      "branch": "initial-docs-refresh",
-      "docsPath": "docs"
-    }
+    "repo": "defenseunicorns/uds-cli",
+    "branch": "implement-docs-config"
   }
 ]
