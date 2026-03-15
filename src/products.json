@@ -2,11 +2,6 @@
   {
     "id": "core",
     "label": "Core",
-<<<<<<< Updated upstream
-    "link": "/",
-    "contentDir": "",
-    "unlistedPaths": ["/404"],
-=======
     "link": "/core/",
     "contentDir": "core",
     "unlistedPaths": ["/core", "/core/404", "/404"],
@@ -17,7 +12,6 @@
       "reference",
       { "dir": "operations", "label": "Operations & Maintenance" }
     ],
->>>>>>> Stashed changes
     "source": {
       "repo": "defenseunicorns/uds-core",
       "mode": "base"
@@ -25,8 +19,6 @@
     "versioning": {
       "archiveCount": 1
     }
-<<<<<<< Updated upstream
-=======
   },
   {
     "id": "cli",
@@ -40,6 +32,5 @@
       "branch": "initial-docs-refresh",
       "docsPath": "docs"
     }
->>>>>>> Stashed changes
   }
 ]

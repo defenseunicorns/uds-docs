@@ -117,20 +117,12 @@ export default defineConfig({
             { label: 'Zarf Docs', url: 'https://docs.zarf.dev/' },
           ],
           customSets: [
-<<<<<<< Updated upstream
-            { label: 'Getting Started', paths: ['getting-started/**'], description: 'Install and first steps.' },
-            { label: 'Concepts', paths: ['concepts/**'], description: 'How UDS Core works and its major features.' },
-            { label: 'Operations & Maintenance', paths: ['operations/**'], description: 'Day-2 operations, upgrades, and runbooks.' },
-          ],
-          promote: ['index*', 'getting-started/**', 'overview/**', 'concepts/**', 'reference/cli/**', 'operations/**'],
-=======
             { label: 'Getting Started', paths: ['core/getting-started/**'], description: 'Install and first steps.' },
             { label: 'Concepts', paths: ['core/concepts/**'], description: 'How UDS Core works and its major features.' },
             { label: 'Operations & Maintenance', paths: ['core/operations-and-maintenance/**'], description: 'Day-2 operations, upgrades, and runbooks.' },
             { label: 'CLI', paths: ['cli/**'], description: 'UDS CLI reference and usage.' },
           ],
           promote: ['index*', 'core/getting-started/**', 'core/overview/**', 'core/concepts/**', 'core/reference/cli/**', 'core/operations-and-maintenance/**', 'cli/**'],
->>>>>>> Stashed changes
           minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
           pageSeparator: '\n\n-----\n\n',
           rawContent: true,
