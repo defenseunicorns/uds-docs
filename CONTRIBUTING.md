@@ -2,7 +2,7 @@
 
 This guide explains how to contribute content to the UDS documentation site. It is tailored for documentation authors (not application developers) and covers local setup, where content lives, navigation, redirects, and style guidance.
 
-## Table of Contents
+## Table of Contents 
 1. [Project Overview](#project-overview)
 2. [Local Development](#local-development)
 3. [Content Structure](#content-structure)
