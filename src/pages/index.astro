@@ -108,11 +108,12 @@ const frontmatter = {
     :global(.card:has(.card-link)) {
         position: relative;
         cursor: pointer;
-        transition: border-color 0.2s ease;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
     }
 
     :global(.card:has(.card-link):hover) {
         border-color: var(--sl-color-text-accent);
+        background-color: var(--sl-color-card-muted);
     }
 
     .card-link {
