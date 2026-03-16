@@ -275,8 +275,8 @@ while IFS= read -r repo; do
     fi
 
     temp_ver_dir="./temp/${repo_name}-${ver}"
-    # Check for version-specific override (repo-name@tag) first, then fall back to repo-level
-    local_override="${OVERRIDES[${override_key}@${ver}]:-${OVERRIDES[$override_key]:-}}"
+    # Check for version-specific override (repo-name@tag); no fallback to repo-level key
+    local_override="${OVERRIDES[${override_key}@${ver}]:-}"
     ver_docs_source=""
 
     if [[ -n "$local_override" ]]; then
@@ -294,9 +294,6 @@ while IFS= read -r repo; do
       fi
       ver_docs_source="${temp_ver_dir}/docs"
     fi
-    mkdir -p "$version_dir"
-    rsync -rt --delete --exclude='404.md' "${temp_ver_dir}/${docs_path}/" "${version_dir}/"
-
     # Write version-specific product config — skip versions without docs.config.json
     if ! write_product_config "$ver_docs_source" "$repo" "${repo_name}.${ver_slug}.json"; then
       echo ""

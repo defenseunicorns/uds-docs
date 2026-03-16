@@ -9,10 +9,48 @@
  *
  * Respects GITHUB_TOKEN env var for authenticated API requests.
  * Per-repo env overrides: VERSIONS_uds_core=v0.61.0,v0.60.0
+ *
+ * archiveCount is read from each product's upstream docs/docs.config.json.
+ * When DOCS_OVERRIDES is set, the local path is used instead of fetching from GitHub.
  */
 import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 const PRODUCTS = JSON.parse(readFileSync(new URL('../src/products.json', import.meta.url), 'utf8'));
+
+// Parse DOCS_OVERRIDES="uds-core=/path;uds-cli=/path2" — repo-level keys only (no @tag)
+const OVERRIDES = {};
+if (process.env.DOCS_OVERRIDES) {
+  for (const pair of process.env.DOCS_OVERRIDES.split(';')) {
+    const eq = pair.indexOf('=');
+    if (eq > 0) {
+      const key = pair.slice(0, eq).trim();
+      const val = pair.slice(eq + 1).trim();
+      if (key && val && !key.includes('@')) OVERRIDES[key] = val;
+    }
+  }
+}
+
+/**
+ * Read docs.config.json for a product. Uses the local override path when available,
+ * otherwise fetches from GitHub raw content. Returns null on failure.
+ */
+async function fetchDocsConfig(repo, branch, localOverridePath) {
+  if (localOverridePath) {
+    try {
+      return JSON.parse(readFileSync(join(localOverridePath, 'docs', 'docs.config.json'), 'utf8'));
+    } catch {
+      return null;
+    }
+  }
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/docs/docs.config.json`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
 
 /** Extract the minor version key from a semver tag: v0.61.1 → v0.61 */
 function minorKey(tag) {
@@ -83,7 +121,10 @@ async function main() {
   for (const product of PRODUCTS) {
     const repo = product.repo;
     const key = envKey(repo);
-    const archiveCount = product.archiveCount ?? 0;
+    const repoName = repo.split('/').pop();
+    const configBranch = product.branch ?? 'main';
+    const docsConfig = await fetchDocsConfig(repo, configBranch, OVERRIDES[repoName]);
+    const archiveCount = docsConfig?.archiveCount ?? 0;
 
     const entry = { repo };
 

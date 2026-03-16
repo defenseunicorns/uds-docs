@@ -22,7 +22,13 @@ try {
 // Index .versions by repo for O(1) lookups, then re-key by product id.
 const versionsByRepo = Object.fromEntries(Object.values(versionsFile).map(v => [v.repo, v]));
 const productVersions = Object.fromEntries(
-  PRODUCTS.map(p => [p.id, versionsByRepo[p.repo]?.versions ?? []])
+  PRODUCTS.map(p => {
+    const allVersions = versionsByRepo[p.repo]?.versions ?? [];
+    const available = allVersions.filter(ver =>
+      existsSync(`./src/content/docs/${versionedContentDir(p, ver)}`)
+    );
+    return [p.id, available];
+  })
 );
 const productLatestTags = Object.fromEntries(
   PRODUCTS.flatMap(p => {

@@ -258,11 +258,14 @@ DOCS_OVERRIDES="uds-cli=/path/to/uds-cli" npm run build
 DOCS_OVERRIDES="uds-core=/path/to/uds-core;uds-cli=/path/to/uds-cli" npm run build
 ```
 
-You can also override specific archived versions by appending `@tag` to the repo name. The version-specific key is checked first, falling back to the repo-level key:
+To also use a local path for a specific archived version, append `@tag` to the repo name. Without a version-specific key, archived versions are always cloned from GitHub at their tag — there is no fallback to the repo-level key:
 
 ```bash
-# Latest uses ../uds-core, but v0.62.0 uses a different local path:
+# Latest uses ../uds-core, v0.62.0 uses a different local path:
 DOCS_OVERRIDES="uds-core=/path/to/uds-core;uds-core@v0.62.0=/path/to/uds-core-old" npm run build
+
+# Latest cloned from GitHub, but v0.62.0 uses a local path:
+DOCS_OVERRIDES="uds-core@v0.62.0=/path/to/uds-core-old" npm run build
 ```
 
 The integration script will rsync from your local path instead of cloning from GitHub. This is the fastest way to preview docs changes locally — no commit or push required.
