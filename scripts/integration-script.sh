@@ -294,6 +294,8 @@ while IFS= read -r repo; do
       fi
       ver_docs_source="${temp_ver_dir}/docs"
     fi
+    mkdir -p "$version_dir"
+    rsync -rt --delete --exclude='404.md' "${temp_ver_dir}/${docs_path}/" "${version_dir}/"
 
     # Write version-specific product config — skip versions without docs.config.json
     if ! write_product_config "$ver_docs_source" "$repo" "${repo_name}.${ver_slug}.json"; then
