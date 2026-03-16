@@ -1,10 +1,8 @@
 [
   {
-    "repo": "defenseunicorns/uds-core",
-    "branch": "implement-docs-config"
+    "repo": "defenseunicorns/uds-core"
   },
   {
-    "repo": "defenseunicorns/uds-cli",
-    "branch": "add-the-docs.config.json-file"
+    "repo": "defenseunicorns/uds-cli"
   }
 ]
