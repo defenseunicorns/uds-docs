@@ -1,0 +1,38 @@
+---
+const { banner } = Astro.locals.starlightRoute.entry.data;
+---
+
+{banner && (
+  <div class="sl-banner" data-pagefind-ignore set:html={banner.content} />
+)}
+
+<style>
+  @layer starlight.core {
+    .sl-banner {
+      padding: 0.85rem var(--sl-nav-pad-x);
+      background-color: #854d0e;
+      color: #fef9c3;
+      line-height: var(--sl-line-height-headings);
+      text-align: center;
+      text-wrap: balance;
+      font-size: 1rem;
+      font-weight: 500;
+      border-bottom: 1px solid #713f12;
+    }
+
+    .sl-banner :global(a) {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 700;
+    }
+
+    .sl-banner :global(a::after) {
+      content: ' →';
+    }
+
+    .sl-banner :global(a:hover) {
+      text-decoration-thickness: 2px;
+    }
+  }
+</style>

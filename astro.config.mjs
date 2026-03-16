@@ -140,6 +140,7 @@ export default defineConfig({
         alt: 'Unicorn Delivery Service'
       },
       components: {
+        Banner: './src/components/Banner.astro',
         Footer: './src/components/Footer.astro',
         Head: './src/components/Head.astro',
         Header: './src/components/Header.astro',
