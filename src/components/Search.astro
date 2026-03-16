@@ -91,7 +91,29 @@ import Default from '@astrojs/starlight/components/Search.astro';
     products as configuredProducts,
   } from '../productUtils';
 
-  let currentFilter = '';
+  // Derived once from the static build-time product config — never changes at runtime.
+  const nonCoreProducts = configuredProducts.filter(p => p.id !== 'core');
+  const coreProduct = configuredProducts.find(p => p.id === 'core');
+  const coreLabel = coreProduct?.label ?? 'Core';
+
+  // Detect the product the user is currently viewing from the page URL.
+  // Returns the product label (e.g. "Core", "CLI") or '' for the root/all pages.
+  function detectDefaultFilter(): string {
+    const path = window.location.pathname;
+    const matched = nonCoreProducts.find(p => path.startsWith(p.link));
+    if (matched) return matched.label;
+    if (coreProduct && path.startsWith(coreProduct.link)) return coreProduct.label;
+    return '';
+  }
+
+  let currentFilter = detectDefaultFilter();
+
+  // The original total count string from Pagefind before any filtering modification.
+  // Saved on first product-filtered render, reset when the user starts a new search.
+  let savedPagefindCount: string | null = null;
+
+  // When true, the observer uses a near-zero debounce to rapidly exhaust load-more batches.
+  let autoLoadingForCount = false;
 
   // Detect the version the user is currently viewing from the page URL.
   // Current docs have no version slug; archived pages have e.g. "v0-62".
@@ -140,28 +162,20 @@ import Default from '@astrojs/starlight/components/Search.astro';
     const filterButtonsContainer = document.createElement('div');
     filterButtonsContainer.className = 'filter-buttons';
 
-    const topics = [
-      { value: '', label: 'All', active: true }
+    const topicEntries: [string, string][] = [
+      ['', 'All'],
+      ...availableTopics.map(label => [label, label] as [string, string]),
     ];
 
-    availableTopics.forEach(topic => {
-      topics.push({ value: topic.label, label: topic.label, active: false });
-    });
-
-    topics.forEach(topic => {
+    topicEntries.forEach(([value, label]) => {
       const button = document.createElement('button');
-      button.textContent = topic.label;
-      button.className = `filter-button ${topic.active ? 'active' : ''}`;
-      button.setAttribute('data-topic', topic.value);
+      button.textContent = label;
+      button.className = `filter-button${currentFilter === value ? ' active' : ''}`;
 
       button.addEventListener('click', () => {
-        filterButtonsContainer.querySelectorAll('.filter-button').forEach(btn => {
-          btn.classList.remove('active');
-        });
-
+        filterButtonsContainer.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-
-        currentFilter = topic.value;
+        currentFilter = value;
         applyProductFilter();
       });
 
@@ -179,22 +193,16 @@ import Default from '@astrojs/starlight/components/Search.astro';
     }
   }
 
-  function detectAvailableTopics(): Array<{label: string, path: string}> {
+  function detectAvailableTopics(): Array<string> {
     const dropdown = document.querySelector('.starlight-sidebar-topics-dropdown-menu');
-    const nonCoreProducts = configuredProducts.filter(p => {
-      if (p.id === 'core') return false;
+    const visibleNonCore = nonCoreProducts.filter(p => {
       if (!dropdown) return true;
-      const link = dropdown.querySelector(`a[href="${p.link}"]`);
-      return link !== null;
+      return dropdown.querySelector(`a[href="${p.link}"]`) !== null;
     });
 
-    if (nonCoreProducts.length === 0) return [];
+    if (visibleNonCore.length === 0) return [];
 
-    const coreProduct = configuredProducts.find(p => p.id === 'core');
-    return [
-      { label: coreProduct?.label ?? 'Core', path: '/' },
-      ...nonCoreProducts.map(p => ({ label: p.label, path: p.link })),
-    ];
+    return [coreLabel, ...visibleNonCore.map(p => p.label)];
   }
 
   function setupFilterBehavior(pagefindForm: Element) {
@@ -208,6 +216,9 @@ import Default from '@astrojs/starlight/components/Search.astro';
 
     const searchInput = pagefindForm.querySelector('.pagefind-ui__search-input') as HTMLInputElement | null;
     searchInput?.addEventListener('input', () => {
+      // New search query — reset all filter state for the new term.
+      savedPagefindCount = null;
+      autoLoadingForCount = false;
       if (searchInput.value.trim()) {
         const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
         if (resultsEl) resultsEl.style.opacity = '0';
@@ -223,21 +234,29 @@ import Default from '@astrojs/starlight/components/Search.astro';
     const observer = new MutationObserver(() => {
       if (isInjecting) return;
       clearTimeout(filterTimer);
+      // During auto-loading for count, use a near-zero delay so batches are consumed rapidly.
+      // For normal search renders, keep the 50ms debounce to avoid processing partial updates.
+      const delay = autoLoadingForCount ? 5 : 50;
       filterTimer = setTimeout(() => {
         isInjecting = true;
-        injectBreadcrumbs();
-        // Activate the native pagefind version filter. If it wasn't already checked,
-        // pagefind re-runs the search — the next observer fire will show results.
-        const willRerun = activateVersionFilter(pagefindContainer);
-        if (!willRerun) {
-          // Version filter already applied (or unavailable) — apply product filter and show results.
-          applyProductFilter();
-          const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
-          if (resultsEl) resultsEl.style.opacity = '';
-          loadingEl.style.display = 'none';
+        // Skip expensive per-result work (breadcrumbs, version filter) during auto-loading —
+        // only applyProductFilter matters at that point.
+        if (!autoLoadingForCount) {
+          injectBreadcrumbs();
+          // Activate the native pagefind version filter. If it wasn't already checked,
+          // pagefind re-runs the search — the next observer fire will show results.
+          const willRerun = activateVersionFilter(pagefindContainer);
+          if (willRerun) {
+            isInjecting = false;
+            return;
+          }
         }
+        applyProductFilter();
+        const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
+        if (resultsEl) resultsEl.style.opacity = '';
+        loadingEl.style.display = 'none';
         isInjecting = false;
-      }, 50);
+      }, delay);
     });
 
     observer.observe(pagefindContainer, { childList: true, subtree: true });
@@ -294,7 +313,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
     return true;
   }
 
-  // Apply the active product filter (Core/Fleet buttons) via DOM hiding.
+  // Apply the active product filter (Core/CLI buttons) via DOM hiding.
   // Version filtering is handled natively by pagefind; this only handles product scope.
   function applyProductFilter() {
     const results = document.querySelectorAll('.pagefind-ui__result');
@@ -310,19 +329,69 @@ import Default from '@astrojs/starlight/components/Search.astro';
       }
     });
 
-    if (currentFilter && results.length > 0 && visibleCount === 0) {
+    if (!currentFilter) {
+      // "All" — restore the original Pagefind total count if we previously modified it.
+      autoLoadingForCount = false;
+      if (savedPagefindCount !== null && results.length > 0) {
+        setResultCount(savedPagefindCount);
+      }
+      removeNoResultsMessage();
+      return;
+    }
+
+    // A product filter is active — save the native total before we change it.
+    capturePagefindCount();
+
+    const loadMoreBtn = findLoadMoreButton();
+    if (loadMoreBtn) {
+      // More results exist — show "…" immediately so the user never sees the wrong total,
+      // then keep loading until all results are in the DOM.
+      // autoLoadingForCount reduces the observer debounce to 5ms for fast batch throughput.
+      setResultCount('\u2026');
+      autoLoadingForCount = true;
+      loadMoreBtn.click();
+      return;
+    }
+
+    // All available results are loaded — inject breadcrumbs for any results that were added
+    // during auto-loading (the observer skipped injectBreadcrumbs while autoLoadingForCount
+    // was true), then update the count to the true filtered total.
+    autoLoadingForCount = false;
+    injectBreadcrumbs();
+    setResultCount(visibleCount);
+
+    if (results.length > 0 && visibleCount === 0) {
       showNoResultsMessage(currentFilter);
     } else {
       removeNoResultsMessage();
     }
   }
 
-  function isResultMatchingFilter(href: string, filter: string): boolean {
-    const nonCoreProducts = configuredProducts.filter(p => p.id !== 'core');
-    const matchedProduct = nonCoreProducts.find(p => p.label === filter);
+  // Save the original Pagefind result count string (e.g. "42") before we modify it.
+  function capturePagefindCount() {
+    if (savedPagefindCount !== null) return;
+    const msg = document.querySelector('.pagefind-ui__message:not(.no-filtered-results)');
+    if (msg) {
+      const match = (msg.textContent || '').match(/\d[\d,]*/);
+      if (match) savedPagefindCount = match[0];
+    }
+  }
 
-    if (matchedProduct) return href.startsWith(matchedProduct.link);
-    const coreLabel = configuredProducts.find(p => p.id === 'core')?.label ?? 'Core';
+  // Returns the Pagefind "load more" button if it is currently rendered.
+  function findLoadMoreButton(): HTMLButtonElement | null {
+    return document.querySelector('.pagefind-ui__button') as HTMLButtonElement | null;
+  }
+
+  // Replace the count in the Pagefind message with any value: a number, saved string, or "…".
+  function setResultCount(count: string | number) {
+    document.querySelectorAll('.pagefind-ui__message:not(.no-filtered-results)').forEach(msg => {
+      msg.textContent = (msg.textContent || '').replace(/\d[\d,]*|\u2026/, String(count));
+    });
+  }
+
+  function isResultMatchingFilter(href: string, filter: string): boolean {
+    const matched = nonCoreProducts.find(p => p.label === filter);
+    if (matched) return href.startsWith(matched.link);
     if (filter === coreLabel) return !nonCoreProducts.some(p => href.startsWith(p.link));
     return true;
   }

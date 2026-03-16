@@ -19,7 +19,7 @@ export interface ContentSource {
   /** Path to docs within the repo (default: 'docs') */
   docsPath?: string;
   /**
-   * 'base' clones with --delete (clean slate); 'overlay' merges on top.
+   * 'base' clones with --delete (clean slate); 'overlay' merges on top of existing files.
    * Exactly one product should use 'base' — typically Core.
    * Default: 'overlay'
    */
@@ -63,7 +63,7 @@ export interface ProductConfig {
   link: string;
   /**
    * Directory under src/content/docs/ that holds this product's content.
-   * Use '' (empty string) for the root (UDS Core).
+   * e.g. 'core' for Core (src/content/docs/core/), 'cli' for CLI.
    */
   contentDir: string;
   /**
@@ -94,8 +94,8 @@ export function versionSlug(ver: string): string {
 
 /**
  * Build the versioned content directory path for a product + version.
- * Core (contentDir ''): 'v0-61'
- * My Product (contentDir 'my-product'): 'my-product/v1-2'
+ * Core (contentDir 'core'): 'core/v0-61'
+ * CLI (contentDir 'cli'): 'cli/v1-2'
  */
 export function versionedContentDir(product: ProductConfig, ver: string): string {
   const slug = versionSlug(ver);
@@ -104,8 +104,8 @@ export function versionedContentDir(product: ProductConfig, ver: string): string
 
 /**
  * Build the versioned URL prefix for a product + version.
- * Core (link '/'): '/v0-61/'
- * My Product (link '/my-product/'): '/my-product/v1-2/'
+ * Core (link '/core/'): '/core/v0-61/'
+ * CLI (link '/cli/'): '/cli/v1-2/'
  */
 export function versionedLink(product: ProductConfig, ver: string): string {
   const slug = versionSlug(ver);

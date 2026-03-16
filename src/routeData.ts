@@ -3,20 +3,14 @@ import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { PRODUCTS } from './products';
 
 // Build a map from contentDir prefix → product label at module load time.
-// Non-core products have a non-empty contentDir (e.g. "cli").
-// Core has contentDir "" and is the fallback.
+// Route ids look like "core/getting-started/foo" or "cli/reference/overview".
 const prefixToLabel = new Map<string, string>(
-  PRODUCTS
-    .filter(p => p.contentDir !== '')
-    .map(p => [p.contentDir, p.label])
+  PRODUCTS.map(p => [p.contentDir, p.label])
 );
 
-const coreLabel = PRODUCTS.find(p => p.contentDir === '')?.label ?? 'Core';
-
 function productFromRouteId(id: string): string {
-  // Route id is like "cli/reference/cli/overview" or "getting-started/foo"
   const first = id.split('/')[0];
-  return prefixToLabel.get(first) ?? coreLabel;
+  return prefixToLabel.get(first) ?? PRODUCTS[0]?.label ?? '';
 }
 
 export const onRequest = defineRouteMiddleware((context) => {

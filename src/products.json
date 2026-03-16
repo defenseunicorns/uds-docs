@@ -2,9 +2,9 @@
   {
     "id": "core",
     "label": "Core",
-    "link": "/",
-    "contentDir": "",
-    "unlistedPaths": ["/404"],
+    "link": "/core/",
+    "contentDir": "core",
+    "unlistedPaths": ["/core", "/core/404", "/404"],
     "source": {
       "repo": "defenseunicorns/uds-core",
       "mode": "base"

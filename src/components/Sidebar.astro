@@ -1,13 +1,17 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.astro';
+
+const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? false;
 ---
 
-{/* Render the topics dropdown menu. */}
-<div class="starlight-sidebar-topics-dropdown-container">
-  <div class="starlight-sidebar-topics-dropdown-title">Choose a product</div>
-  <TopicsDropdown />
-</div>
+{/* Render the topics dropdown menu only when the page belongs to a topic. */}
+{isPageWithTopic && (
+  <div class="starlight-sidebar-topics-dropdown-container">
+    <div class="starlight-sidebar-topics-dropdown-title">Choose a product</div>
+    <TopicsDropdown />
+  </div>
+)}
 
 {/* Clear persisted sidebar state BEFORE Starlight's restore script runs,
     so the sidebar always reflects the current page's tree on navigation. */}

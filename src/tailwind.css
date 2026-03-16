@@ -91,6 +91,31 @@
     border-radius: 0.75rem;
 }
 
+/* Hero logo — used on both the ecosystem landing page and product landing pages */
+.custom-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 0 1.5rem;
+}
+
+.custom-hero .hero-logo,
+.hero-logo {
+    display: block;
+    max-width: 28rem;
+    width: 100%;
+    height: auto;
+}
+
+.hero-logo.hero-logo-light { display: none; }
+.hero-logo.hero-logo-dark  { display: block; }
+
+:root[data-theme='light'] {
+    .hero-logo.hero-logo-light { display: block; }
+    .hero-logo.hero-logo-dark  { display: none; }
+}
+
 /* Adjust selector based on actual DOM. Inspect the search result markup. */
 [data-pagefind-ui-meta="product"] {
   display: inline-block;
