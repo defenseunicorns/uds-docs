@@ -7,23 +7,10 @@
     "unlistedPaths": ["/core", "/core/404", "/404"],
     "source": {
       "repo": "defenseunicorns/uds-core",
-      "branch": "chance/core-406-make-core-docs-use-their-own-path-v2",
       "mode": "base"
     },
     "versioning": {
       "archiveCount": 1
-    }
-  },
-  {
-    "id": "cli",
-    "label": "CLI",
-    "link": "/cli/",
-    "contentDir": "cli",
-    "unlistedPaths": ["/cli", "/cli/404"],
-    "source": {
-      "repo": "defenseunicorns/uds-cli",
-      "branch": "initial-docs-refresh",
-      "docsPath": "docs"
     }
   }
 ]
