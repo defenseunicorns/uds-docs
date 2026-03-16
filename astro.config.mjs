@@ -1,6 +1,9 @@
 import { defineConfig } from 'astro/config';
 import { existsSync, readFileSync } from 'fs';
 import starlight from '@astrojs/starlight';
+
+const logqlGrammar = JSON.parse(readFileSync(new URL('./src/languages/logql.tmLanguage.json', import.meta.url)));
+const promqlGrammar = JSON.parse(readFileSync(new URL('./src/languages/promql.tmLanguage.json', import.meta.url)));
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
@@ -81,6 +84,11 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
+      expressiveCode: {
+        shiki: {
+          langs: [logqlGrammar, promqlGrammar],
+        },
+      },
       pagination: false,
       routeMiddleware: './src/routeData.ts',
       plugins: [
