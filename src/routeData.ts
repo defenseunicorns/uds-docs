@@ -36,8 +36,10 @@ export const onRequest = defineRouteMiddleware((context) => {
   // Inject an "older version" banner on all versioned pages.
   const versioned = versionedProduct(route.id);
   if (versioned) {
+    const versionSlug = route.id.split('/')[1]; // e.g. "v0-61"
+    const versionLabel = versionSlug.replace('-', '.'); // e.g. "v0.61"
     (route.entry.data as Record<string, unknown>).banner = {
-      content: `You're viewing an older version of the ${versioned.label} docs. <a href="${versioned.link}">View the latest version</a>`,
+      content: `You're viewing docs for ${versionLabel}. <a href="${versioned.link}">Go to the latest</a>`,
     };
   }
 });
