@@ -1,8 +1,10 @@
 [
   {
-    "repo": "defenseunicorns/uds-core"
+    "repo": "defenseunicorns/uds-core",
+    "branch": "main"
   },
   {
-    "repo": "defenseunicorns/uds-cli"
+    "repo": "defenseunicorns/uds-cli",
+    "branch": "main"
   }
 ]
