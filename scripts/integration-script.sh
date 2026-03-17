@@ -109,7 +109,7 @@ missing_config_error() {
 echo "Preparing target directory: $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 rm -rf "$CONFIG_DIR" && mkdir -p "$CONFIG_DIR"
-mkdir -p temp
+rm -rf temp && mkdir -p temp
 
 # Generate .versions metadata from GitHub releases
 node scripts/discover-versions.mjs || {
