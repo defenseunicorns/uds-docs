@@ -1,16 +1,10 @@
 [
   {
-    "id": "core",
-    "label": "Core",
-    "link": "/core/",
-    "contentDir": "core",
-    "unlistedPaths": ["/core", "/core/404", "/404"],
-    "source": {
-      "repo": "defenseunicorns/uds-core",
-      "mode": "base"
-    },
-    "versioning": {
-      "archiveCount": 1
-    }
+    "repo": "defenseunicorns/uds-core",
+    "branch": "main"
+  },
+  {
+    "repo": "defenseunicorns/uds-cli",
+    "branch": "main"
   }
 ]
