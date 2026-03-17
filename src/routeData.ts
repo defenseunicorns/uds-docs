@@ -39,7 +39,9 @@ export const onRequest = defineRouteMiddleware((context) => {
     const versionSlug = route.id.split('/')[1]; // e.g. "v0-61"
     const versionLabel = versionSlug.replace('-', '.'); // e.g. "v0.61"
     (route.entry.data as Record<string, unknown>).banner = {
-      content: `You're viewing docs for ${versionLabel}. <a href="${versioned.link}">Go to the latest</a>`,
+      text: `You're viewing docs for ${versionLabel}.`,
+      linkHref: versioned.link,
+      linkText: 'Go to the latest',
     };
   }
 });

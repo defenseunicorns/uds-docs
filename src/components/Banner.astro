@@ -1,9 +1,13 @@
 ---
-const { banner } = Astro.locals.starlightRoute.entry.data;
+const banner = Astro.locals.starlightRoute?.entry?.data?.banner as
+  | { text: string; linkHref: string; linkText: string }
+  | undefined;
 ---
 
 {banner && (
-  <div class="sl-banner" data-pagefind-ignore set:html={banner.content} />
+  <div class="sl-banner" data-pagefind-ignore>
+    {banner.text} <a href={banner.linkHref}>{banner.linkText}</a>
+  </div>
 )}
 
 <style>
