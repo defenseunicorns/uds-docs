@@ -1,7 +1,8 @@
 # build output
 dist/
-# version list written by integration-script.sh at build time
+# build artifacts written by integration-script.sh at build time
 .versions
+.product-configs/
 # generated types
 .astro/
 
@@ -14,7 +15,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
 # environment variables
 .env
 .env.production
@@ -26,16 +26,16 @@ pnpm-debug.log*
 
 zarf-sbom/
 
-.vscode
-.idea
+.vscode/
+.idea/
 
 # temp folder
 temp/
 # Local Netlify folder
-.netlify
+.netlify/
 
-# uds-core .c4 folder
-*.c4
+# LikeC4 model directories (cloned from upstream)
+.c4/
 
 # Ignore cloned docs, while including top level pages like 404.md
 src/content/docs/*

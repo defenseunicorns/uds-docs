@@ -50,16 +50,9 @@ Static assets, like favicons, can be placed in the `public/` directory.
 
 ### Document Sourcing
 
-High‑level docs are hosted within this repository (e.g., `src/content/docs/getting-started/`). Reference and troubleshooting
-docs are sourced from upstream repositories using `scripts/integration-script.sh` and then integrated into this site. The primary
-sources of truth for reference content are:
+Product docs are sourced from upstream repositories registered in `src/products.json`. Each upstream repo owns its docs configuration via a `docs/docs.config.json` file that defines sidebar order, labels, and content directory. The integration script (`scripts/integration-script.sh`) clones these repos and copies their docs into this site at build time.
 
-- [UDS Core](https://github.com/defenseunicorns/uds-core)
-- [UDS CLI](https://github.com/defenseunicorns/uds-cli)
-- [UDS Identity Config](https://github.com/defenseunicorns/uds-identity-config)
-
-If you need to update reference documentation for any of the above, make the change in the respective upstream repository.
-This site periodically ingests those docs; their placement in the sidebar is driven by `astro.config.mjs`.
+To update docs for a product, make the change in its upstream repository. See `CONTRIBUTING.md` for the full architecture.
 
 ### Commands
 

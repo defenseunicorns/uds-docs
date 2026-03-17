@@ -8,6 +8,8 @@ const prefixToLabel = new Map<string, string>(
   PRODUCTS.map(p => [p.contentDir, p.label])
 );
 
+/** Extract product label from a route id (e.g. "core/getting-started/foo" → "Core").
+ *  Falls back to the first product for unmatched routes (e.g. root-level pages). */
 function productFromRouteId(id: string): string {
   const first = id.split('/')[0];
   return prefixToLabel.get(first) ?? PRODUCTS[0]?.label ?? '';

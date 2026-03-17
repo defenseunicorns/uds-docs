@@ -1,42 +1,90 @@
 #!/usr/bin/env node
 /**
- * Reads product configuration from src/products.json, discovers archived versions
- * for each product that has `versioning` configured, and writes .versions JSON
- * with all metadata the integration script and astro.config.mjs need.
+ * Reads product configuration from src/products.json, discovers the latest
+ * release tag and archived versions for each product, and writes .versions JSON
+ * with all metadata the integration script needs.
  *
  * Usage:
  *   node scripts/discover-versions.mjs
  *
  * Respects GITHUB_TOKEN env var for authenticated API requests.
- * Products can be overridden via env: VERSIONS_core=v0.61.0,v0.60.0
+ *
+ * archiveCount is read from each product's upstream docs/docs.config.json.
+ * When DOCS_OVERRIDES is set, the local path is used instead of fetching from GitHub.
  */
 import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 const PRODUCTS = JSON.parse(readFileSync(new URL('../src/products.json', import.meta.url), 'utf8'));
+
+// Parse DOCS_OVERRIDES="uds-core=/path;uds-cli=/path2" — repo-level keys only (no @tag)
+const OVERRIDES = {};
+if (process.env.DOCS_OVERRIDES) {
+  for (const pair of process.env.DOCS_OVERRIDES.split(';')) {
+    const eq = pair.indexOf('=');
+    if (eq > 0) {
+      const key = pair.slice(0, eq).trim();
+      const val = pair.slice(eq + 1).trim();
+      if (key && val && !key.includes('@')) OVERRIDES[key] = val;
+    }
+  }
+}
+
+/**
+ * Read docs.config.json for a product. Uses the local override path when available,
+ * otherwise fetches from GitHub raw content. Returns null on failure.
+ */
+async function fetchDocsConfig(repo, branch, localOverridePath) {
+  if (localOverridePath) {
+    try {
+      return JSON.parse(readFileSync(join(localOverridePath, 'docs', 'docs.config.json'), 'utf8'));
+    } catch {
+      return null;
+    }
+  }
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/docs/docs.config.json`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
 
 /** Extract the minor version key from a semver tag: v0.61.1 → v0.61 */
 function minorKey(tag) {
   return tag.replace(/\.\d+$/, '');
 }
 
-async function discoverVersions(repo, count = 5) {
+async function discoverVersions(repo, count = 0) {
   const headers = { 'Accept': 'application/vnd.github+json' };
-  if (process.env.GITHUB_TOKEN) {
-    headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   // Fetch enough releases to find `count` archived minor versions plus the latest
   const res = await fetch(
-    `https://api.github.com/repos/${repo}/releases?per_page=${(count + 1) * 5}`,
+    `https://api.github.com/repos/${repo}/releases?per_page=${Math.max((count + 1) * 5, 10)}`,
     { headers }
   );
 
   if (!res.ok) {
-    console.error(`Warning: GitHub API returned ${res.status} for ${repo}`);
+    console.error(`Warning: GitHub API returned ${res.status} ${res.statusText} for ${repo}`);
     return { latestTag: null, archived: [] };
   }
 
-  const releases = await res.json();
+  let releases;
+  try {
+    releases = await res.json();
+  } catch {
+    console.error(`Warning: failed to parse GitHub API response for ${repo}`);
+    return { latestTag: null, archived: [] };
+  }
+  if (!Array.isArray(releases)) {
+    console.error(`Warning: unexpected GitHub API response for ${repo}: ${JSON.stringify(releases).slice(0, 200)}`);
+    return { latestTag: null, archived: [] };
+  }
   const tags = releases
     .filter(r => !r.prerelease && !r.draft)
     .map(r => r.tag_name);
@@ -65,68 +113,27 @@ async function main() {
   const output = {};
 
   for (const product of PRODUCTS) {
-    const entry = {
-      contentDir: product.contentDir,
-    };
+    const repo = product.repo;
+    const repoName = repo.split('/').pop();
+    const configBranch = product.branch ?? 'main';
+    const docsConfig = await fetchDocsConfig(repo, configBranch, OVERRIDES[repoName]);
+    const archiveCount = docsConfig?.archiveCount ?? 0;
 
-    // Content sources — read from product.source
-    if (product.source) {
-      entry.sources = [{
-        repo: product.source.repo,
-        branch: product.source.branch ?? 'main',
-        docsPath: product.source.docsPath ?? 'docs',
-        mode: product.source.mode ?? 'overlay',
-      }];
-    }
+    const entry = { repo };
 
-    // Version discovery
-    if (product.versioning) {
-      // Resolve versioning repo: explicit > source.repo > required
-      const versionRepo = product.versioning.repo
-        ?? product.source?.repo
-        ?? null;
+    console.log(`${repo}: discovering versions...`);
+    const { latestTag, archived: versions } = await discoverVersions(repo, archiveCount);
+    console.log(`${repo}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.join(', ') || '(none)'}`);
 
-      if (!versionRepo) {
-        console.error(`${product.id}: versioning configured but no repo found (set versioning.repo or source.repo)`);
-        // Still write the product entry so its sources are processed by the integration script.
-      } else {
-        const versionDocsPath = product.versioning.docsPath
-          ?? product.source?.docsPath
-          ?? 'docs';
+    // Branch resolution:
+    // - If branch is set in products.json → use it (dev override)
+    // - Otherwise → use latestTag (production default)
+    // - Fallback to 'main' if no releases found
+    entry.branch = product.branch ?? latestTag ?? 'main';
+    if (latestTag) entry.latestTag = latestTag;
+    entry.versions = versions;
 
-        // Allow per-product env override: VERSIONS_core=v0.61.0,v0.60.0
-        const envKey = `VERSIONS_${product.id}`;
-        const envVal = process.env[envKey]?.trim();
-        let versions;
-
-        let latestTag = null;
-        if (envVal) {
-          versions = envVal.split(',').map(v => v.trim()).filter(Boolean);
-          console.log(`${product.id}: using ${envKey} = ${versions.join(', ')}`);
-        } else {
-          console.log(`${product.id}: discovering versions from ${versionRepo}...`);
-          ({ latestTag, archived: versions } = await discoverVersions(
-            versionRepo,
-            product.versioning.archiveCount ?? 5,
-          ));
-          console.log(`${product.id}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.join(', ') || '(none)'}`);
-        }
-
-        entry.versions = versions;
-        if (latestTag) entry.latestTag = latestTag;
-
-        // Pin the source branch to the latest release tag so "Latest" docs are
-        // stable and don't change from unreleased commits on main.
-        // Only auto-pin if no explicit branch was set in products.json.
-        if (latestTag && entry.sources && !product.source?.branch) {
-          entry.sources[0].branch = latestTag;
-        }
-        entry.versionRepo = versionRepo;
-        entry.versionDocsPath = versionDocsPath;
-      }
-    }
-
-    output[product.id] = entry;
+    output[repo] = entry;
   }
 
   writeFileSync('.versions', JSON.stringify(output, null, 2) + '\n');

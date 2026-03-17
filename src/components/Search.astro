@@ -71,7 +71,8 @@ import Default from '@astrojs/starlight/components/Search.astro';
     color: var(--sl-color-gray-2);
     font-style: italic;
   }
-  .search-loading { justify-content: center; padding: 1.5rem 0; }
+  .search-loading { justify-content: center; padding: 1.5rem 0; display: none; }
+  .search-loading.visible { display: flex; }
   .search-spinner {
     width: 1.25rem; height: 1.25rem;
     border: 2px solid var(--sl-color-gray-5);
@@ -81,28 +82,42 @@ import Default from '@astrojs/starlight/components/Search.astro';
   }
   @keyframes search-spin { to { transform: rotate(360deg); } }
   .pagefind-ui__results { transition: opacity 0.1s ease; }
+  .pagefind-ui__results.loading { opacity: 0; }
   /* Version filter panel is hidden — version scoping is applied programmatically.
      Users never need to see or interact with the filter panel directly. */
   .pagefind-ui__filter-panel { display: none !important; }
 </style>
 
 <script>
+  /**
+   * Search component enhancement for multi-product docs.
+   *
+   * Layers on top of Pagefind's default search UI to provide:
+   * 1. Product filter buttons (e.g. "All", "Core", "CLI") — filters results by URL prefix.
+   * 2. Version scoping — activates Pagefind's native filter so only results from the
+   *    current page's version are shown (latest vs archived).
+   * 3. Breadcrumb injection — adds section path above each result title for context.
+   * 4. Result count correction — adjusts the displayed count when product filtering
+   *    hides results, including auto-loading all pages to get an accurate total.
+   */
   import {
     products as configuredProducts,
+    VERSION_SLUG_PATTERN,
   } from '../productUtils';
 
-  // Derived once from the static build-time product config — never changes at runtime.
-  const nonCoreProducts = configuredProducts.filter(p => p.id !== 'core');
-  const coreProduct = configuredProducts.find(p => p.id === 'core');
-  const coreLabel = coreProduct?.label ?? 'Core';
+  // The first product in the config is treated as the "primary" product.
+  // Search results not matching any other product are assumed to belong to it.
+  const primaryProduct = configuredProducts[0] ?? null;
+  const primaryLabel = primaryProduct?.label ?? '';
+  const otherProducts = configuredProducts.slice(1);
 
   // Detect the product the user is currently viewing from the page URL.
   // Returns the product label (e.g. "Core", "CLI") or '' for the root/all pages.
   function detectDefaultFilter(): string {
     const path = window.location.pathname;
-    const matched = nonCoreProducts.find(p => path.startsWith(p.link));
+    const matched = otherProducts.find(p => path.startsWith(p.link));
     if (matched) return matched.label;
-    if (coreProduct && path.startsWith(coreProduct.link)) return coreProduct.label;
+    if (primaryProduct && path.startsWith(primaryProduct.link)) return primaryProduct.label;
     return '';
   }
 
@@ -120,7 +135,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
   function detectPageVersion(path: string): string {
     const segs = path.split('/');
     for (const seg of segs) {
-      if (/^v\d+-\d+$/.test(seg)) return seg;
+      if (VERSION_SLUG_PATTERN.test(seg)) return seg;
     }
     return 'current';
   }
@@ -137,6 +152,8 @@ import Default from '@astrojs/starlight/components/Search.astro';
         setupFilterBehavior(pagefindForm);
       } else if (retries++ < 50) {
         setTimeout(waitForPagefindUI, 100);
+      } else {
+        console.warn('Search: Pagefind UI form not found after 5s — product filter not injected.');
       }
     };
 
@@ -195,14 +212,14 @@ import Default from '@astrojs/starlight/components/Search.astro';
 
   function detectAvailableTopics(): Array<string> {
     const dropdown = document.querySelector('.starlight-sidebar-topics-dropdown-menu');
-    const visibleNonCore = nonCoreProducts.filter(p => {
+    const visibleOther = otherProducts.filter(p => {
       if (!dropdown) return true;
       return dropdown.querySelector(`a[href="${p.link}"]`) !== null;
     });
 
-    if (visibleNonCore.length === 0) return [];
+    if (visibleOther.length === 0) return [];
 
-    return [coreLabel, ...visibleNonCore.map(p => p.label)];
+    return [primaryLabel, ...visibleOther.map(p => p.label)];
   }
 
   function setupFilterBehavior(pagefindForm: Element) {
@@ -210,7 +227,6 @@ import Default from '@astrojs/starlight/components/Search.astro';
 
     const loadingEl = document.createElement('div');
     loadingEl.className = 'search-loading';
-    loadingEl.style.display = 'none';
     loadingEl.innerHTML = '<div class="search-spinner" aria-hidden="true"></div>';
     pagefindContainer.appendChild(loadingEl);
 
@@ -221,10 +237,10 @@ import Default from '@astrojs/starlight/components/Search.astro';
       autoLoadingForCount = false;
       if (searchInput.value.trim()) {
         const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
-        if (resultsEl) resultsEl.style.opacity = '0';
-        loadingEl.style.display = 'flex';
+        if (resultsEl) resultsEl.classList.add('loading');
+        loadingEl.classList.add('visible');
       } else {
-        loadingEl.style.display = 'none';
+        loadingEl.classList.remove('visible');
       }
     });
 
@@ -253,8 +269,8 @@ import Default from '@astrojs/starlight/components/Search.astro';
         }
         applyProductFilter();
         const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
-        if (resultsEl) resultsEl.style.opacity = '';
-        loadingEl.style.display = 'none';
+        if (resultsEl) resultsEl.classList.remove('loading');
+        loadingEl.classList.remove('visible');
         isInjecting = false;
       }, delay);
     });
@@ -262,16 +278,25 @@ import Default from '@astrojs/starlight/components/Search.astro';
     observer.observe(pagefindContainer, { childList: true, subtree: true });
   }
 
+  /**
+   * Build a breadcrumb string from a search result href.
+   * Strips the product prefix and version slug, then title-cases each segment.
+   * Uses non-breaking space (\u00a0) within segments and › (\u203a) as separator.
+   * e.g. "/core/getting-started/local-demo/overview/" → "Getting\u00a0Started › Local\u00a0Demo"
+   */
   function formatBreadcrumb(href: string): string {
     let stripped = href;
-    for (const p of configuredProducts.filter(p => p.id !== 'core')) {
+    // Strip product prefix (any product, including primary) so breadcrumbs are section-relative
+    for (const p of configuredProducts) {
       if (stripped.startsWith(p.link)) {
         stripped = '/' + stripped.slice(p.link.length);
         break;
       }
     }
+    // Strip version slug segment if present (e.g. /v0-62/)
     stripped = stripped.replace(/^\/(v\d+-\d+)\//, '/');
     const parts = stripped.replace(/^\/|\/$/g, '').split('/');
+    // Drop the last segment (the page itself) — breadcrumbs show the path to it
     const sectionParts = parts.slice(0, -1);
     if (sectionParts.length === 0) return '';
     return sectionParts
@@ -390,9 +415,9 @@ import Default from '@astrojs/starlight/components/Search.astro';
   }
 
   function isResultMatchingFilter(href: string, filter: string): boolean {
-    const matched = nonCoreProducts.find(p => p.label === filter);
+    const matched = otherProducts.find(p => p.label === filter);
     if (matched) return href.startsWith(matched.link);
-    if (filter === coreLabel) return !nonCoreProducts.some(p => href.startsWith(p.link));
+    if (filter === primaryLabel) return !otherProducts.some(p => href.startsWith(p.link));
     return true;
   }
 
