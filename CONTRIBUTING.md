@@ -225,7 +225,7 @@ Configuration lives in two places: `src/products.json` (repo references) and ups
 
 ### Versioning pipeline
 
-1. `discover-versions.mjs` reads `src/products.json`, fetches release tags from GitHub (for products with `archiveCount`), deduplicates by minor version, and writes `.versions` JSON.
+1. `discover-versions.mjs` reads `src/products.json`, fetches release tags from GitHub (reading `archiveCount` from each product's upstream `docs/docs.config.json`), deduplicates by minor version, and writes `.versions` JSON.
 2. `integration-script.sh` reads `.versions` and:
    - Clones latest docs for each repo and reads `docs/docs.config.json` to determine `contentDir`, sidebar config, etc.
    - Clones each archived version tag, reads that version's `docs/docs.config.json`, and copies docs into versioned content directories (e.g. `src/content/docs/core/v0-61/`).

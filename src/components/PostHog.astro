@@ -63,7 +63,7 @@
             trackedUrl.hash = hashParams.toString();
 
             if (link.target === '_blank' || event.ctrlKey || event.metaKey) {
-              window.open(trackedUrl.href, '_blank');
+              window.open(trackedUrl.href, '_blank', 'noopener,noreferrer');
             } else {
               window.location.href = trackedUrl.href;
             }

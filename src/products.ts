@@ -2,7 +2,7 @@
  * Product configuration — resolved from upstream docs.config.json files.
  *
  * To add a new product:
- *   1. Add an entry to src/products.json (repo, optional branch, optional archiveCount).
+ *   1. Add an entry to src/products.json (repo, optional branch).
  *   2. Ensure the upstream repo has a docs/docs.config.json defining id, label, contentDir, sidebarOrder.
  *   3. Run `npm run build` to verify everything wires up.
  *
@@ -59,6 +59,20 @@ export function versionedLink(product: ProductConfig, ver: string): string {
 export function loadProductConfigs(): ProductConfig[] {
   const configDir = '.product-configs';
   if (!existsSync(configDir)) return [];
+
+  // Read src/products.json to get the authoritative product order.
+  // readdirSync order is filesystem-dependent and not reliable for determining
+  // which product is "primary" (PRODUCTS[0]).
+  let repoOrder: Map<string, number> = new Map();
+  try {
+    const productsJson: Array<{ repo: string }> = JSON.parse(
+      readFileSync('src/products.json', 'utf8')
+    );
+    repoOrder = new Map(productsJson.map((p, i) => [p.repo, i]));
+  } catch {
+    // Fall back to filesystem order if products.json can't be read.
+  }
+
   return readdirSync(configDir)
     .filter(f => f.endsWith('.json') && !/\.v\d+-\d+\.json$/.test(f))
     .map(f => {
@@ -79,7 +93,8 @@ export function loadProductConfigs(): ProductConfig[] {
       } catch (err) {
         throw new Error(`Failed to parse product config ${path}: ${(err as Error).message}`);
       }
-    });
+    })
+    .sort((a, b) => (repoOrder.get(a.repo) ?? Infinity) - (repoOrder.get(b.repo) ?? Infinity));
 }
 
 export const PRODUCTS: ProductConfig[] = loadProductConfigs();
