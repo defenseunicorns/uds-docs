@@ -233,8 +233,6 @@ Configuration lives in two places: `src/products.json` (repo references) and ups
 3. `astro.config.mjs` reads `.product-configs/` and `.versions`, generates sidebar topics for each product and archived version.
 4. Version slugs use hyphens (`v0-61`) because Astro's content collection slugger strips dots.
 
-You can override discovered versions via environment variables: `VERSIONS_uds_core=v0.62.0,v0.61.0,v0.60.0` (repo name with hyphens replaced by underscores). The first item is treated as the latest release tag (used for branch resolution); the rest are archived versions.
-
 ### Targeting a specific branch
 
 By default, the build uses the latest release tag. To target a specific branch (e.g. while iterating on docs changes before merging), add a `branch` field in `src/products.json`:

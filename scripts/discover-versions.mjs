@@ -8,7 +8,6 @@
  *   node scripts/discover-versions.mjs
  *
  * Respects GITHUB_TOKEN env var for authenticated API requests.
- * Per-repo env overrides: VERSIONS_uds_core=v0.61.0,v0.60.0
  *
  * archiveCount is read from each product's upstream docs/docs.config.json.
  * When DOCS_OVERRIDES is set, the local path is used instead of fetching from GitHub.
@@ -55,11 +54,6 @@ async function fetchDocsConfig(repo, branch, localOverridePath) {
 /** Extract the minor version key from a semver tag: v0.61.1 → v0.61 */
 function minorKey(tag) {
   return tag.replace(/\.\d+$/, '');
-}
-
-/** Derive an env-safe key from the repo's short name: "owner/my-repo" → "my_repo" */
-function envKey(repo) {
-  return repo.split('/').pop().replace(/[^a-zA-Z0-9_]/g, '_');
 }
 
 async function discoverVersions(repo, count = 0) {
@@ -120,7 +114,6 @@ async function main() {
 
   for (const product of PRODUCTS) {
     const repo = product.repo;
-    const key = envKey(repo);
     const repoName = repo.split('/').pop();
     const configBranch = product.branch ?? 'main';
     const docsConfig = await fetchDocsConfig(repo, configBranch, OVERRIDES[repoName]);
@@ -128,22 +121,9 @@ async function main() {
 
     const entry = { repo };
 
-    // Allow per-repo env override: VERSIONS_uds_core=v0.61.0,v0.60.0
-    const envVal = process.env[`VERSIONS_${key}`]?.trim();
-    let latestTag = null;
-    let versions = [];
-
-    if (envVal) {
-      // Treat the first item as the latest tag (for branch resolution) and the rest as archived.
-      const allVersions = envVal.split(',').map(v => v.trim()).filter(Boolean);
-      latestTag = allVersions[0] ?? null;
-      versions = allVersions.slice(1);
-      console.log(`${repo}: using VERSIONS_${key}: latest=${latestTag ?? '(none)'}, archived=${versions.join(', ') || '(none)'}`);
-    } else {
-      console.log(`${repo}: discovering versions...`);
-      ({ latestTag, archived: versions } = await discoverVersions(repo, archiveCount));
-      console.log(`${repo}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.join(', ') || '(none)'}`);
-    }
+    console.log(`${repo}: discovering versions...`);
+    const { latestTag, archived: versions } = await discoverVersions(repo, archiveCount);
+    console.log(`${repo}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.join(', ') || '(none)'}`);
 
     // Branch resolution:
     // - If branch is set in products.json → use it (dev override)
