@@ -11,6 +11,7 @@ import { LikeC4VitePlugin } from 'likec4/vite-plugin';
 import starlightImageZoom from 'starlight-image-zoom';
 import react from '@astrojs/react';
 import starlightGitHubAlerts from 'starlight-github-alerts';
+import { remarkLinkRewrite } from './src/plugins/remark-link-rewrite.mjs';
 
 // Read per-product versions from .versions JSON (written by scripts/discover-versions.mjs).
 // Format: { "owner/repo": { "repo": "...", "branch": "...", "versions": [...], "latestTag": "..." } }
@@ -36,6 +37,14 @@ const productLatestTags = Object.fromEntries(
     return tag ? [[p.id, tag]] : [];
   })
 );
+
+// Build remark-link-rewrite options from product configs.
+// Sections are derived from sidebarOrder — these are the root-relative path
+// prefixes that need rewriting (e.g. /reference/, /getting-started/).
+const linkRewriteProducts = PRODUCTS.map(p => ({
+  contentDir: p.contentDir,
+  sections: p.sidebarOrder.map(e => typeof e === 'string' ? e : e.dir),
+}));
 
 function titleCase(name) {
   return name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -124,7 +133,7 @@ export default defineConfig({
       plugins: [
         starlightGitHubAlerts(),
         starlightLinksValidator({
-          exclude: ({ slug }) => /(?:^|\/)404$/.test(slug) || /(?:^|\/)v\d+-\d+\//.test(slug),
+          exclude: ({ slug }) => /(?:^|\/)404$/.test(slug),
         }),
         starlightImageZoom(),
         starlightLlmsTxt({
@@ -196,6 +205,14 @@ export default defineConfig({
       ],
     },
     )],
+  markdown: {
+    remarkPlugins: [
+      [remarkLinkRewrite, {
+        products: linkRewriteProducts,
+        srcDir: new URL('./src/content/docs/', import.meta.url).pathname,
+      }],
+    ],
+  },
   vite: {
     resolve: { preserveSymlinks: true },
     define: {

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 TARGET_DIR="src/content/docs/"
@@ -174,35 +174,9 @@ while IFS= read -r repo; do
   fi
 done < <(jq -r 'keys[]' .versions)
 
-# --- Step 2: Rewrite root-relative internal links ---
-# Upstream docs may reference sections with root-relative paths like /reference/, /overview/, etc.
-# After placing content under /contentDir/, these must become /contentDir/reference/ etc.
-# Section names come from the upstream docs.config.json sidebarOrder.
-
-for config_file in "${CONFIG_DIR}"/*.json; do
-  [[ -f "$config_file" ]] || continue
-  # Skip version-specific configs
-  [[ "$config_file" =~ \.v[0-9]+-[0-9]+\.json$ ]] && continue
-
-  contentDir=$(jq -r '.contentDir' "$config_file")
-  [[ -z "$contentDir" ]] && continue
-  [[ ! -d "${TARGET_DIR}${contentDir}" ]] && continue
-
-  # Extract section dirs from sidebarOrder (handles both string and object entries)
-  mapfile -t sections < <(jq -r '(.sidebarOrder // [])[] | if type == "string" then . else .dir end' "$config_file")
-
-  [[ ${#sections[@]} -eq 0 ]] && continue
-
-  echo "Rewriting root-relative links in ${contentDir} docs to /${contentDir}/ prefix..."
-  sed_args=()
-  for section in "${sections[@]}"; do
-    sed_args+=(-e "s|](/${section}/|](/${contentDir}/${section}/|g")
-    sed_args+=(-e "s|href=\"/${section}/|href=\"/${contentDir}/${section}/|g")
-  done
-  while IFS= read -r file; do
-    sed -i.bak "${sed_args[@]}" "$file" && rm -f "${file}.bak"
-  done < <(find "${TARGET_DIR}${contentDir}" -maxdepth 5 -type f \( -name "*.md" -o -name "*.mdx" \) -not -path '*/v[0-9]*-[0-9]*/*')
-done
+# --- Step 2: Link rewriting ---
+# Root-relative internal links (e.g. /reference/, /overview/) are rewritten at
+# render time by the remark-link-rewrite plugin (src/plugins/remark-link-rewrite.mjs).
 
 # Create per-product 404 pages.
 echo "Creating per-product 404 pages..."
@@ -314,22 +288,6 @@ while IFS= read -r repo; do
     rm -rf "${version_dir}/dev" "${version_dir}/adr"
     rm -f "${version_dir}/README.md"
 
-    # Rewrite root-relative links in versioned docs to use /{contentDir}/{versionSlug}/ prefix
-    ver_config="${CONFIG_DIR}/${repo_name}.${ver_slug}.json"
-    if [[ -f "$ver_config" ]]; then
-      mapfile -t ver_sections < <(jq -r '(.sidebarOrder // [])[] | if type == "string" then . else .dir end' "$ver_config")
-      if [[ ${#ver_sections[@]} -gt 0 ]]; then
-        ver_sed_args=()
-        for section in "${ver_sections[@]}"; do
-          ver_sed_args+=(-e "s|](/${section}/|](/${content_dir}/${ver_slug}/${section}/|g")
-          ver_sed_args+=(-e "s|href=\"/${section}/|href=\"/${content_dir}/${ver_slug}/${section}/|g")
-        done
-        while IFS= read -r file; do
-          sed -i.bak "${ver_sed_args[@]}" "$file" && rm -f "${file}.bak"
-        done < <(find "${version_dir}" -maxdepth 5 -type f \( -name "*.md" -o -name "*.mdx" \))
-      fi
-    fi
-
     # Create a 404 page for this version
     cat > "${version_dir}/404.md" << 'MDEOF'
 ---
@@ -403,9 +361,12 @@ while IFS= read -r dir; do
       # Track dirs renamed to contain '&': github-slugger strips '&' and
       # leaves surrounding spaces as hyphens, producing a double hyphen.
       # "-and-" in the old slug becomes "--" in the URL slug.
+      # Use section-relative paths (strip contentDir) because the remark-link-rewrite
+      # plugin adds the product prefix at render time — raw files have bare section paths.
       if [[ "$new_base" == *"&"* ]]; then
         rel_old="${dir#$TARGET_DIR}"
-        SLUG_RENAMES+=("$rel_old:${rel_old//-and-/--}")
+        section_old="${rel_old#*/}"
+        SLUG_RENAMES+=("$section_old:${section_old//-and-/--}")
       fi
     fi
   fi
@@ -420,7 +381,7 @@ if [[ ${#SLUG_RENAMES[@]} -gt 0 ]]; then
   done
   while IFS= read -r file; do
     sed -i.bak "${sed_args[@]}" "$file" && rm -f "${file}.bak"
-  done < <(find "$TARGET_DIR" -type f \( -name "*.md" -o -name "*.mdx" \))
+  done < <(find "$TARGET_DIR" -type f \( -name "*.md" -o -name "*.mdx" \) -not -path '*/v[0-9]*-[0-9]*/*')
 fi
 
 # Bust Astro's content cache so it rescans renamed directories on next run.
