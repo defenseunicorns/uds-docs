@@ -190,8 +190,6 @@ for product_id in $(jq -r 'keys[]' .versions); do
   [[ -z "$versions_csv" ]] && continue
   [[ -z "$repo_full" ]] && continue
 
-  override_key="${repo_full##*/}"
-
   echo "Cloning versioned docs for $product_id from $repo_full..."
 
   IFS=',' read -ra vers <<< "$versions_csv"
@@ -210,25 +208,18 @@ for product_id in $(jq -r 'keys[]' .versions); do
     fi
 
     temp_ver_dir="./temp/${product_id}-${ver}"
-    local_override="${OVERRIDES[$override_key]:-}"
 
-    if [[ -n "$local_override" ]]; then
-      echo "Using local override for versioned ${product_id} (${ver})"
-      mkdir -p "$version_dir"
-      rsync -rt --delete --exclude='404.md' "$local_override/${docs_path}/" "$version_dir/"
-    else
-      repo_url="https://github.com/${repo_full}"
-      if ! clone_repo "$repo_url" "$ver" "$temp_ver_dir"; then
-        echo "Warning: could not clone ${product_id} at tag '${ver}'; skipping."
-        continue
-      fi
-      if [[ ! -d "${temp_ver_dir}/${docs_path}" ]]; then
-        echo "Warning: no ${docs_path}/ found for ${product_id} ${ver}; skipping."
-        continue
-      fi
-      mkdir -p "$version_dir"
-      rsync -rt --delete --exclude='404.md' "${temp_ver_dir}/${docs_path}/" "${version_dir}/"
+    repo_url="https://github.com/${repo_full}"
+    if ! clone_repo "$repo_url" "$ver" "$temp_ver_dir"; then
+      echo "Warning: could not clone ${product_id} at tag '${ver}'; skipping."
+      continue
     fi
+    if [[ ! -d "${temp_ver_dir}/${docs_path}" ]]; then
+      echo "Warning: no ${docs_path}/ found for ${product_id} ${ver}; skipping."
+      continue
+    fi
+    mkdir -p "$version_dir"
+    rsync -rt --delete --exclude='404.md' "${temp_ver_dir}/${docs_path}/" "${version_dir}/"
 
     # Remove non-public directories
     rm -rf "${version_dir}/dev" "${version_dir}/adr"
