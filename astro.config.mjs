@@ -11,6 +11,7 @@ import { LikeC4VitePlugin } from 'likec4/vite-plugin';
 import starlightImageZoom from 'starlight-image-zoom';
 import react from '@astrojs/react';
 import starlightGitHubAlerts from 'starlight-github-alerts';
+import { fileURLToPath } from 'node:url';
 import { remarkLinkRewrite } from './src/plugins/remark-link-rewrite.mjs';
 
 // Read per-product versions from .versions JSON (written by scripts/discover-versions.mjs).
@@ -209,7 +210,7 @@ export default defineConfig({
     remarkPlugins: [
       [remarkLinkRewrite, {
         products: linkRewriteProducts,
-        srcDir: new URL('./src/content/docs/', import.meta.url).pathname,
+        srcDir: fileURLToPath(new URL('./src/content/docs/', import.meta.url)),
       }],
     ],
   },
