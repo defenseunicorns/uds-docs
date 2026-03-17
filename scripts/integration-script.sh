@@ -365,9 +365,8 @@ while IFS= read -r dir; do
       # plugin adds the product prefix at render time — raw files have bare section paths.
       if [[ "$new_base" == *"&"* ]]; then
         rel_old="${dir#$TARGET_DIR}"
-        content_dir_old="${rel_old%%/*}"
         section_old="${rel_old#*/}"
-        SLUG_RENAMES+=("$content_dir_old:$section_old:${section_old//-and-/--}")
+        SLUG_RENAMES+=("$section_old:${section_old//-and-/--}")
       fi
     fi
   fi
@@ -378,7 +377,7 @@ if [[ ${#SLUG_RENAMES[@]} -gt 0 ]]; then
   echo "Updating internal links for renamed directories..."
   sed_args=()
   for entry in "${SLUG_RENAMES[@]}"; do
-    IFS=':' read -r cd_old sec_old sec_new <<< "$entry"
+    IFS=':' read -r sec_old sec_new <<< "$entry"
     sed_args+=(-e "s|/${sec_old}/|/${sec_new}/|g")
   done
   while IFS= read -r file; do

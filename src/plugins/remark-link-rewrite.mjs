@@ -11,15 +11,15 @@ import path from 'node:path';
 
 /**
  * @param {Object} options
- * @param {Array<{contentDir: string, sections: string[]}>} options.products
+ * @param {Array<{contentDir: string, sections: string[], versionedSections: Record<string, string[]>}>} options.products
  * @param {string} options.srcDir - Absolute path to src/content/docs/
  */
 export function remarkLinkRewrite(options) {
   const { products, srcDir } = options;
 
-  // Build a Set of all known section prefixes for fast lookup
+  // Build a lookup of section prefixes per product (and per version when available).
   const sectionsByProduct = new Map(
-    products.map(p => [p.contentDir, new Set(p.sections)])
+    products.map(p => [p.contentDir, { sections: new Set(p.sections), versionedSections: p.versionedSections ?? {} }])
   );
 
   /** Check if a URL starts with a known section and return the section name, or null. */
@@ -45,11 +45,18 @@ export function remarkLinkRewrite(options) {
     const segments = relPath.split(path.sep);
     const contentDir = segments[0];
 
-    const sections = sectionsByProduct.get(contentDir);
-    if (!sections) return;
+    const productData = sectionsByProduct.get(contentDir);
+    if (!productData) return;
 
+    // Same pattern as VERSION_SLUG_PATTERN in src/productUtils.ts
     const versionMatch = segments[1]?.match(/^v\d+-\d+$/);
     const versionSlug = versionMatch ? segments[1] : null;
+
+    // Use version-specific sections if available, otherwise fall back to current.
+    const sectionsArr = versionSlug && productData.versionedSections[versionSlug]
+      ? productData.versionedSections[versionSlug]
+      : [...productData.sections];
+    const sections = new Set(sectionsArr);
 
     const prefix = versionSlug
       ? `/${contentDir}/${versionSlug}`

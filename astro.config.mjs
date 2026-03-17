@@ -42,9 +42,18 @@ const productLatestTags = Object.fromEntries(
 // Build remark-link-rewrite options from product configs.
 // Sections are derived from sidebarOrder — these are the root-relative path
 // prefixes that need rewriting (e.g. /reference/, /getting-started/).
+// versionedSections provides per-version overrides for archived docs that had
+// a different sidebarOrder than the current product config.
 const linkRewriteProducts = PRODUCTS.map(p => ({
   contentDir: p.contentDir,
   sections: p.sidebarOrder.map(e => typeof e === 'string' ? e : e.dir),
+  versionedSections: Object.fromEntries(
+    (productVersions[p.id] ?? []).map(ver => {
+      const verSlug = versionSlug(ver);
+      const verSidebarOrder = loadVersionSidebarOrder(p.repo, verSlug) ?? p.sidebarOrder;
+      return [verSlug, verSidebarOrder.map(e => typeof e === 'string' ? e : e.dir)];
+    })
+  ),
 }));
 
 function titleCase(name) {
