@@ -286,8 +286,8 @@ import Default from '@astrojs/starlight/components/Search.astro';
    */
   function formatBreadcrumb(href: string): string {
     let stripped = href;
-    // Strip non-primary product prefix so breadcrumbs are product-relative
-    for (const p of otherProducts) {
+    // Strip product prefix (any product, including primary) so breadcrumbs are section-relative
+    for (const p of configuredProducts) {
       if (stripped.startsWith(p.link)) {
         stripped = '/' + stripped.slice(p.link.length);
         break;

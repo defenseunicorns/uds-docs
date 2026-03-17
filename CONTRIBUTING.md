@@ -168,6 +168,7 @@ Each upstream repo must have a `docs/docs.config.json` that defines how the prod
   "id": "myproduct",
   "label": "My Product",
   "contentDir": "my-product",
+  "archiveCount": 2,
   "sidebarOrder": [
     "getting-started",
     "concepts",
@@ -180,6 +181,7 @@ Each upstream repo must have a `docs/docs.config.json` that defines how the prod
 - `id` — unique product identifier. **Do not use hyphens** — use underscores instead (e.g. `my_product` not `my-product`). The id is used as an environment variable suffix for version overrides.
 - `label` — display name shown in navigation.
 - `contentDir` — directory under `src/content/docs/` where docs are placed. Also determines the URL prefix (`/{contentDir}/`).
+- `archiveCount` (optional) — number of archived minor versions to keep alongside the latest. Omit (or set to `0`) for latest-only.
 - `sidebarOrder` — ordered list of sidebar sections. Each entry is a directory name string (label auto-generated via title-casing) or an object `{ "dir": "...", "label": "..." }` for custom labels. Only listed directories appear in the sidebar — unlisted directories are removed by the integration script. Directories listed in `sidebarOrder` that don't exist on disk are silently skipped.
 
 Different versions of a product can have different `sidebarOrder` — the config is read per-version at build time. Archived versions without a `docs.config.json` are skipped with a warning.
@@ -191,13 +193,11 @@ Different versions of a product can have different `sidebarOrder` — the config
 2. **Add an entry to `src/products.json`** in this repo:
    ```json
    {
-     "repo": "org/my-product",
-     "archiveCount": 2
+     "repo": "org/my-product"
    }
    ```
    - `repo` (required) — GitHub repo in `owner/name` format.
    - `branch` (optional) — override branch for development. Omit to auto-discover the latest release tag.
-   - `archiveCount` (optional) — number of archived minor versions to keep. Omit for latest-only.
 
 3. **Create a product landing page** at `docs/index.mdx` in the upstream repo:
    - Use `.mdx` (not `.md`) so you can import and use Starlight components like `<CardGrid>` and `<Card>`.
@@ -233,7 +233,7 @@ Configuration lives in two places: `src/products.json` (repo references) and ups
 3. `astro.config.mjs` reads `.product-configs/` and `.versions`, generates sidebar topics for each product and archived version.
 4. Version slugs use hyphens (`v0-61`) because Astro's content collection slugger strips dots.
 
-You can override discovered versions via environment variables: `VERSIONS_uds_core=v0.61.0,v0.60.0` (repo name with hyphens replaced by underscores).
+You can override discovered versions via environment variables: `VERSIONS_uds_core=v0.62.0,v0.61.0,v0.60.0` (repo name with hyphens replaced by underscores). The first item is treated as the latest release tag (used for branch resolution); the rest are archived versions.
 
 ### Targeting a specific branch
 

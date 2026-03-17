@@ -108,7 +108,7 @@ missing_config_error() {
 
 echo "Preparing target directory: $TARGET_DIR"
 mkdir -p "$TARGET_DIR"
-mkdir -p "$CONFIG_DIR"
+rm -rf "$CONFIG_DIR" && mkdir -p "$CONFIG_DIR"
 mkdir -p temp
 
 # Generate .versions metadata from GitHub releases
@@ -182,7 +182,7 @@ done < <(jq -r 'keys[]' .versions)
 for config_file in "${CONFIG_DIR}"/*.json; do
   [[ -f "$config_file" ]] || continue
   # Skip version-specific configs
-  [[ "$config_file" == *".v"* ]] && continue
+  [[ "$config_file" =~ \.v[0-9]+-[0-9]+\.json$ ]] && continue
 
   contentDir=$(jq -r '.contentDir' "$config_file")
   [[ -z "$contentDir" ]] && continue
@@ -208,7 +208,7 @@ done
 echo "Creating per-product 404 pages..."
 for config_file in "${CONFIG_DIR}"/*.json; do
   [[ -f "$config_file" ]] || continue
-  [[ "$config_file" == *".v"* ]] && continue
+  [[ "$config_file" =~ \.v[0-9]+-[0-9]+\.json$ ]] && continue
 
   contentDir=$(jq -r '.contentDir' "$config_file")
   [[ -z "$contentDir" ]] && continue
@@ -357,7 +357,7 @@ done < <(jq -r 'keys[]' .versions)
 # Unlisted directories (dev, adr, etc.) are already removed by cleanup_unlisted_dirs.
 for config_file in "${CONFIG_DIR}"/*.json; do
   [[ -f "$config_file" ]] || continue
-  [[ "$config_file" == *".v"* ]] && continue
+  [[ "$config_file" =~ \.v[0-9]+-[0-9]+\.json$ ]] && continue
   contentDir=$(jq -r '.contentDir' "$config_file")
   rm -f "${TARGET_DIR}${contentDir}/README.md"
 done

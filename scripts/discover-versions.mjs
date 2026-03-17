@@ -134,8 +134,11 @@ async function main() {
     let versions = [];
 
     if (envVal) {
-      versions = envVal.split(',').map(v => v.trim()).filter(Boolean);
-      console.log(`${repo}: using VERSIONS_${key} = ${versions.join(', ')}`);
+      // Treat the first item as the latest tag (for branch resolution) and the rest as archived.
+      const allVersions = envVal.split(',').map(v => v.trim()).filter(Boolean);
+      latestTag = allVersions[0] ?? null;
+      versions = allVersions.slice(1);
+      console.log(`${repo}: using VERSIONS_${key}: latest=${latestTag ?? '(none)'}, archived=${versions.join(', ') || '(none)'}`);
     } else {
       console.log(`${repo}: discovering versions...`);
       ({ latestTag, archived: versions } = await discoverVersions(repo, archiveCount));

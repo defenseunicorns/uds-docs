@@ -65,6 +65,9 @@ export function loadProductConfigs(): ProductConfig[] {
       const path = `${configDir}/${f}`;
       try {
         const data = JSON.parse(readFileSync(path, 'utf8'));
+        for (const field of ['id', 'label', 'contentDir'] as const) {
+          if (!data[field]) throw new Error(`missing required field '${field}'`);
+        }
         return {
           id: data.id,
           label: data.label,
