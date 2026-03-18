@@ -122,6 +122,27 @@ const frontmatter = {
         border-radius: inherit;
     }
 
+    .oss-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0.5rem 0;
+    }
+
+    .oss-logo {
+        height: 3.5rem;
+        width: auto;
+        flex-shrink: 0;
+    }
+
+    .oss-logo.oss-logo-light { display: none; }
+    .oss-logo.oss-logo-dark { display: block; }
+
+    :root[data-theme='light'] {
+        .oss-logo.oss-logo-light { display: block; }
+        .oss-logo.oss-logo-dark { display: none; }
+    }
+
     :global(.content-panel) {
         padding: 0rem var(--sl-content-pad-x);
     }
@@ -186,8 +207,16 @@ const frontmatter = {
 
         <Card title="Open-Source Foundation">
             UDS is built on open-source projects created by Defense Unicorns:
-            <p><strong><a href="https://docs.zarf.dev/" target="_blank">Zarf</a></strong> — airgap packaging and delivery for Kubernetes workloads.</p>
-            <p><strong><a href="https://docs.pepr.dev/" target="_blank">Pepr</a></strong> — policy engine and Kubernetes operator automation.</p>
+            <div class="oss-item">
+                <img src="/assets/Zarf_Logo_Light.svg" alt="Zarf" class="oss-logo oss-logo-dark" />
+                <img src="/assets/Zarf_Logo_Dark.svg" alt="Zarf" class="oss-logo oss-logo-light" />
+                <span><a href="https://docs.zarf.dev/" target="_blank" rel="noopener noreferrer">Zarf</a> — airgap packaging and delivery for Kubernetes workloads.</span>
+            </div>
+            <div class="oss-item">
+                <img src="/assets/Pepr_Logo_White.svg" alt="Pepr" class="oss-logo oss-logo-dark" />
+                <img src="/assets/Pepr_Logo_Dark.svg" alt="Pepr" class="oss-logo oss-logo-light" />
+                <span><a href="https://docs.pepr.dev/" target="_blank" rel="noopener noreferrer">Pepr</a> — policy engine and Kubernetes operator automation.</span>
+            </div>
         </Card>
     </CardGrid>
 

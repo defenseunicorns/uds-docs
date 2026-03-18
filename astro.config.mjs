@@ -129,7 +129,7 @@ export default defineConfig({
         starlightImageZoom(),
         starlightLlmsTxt({
           projectName: 'UDS Documentation',
-          description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
+          description: 'Authoritative docs for UDS.',
           details: [
             '- CLI examples use `uds` and bash-like shells.',
             '- Start with Getting Started; use CLI Reference for flags.',
