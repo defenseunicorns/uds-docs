@@ -91,19 +91,28 @@
     border-radius: 0.75rem;
 }
 
-/* Hero logo — used on both the ecosystem landing page and product landing pages */
+/* Hide the default Starlight page title on product landing pages that use a custom hero.
+   In Astro 6, MDX <style> blocks are bundled into a shared stylesheet (no longer page-scoped),
+   so the upstream unscoped rules leak globally. This scoped override ensures the title is only
+   hidden on pages that actually have a .custom-hero element. */
+.main-pane:has(.custom-hero) .content-panel:has(h1#_top) { display: none; }
+.main-pane:has(.custom-hero) .content-panel:has(h1#_top) + .content-panel { border-top: none; }
+
+/* Hero logo — used on both the ecosystem landing page and product landing pages.
+   Product landing pages (MDX) rely on these defaults; the ecosystem page (index.astro)
+   overrides padding and size with its own scoped styles. */
 .custom-hero {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 2rem 0 1.5rem;
+    padding: 1rem 0 0.5rem;
 }
 
 .custom-hero .hero-logo,
 .hero-logo {
     display: block;
-    max-width: 28rem;
+    max-width: 36rem;
     width: 100%;
     height: auto;
 }

@@ -12,7 +12,6 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/markdown-remark": "^7.0.0",
-    "@astrojs/node": "^10.0.0",
     "@astrojs/react": "^5.0.0",
     "@astrojs/starlight": "^0.38.0",
     "@astrojs/starlight-tailwind": "^5.0.0",

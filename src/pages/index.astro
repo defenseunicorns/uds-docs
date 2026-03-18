@@ -13,13 +13,6 @@ const frontmatter = {
 
 ---
 <style>
-    /* Hide the auto-generated page title */
-    :global(.main-pane .content-panel:has(h1#_top)) {
-        display: none;
-    }
-    :global(.main-pane .content-panel:has(h1#_top) + .content-panel) {
-        border-top: none;
-    }
 
     .custom-hero {
         display: flex;
@@ -37,18 +30,14 @@ const frontmatter = {
         color: var(--sl-color-gray-2);
     }
 
-    :root[data-theme='light'] {
-        h2 {
-            font-family: "Teko", sans-serif;
-            color: #122248;
-        }
+    :root[data-theme='light'] .ecosystem-landing h2 {
+        font-family: "Teko", sans-serif;
+        color: #122248;
     }
 
-    :root[data-theme='dark'] {
-        h2 {
-            font-family: "Teko", sans-serif;
-            color: #24b0ff;
-        }
+    :root[data-theme='dark'] .ecosystem-landing h2 {
+        font-family: "Teko", sans-serif;
+        color: #24b0ff;
     }
 
     @media (max-width: 50rem) {
@@ -143,12 +132,13 @@ const frontmatter = {
         .oss-logo.oss-logo-dark { display: none; }
     }
 
-    :global(.content-panel) {
+    :global(.main-pane:has(.custom-hero) .content-panel) {
         padding: 0rem var(--sl-content-pad-x);
     }
 </style>
 
 <StarlightPage frontmatter={frontmatter} hasSidebar={false}>
+    <div class="ecosystem-landing">
     <div class="custom-hero">
         <h1 class="sr-only">Unicorn Delivery Service</h1>
         <img src="/assets/UDS_Logo_White.svg" alt="Unicorn Delivery Service" class="hero-logo hero-logo-dark" />
@@ -231,5 +221,6 @@ const frontmatter = {
                 <li><a href="/llms-small.txt">llms-small.txt</a> — compressed documentation for smaller context windows</li>
             </ul>
         </div>
+    </div>
     </div>
 </StarlightPage>
