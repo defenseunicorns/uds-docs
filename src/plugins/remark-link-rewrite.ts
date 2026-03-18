@@ -1,5 +1,3 @@
-// src/plugins/remark-link-rewrite.mjs
-//
 // Remark plugin that rewrites root-relative internal links to include
 // the product prefix (e.g. /core/) and version slug (e.g. /core/v0-61/).
 //
@@ -8,13 +6,26 @@
 
 import { visit } from 'unist-util-visit';
 import path from 'node:path';
+import { VERSION_SLUG_PATTERN } from '../productUtils';
+import type { Root } from 'mdast';
+import type { VFile } from 'vfile';
+
+interface ProductConfig {
+  contentDir: string;
+  sections: string[];
+  versionedSections?: Record<string, string[]>;
+}
+
+interface Options {
+  products: ProductConfig[];
+  srcDir: string;
+}
 
 /**
- * @param {Object} options
- * @param {Array<{contentDir: string, sections: string[], versionedSections: Record<string, string[]>}>} options.products
- * @param {string} options.srcDir - Absolute path to src/content/docs/
+ * @param options.products - Per-product section lists and optional version overrides
+ * @param options.srcDir - Absolute path to src/content/docs/
  */
-export function remarkLinkRewrite(options) {
+export function remarkLinkRewrite(options: Options) {
   const { products, srcDir } = options;
 
   // Build a lookup of section prefixes per product (and per version when available).
@@ -23,7 +34,7 @@ export function remarkLinkRewrite(options) {
   );
 
   /** Check if a URL starts with a known section and return the section name, or null. */
-  function matchSection(url, sections) {
+  function matchSection(url: string, sections: Set<string>): string | null {
     for (const section of sections) {
       if (url.startsWith(`/${section}/`)) return section;
     }
@@ -31,12 +42,12 @@ export function remarkLinkRewrite(options) {
   }
 
   /** Prepend prefix to a URL if it starts with a known section. */
-  function rewriteUrl(url, prefix, sections) {
+  function rewriteUrl(url: string, prefix: string, sections: Set<string>): string {
     if (matchSection(url, sections)) return `${prefix}${url}`;
     return url;
   }
 
-  return (tree, file) => {
+  return (tree: Root, file: VFile) => {
     if (!file.path) return;
 
     const relPath = path.relative(srcDir, file.path);
@@ -48,15 +59,12 @@ export function remarkLinkRewrite(options) {
     const productData = sectionsByProduct.get(contentDir);
     if (!productData) return;
 
-    // Same pattern as VERSION_SLUG_PATTERN in src/productUtils.ts
-    const versionMatch = segments[1]?.match(/^v\d+-\d+$/);
-    const versionSlug = versionMatch ? segments[1] : null;
+    const versionSlug = VERSION_SLUG_PATTERN.test(segments[1] ?? '') ? segments[1] : null;
 
     // Use version-specific sections if available, otherwise fall back to current.
-    const sectionsArr = versionSlug && productData.versionedSections[versionSlug]
-      ? productData.versionedSections[versionSlug]
-      : [...productData.sections];
-    const sections = new Set(sectionsArr);
+    const sections = versionSlug && productData.versionedSections[versionSlug]
+      ? new Set(productData.versionedSections[versionSlug])
+      : productData.sections;
 
     const prefix = versionSlug
       ? `/${contentDir}/${versionSlug}`
@@ -78,7 +86,7 @@ export function remarkLinkRewrite(options) {
     });
 
     // Rewrite href attributes in MDX JSX elements (e.g. <LinkCard href="/section/..." />)
-    visit(tree, ['mdxJsxFlowElement', 'mdxJsxTextElement'], (node) => {
+    visit(tree, ['mdxJsxFlowElement', 'mdxJsxTextElement'], (node: any) => {
       if (!node.attributes) return;
       for (const attr of node.attributes) {
         if (attr.type === 'mdxJsxAttribute' && attr.name === 'href' && typeof attr.value === 'string') {

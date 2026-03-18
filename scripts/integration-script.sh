@@ -174,11 +174,7 @@ while IFS= read -r repo; do
   fi
 done < <(jq -r 'keys[]' .versions)
 
-# --- Step 2: Link rewriting ---
-# Root-relative internal links (e.g. /reference/, /overview/) are rewritten at
-# render time by the remark-link-rewrite plugin (src/plugins/remark-link-rewrite.mjs).
-
-# Create per-product 404 pages.
+# --- Step 2: Create per-product 404 pages ---
 echo "Creating per-product 404 pages..."
 for config_file in "${CONFIG_DIR}"/*.json; do
   [[ -f "$config_file" ]] || continue
@@ -377,8 +373,7 @@ if [[ ${#SLUG_RENAMES[@]} -gt 0 ]]; then
   echo "Updating internal links for renamed directories..."
   sed_args=()
   for entry in "${SLUG_RENAMES[@]}"; do
-    IFS=':' read -r sec_old sec_new <<< "$entry"
-    sed_args+=(-e "s|/${sec_old}/|/${sec_new}/|g")
+    sed_args+=(-e "s|/${entry%%:*}/|/${entry#*:}/|g")
   done
   while IFS= read -r file; do
     sed -i.bak "${sed_args[@]}" "$file" && rm -f "${file}.bak"
