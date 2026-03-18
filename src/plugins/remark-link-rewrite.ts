@@ -28,9 +28,14 @@ interface Options {
 export function remarkLinkRewrite(options: Options) {
   const { products, srcDir } = options;
 
-  // Build a lookup of section prefixes per product (and per version when available).
+  // Pre-build Sets for all section lookups so we don't re-create them per file.
   const sectionsByProduct = new Map(
-    products.map(p => [p.contentDir, { sections: new Set(p.sections), versionedSections: p.versionedSections ?? {} }])
+    products.map(p => [p.contentDir, {
+      sections: new Set(p.sections),
+      versionedSections: Object.fromEntries(
+        Object.entries(p.versionedSections ?? {}).map(([k, v]) => [k, new Set(v)])
+      ) as Record<string, Set<string>>,
+    }])
   );
 
   /** Check if a URL starts with a known section and return the section name, or null. */
@@ -62,8 +67,8 @@ export function remarkLinkRewrite(options: Options) {
     const versionSlug = VERSION_SLUG_PATTERN.test(segments[1] ?? '') ? segments[1] : null;
 
     // Use version-specific sections if available, otherwise fall back to current.
-    const sections = versionSlug && productData.versionedSections[versionSlug]
-      ? new Set(productData.versionedSections[versionSlug])
+    const sections = versionSlug
+      ? productData.versionedSections[versionSlug] ?? productData.sections
       : productData.sections;
 
     const prefix = versionSlug
