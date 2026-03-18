@@ -275,7 +275,7 @@ while IFS= read -r repo; do
     fi
 
     mkdir -p "$version_dir"
-    rsync -rtL --delete --exclude='404.md' --exclude='docs.config.json' "$ver_docs_source/" "${version_dir}/"
+    rsync -rtL --safe-links --delete --exclude='404.md' --exclude='docs.config.json' "$ver_docs_source/" "${version_dir}/"
 
     # Remove directories not in this version's sidebarOrder
     cleanup_unlisted_dirs "$version_dir" "${CONFIG_DIR}/${repo_name}.${ver_slug}.json" "${content_dir}/${ver_slug}"
