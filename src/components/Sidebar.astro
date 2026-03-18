@@ -121,6 +121,10 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
     const applyOverviewBehavior = () => {
       const nav = document.querySelector("nav");
       if (!nav) return;
+      // Clear any stale active highlights before re-applying for the current route.
+      nav.querySelectorAll("summary.overview-section-active").forEach((s) => {
+        s.classList.remove("overview-section-active");
+      });
       const currentPath = strip(window.location.pathname);
       const currentParts = currentPath.split("/").filter(Boolean);
       const currentLast = currentParts[currentParts.length - 1];

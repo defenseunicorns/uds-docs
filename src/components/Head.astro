@@ -29,13 +29,15 @@ import PostHog from './PostHog.astro';
 
 <script>
   function applyExternalLinks() {
-    const host = window.location.hostname;
+    const origin = window.location.origin;
     document.querySelectorAll('main a[href]').forEach((link) => {
       const anchor = link as HTMLAnchorElement;
       try {
         const url = new URL(anchor.href, window.location.href);
-        if (url.hostname !== host && !anchor.hasAttribute('target')) {
-          anchor.setAttribute('target', '_blank');
+        if (url.origin !== origin) {
+          if (!anchor.hasAttribute('target')) {
+            anchor.setAttribute('target', '_blank');
+          }
           anchor.setAttribute('rel', 'noopener noreferrer');
         }
       } catch { /* ignore unparseable hrefs */ }
