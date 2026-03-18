@@ -163,7 +163,7 @@ while IFS= read -r repo; do
 
   echo "Copying docs from ${docs_source}/ to ${dest_dir}"
   mkdir -p "$dest_dir"
-  rsync -rt --delete --exclude='404.md' --exclude='docs.config.json' "$docs_source/" "$dest_dir/"
+  rsync -rtL --safe-links --delete --exclude='404.md' --exclude='docs.config.json' "$docs_source/" "$dest_dir/"
 
   cleanup_unlisted_dirs "$dest_dir" "${CONFIG_DIR}/${repo_name}.json" "$contentDir"
 
@@ -275,7 +275,7 @@ while IFS= read -r repo; do
     fi
 
     mkdir -p "$version_dir"
-    rsync -rt --delete --exclude='404.md' --exclude='docs.config.json' "$ver_docs_source/" "${version_dir}/"
+    rsync -rtL --safe-links --delete --exclude='404.md' --exclude='docs.config.json' "$ver_docs_source/" "${version_dir}/"
 
     # Remove directories not in this version's sidebarOrder
     cleanup_unlisted_dirs "$version_dir" "${CONFIG_DIR}/${repo_name}.${ver_slug}.json" "${content_dir}/${ver_slug}"
