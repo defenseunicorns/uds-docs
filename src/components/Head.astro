@@ -26,3 +26,21 @@ import PostHog from './PostHog.astro';
 <PostHog/>
 
 <Default><slot /></Default>
+
+<script>
+  function applyExternalLinks() {
+    const host = window.location.hostname;
+    document.querySelectorAll('main a[href]').forEach((link) => {
+      const anchor = link as HTMLAnchorElement;
+      try {
+        const url = new URL(anchor.href, window.location.href);
+        if (url.hostname !== host && !anchor.hasAttribute('target')) {
+          anchor.setAttribute('target', '_blank');
+          anchor.setAttribute('rel', 'noopener noreferrer');
+        }
+      } catch { /* ignore unparseable hrefs */ }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', applyExternalLinks);
+  document.addEventListener('astro:page-load', applyExternalLinks);
+</script>

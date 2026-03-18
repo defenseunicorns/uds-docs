@@ -59,6 +59,17 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
     border-radius: 0.25rem;
   }
 
+  :global(nav details summary.overview-section-active),
+  :global(nav details summary.overview-section-active:hover),
+  :global(nav details summary.overview-section-active:focus) {
+    background-color: var(--sl-color-text-accent) !important;
+  }
+
+  :global(nav details summary.overview-section-active .group-label span) {
+    color: var(--sl-color-text-invert);
+    font-weight: 600;
+  }
+
 </style>
 
 <script is:inline>
@@ -89,7 +100,8 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       return closestDetails && closestDetails !== detailsEl;
     };
 
-    // 1) Returns overview/index href ONLY if it exists at THIS group level.
+    // Returns the overview/index href if one exists at THIS group level (including hidden items).
+    // Returns null if no overview exists — callers must handle this case gracefully.
     const findOverviewHref = (detailsEl) => {
       const linkEls = Array.from(detailsEl.querySelectorAll("a[href]")).filter(
         (a) => !isInsideNestedDetails(detailsEl, a)
@@ -106,13 +118,37 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       return null;
     };
 
-    // 2) Returns the first non-nested doc link in this group (fallback)
-    const findFirstDocHref = (detailsEl) => {
-      const first = Array.from(detailsEl.querySelectorAll("a[href]")).find(
-        (a) => !isInsideNestedDetails(detailsEl, a)
-      );
-      return first?.getAttribute("href") || null;
+    const applyOverviewBehavior = () => {
+      const nav = document.querySelector("nav");
+      if (!nav) return;
+      const currentPath = strip(window.location.pathname);
+      const currentParts = currentPath.split("/").filter(Boolean);
+      const currentLast = currentParts[currentParts.length - 1];
+      const isOnOverview = Boolean(currentLast && OVERVIEW_SLUGS.has(currentLast));
+      const normalize = (p) => strip(p).replace(/\/$/, "");
+      nav.querySelectorAll("a[href]").forEach((link) => {
+        const href = strip(link.getAttribute("href") || "");
+        const parts = href.split("/").filter(Boolean);
+        const last = parts[parts.length - 1];
+        if (!last || !OVERVIEW_SLUGS.has(last)) return;
+        // Hide the sidebar list item for this overview link
+        const li = link.closest("li");
+        if (li) li.style.display = "none";
+        // Highlight parent section when on this overview page
+        if (isOnOverview && normalize(href) === normalize(currentPath)) {
+          const details = link.closest("details");
+          if (details) {
+            const summary = details.querySelector(":scope > summary");
+            if (summary) summary.classList.add("overview-section-active");
+          }
+        }
+      });
     };
+
+    // Run immediately — the nav is already in the DOM since this script
+    // executes after <Default> renders the sidebar HTML. This avoids the
+    // flash-of-overview-item that occurs if we wait for DOMContentLoaded.
+    applyOverviewBehavior();
 
     const onReady = () => {
       const nav = document.querySelector("nav");
@@ -140,9 +176,9 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
           const details = summary.parentElement;
           if (!(details instanceof HTMLDetailsElement)) return;
 
-          // 1) Prefer an explicit overview/index link if it exists
-          // 2) Otherwise derive it from the first visible child link
-          const href = findOverviewHref(details) || findFirstDocHref(details);
+          // Only navigate if an overview page actually exists for this section.
+          // If not, let the native toggle run so the section just opens/closes.
+          const href = findOverviewHref(details);
           if (!href) return;
 
           // Prevent native toggle, navigate instead
