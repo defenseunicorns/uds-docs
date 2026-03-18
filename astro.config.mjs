@@ -8,6 +8,7 @@ import { PRODUCTS, versionSlug, versionedContentDir, versionedLink } from './src
 
 import tailwindcss from '@tailwindcss/vite';
 import { LikeC4VitePlugin } from 'likec4/vite-plugin';
+import react from '@astrojs/react';
 import starlightImageZoom from 'starlight-image-zoom';
 import starlightGitHubAlerts from 'starlight-github-alerts';
 import { fileURLToPath } from 'node:url';
@@ -211,7 +212,9 @@ export default defineConfig({
         }
       ],
     },
-    )],
+    ),
+    react(),
+  ],
   markdown: {
     remarkPlugins: [
       [remarkLinkRewrite, {
