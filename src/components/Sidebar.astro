@@ -171,11 +171,11 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
           // Don’t interfere with the product dropdown UI
           if (summary.closest(".starlight-sidebar-topics-dropdown-container")) return;
 
-          // Only navigate if the click landed on the group label text
-          const clickedLabel =
-            e.target instanceof Element &&
-            (e.target.closest(".group-label") || e.target.classList.contains("group-label"));
-          if (!clickedLabel) return;
+          // Navigate for clicks anywhere on the summary except the caret arrow,
+          // which should only toggle the dropdown open/closed.
+          const clickedCaret =
+            e.target instanceof Element && e.target.closest(".caret");
+          if (clickedCaret) return;
 
           const details = summary.parentElement;
           if (!(details instanceof HTMLDetailsElement)) return;
