@@ -2,17 +2,19 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { PRODUCTS } from './products';
 
-// Build a map from contentDir prefix → product label at module load time.
+// Build a map from contentDir prefix → product at module load time.
 // Route ids look like "core/getting-started/foo" or "cli/reference/overview".
-const prefixToLabel = new Map<string, string>(
-  PRODUCTS.map(p => [p.contentDir, p.label])
-);
+const prefixToProduct = new Map(PRODUCTS.map(p => [p.contentDir, p]));
 
-/** Extract product label from a route id (e.g. "core/getting-started/foo" → "Core").
- *  Falls back to the first product for unmatched routes (e.g. root-level pages). */
-function productFromRouteId(id: string): string {
-  const first = id.split('/')[0];
-  return prefixToLabel.get(first) ?? PRODUCTS[0]?.label ?? '';
+// Version slugs look like "v0-61", "v1-2", etc.
+const VERSION_SLUG_RE = /^v\d+-\d+$/;
+
+// Returns the product if this route is a versioned page, otherwise null.
+// e.g. "core/v0-61/getting-started/foo" → Core product
+function versionedProduct(id: string) {
+  const [contentDir, maybeVersion] = id.split('/');
+  if (!maybeVersion || !VERSION_SLUG_RE.test(maybeVersion)) return null;
+  return prefixToProduct.get(contentDir) ?? null;
 }
 
 export const onRequest = defineRouteMiddleware((context) => {
@@ -21,13 +23,25 @@ export const onRequest = defineRouteMiddleware((context) => {
   // Defensive: route/head should exist on normal Starlight pages
   if (!route?.head || !route?.id) return;
 
-  const product = productFromRouteId(route.id);
+  const product = prefixToProduct.get(route.id.split('/')[0]);
 
   // Pagefind supports inline metadata "key:value" in <head>.
   route.head.push({
     tag: 'meta',
     attrs: {
-      'data-pagefind-meta': `product:${product}`,
+      'data-pagefind-meta': `product:${product?.label ?? PRODUCTS[0]?.label ?? ''}`,
     },
   });
+
+  // Inject an "older version" banner on all versioned pages.
+  const versioned = versionedProduct(route.id);
+  if (versioned) {
+    const versionSlug = route.id.split('/')[1]; // e.g. "v0-61"
+    const versionLabel = versionSlug.replace('-', '.'); // e.g. "v0.61"
+    (route.entry.data as Record<string, unknown>).banner = {
+      text: `You're viewing docs for ${versionLabel}.`,
+      linkHref: versioned.link,
+      linkText: 'Go to the latest',
+    };
+  }
 });

@@ -146,7 +146,7 @@ export default defineConfig({
         starlightImageZoom(),
         starlightLlmsTxt({
           projectName: 'UDS Documentation',
-          description: 'Authoritative docs for Unicorn Delivery Service (UDS).',
+          description: 'Authoritative docs for UDS.',
           details: [
             '- CLI examples use `uds` and bash-like shells.',
             '- Start with Getting Started; use CLI Reference for flags.',
@@ -196,6 +196,7 @@ export default defineConfig({
         alt: 'Unicorn Delivery Service'
       },
       components: {
+        Banner: './src/components/Banner.astro',
         Footer: './src/components/Footer.astro',
         Head: './src/components/Head.astro',
         Header: './src/components/Header.astro',
