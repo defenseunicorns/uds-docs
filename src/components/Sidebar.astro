@@ -75,7 +75,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 <script is:inline>
   // Hide versioned topics from the product dropdown — versions use the VersionPicker instead.
   // Runs immediately so there's no flash of versioned items in the dropdown.
-  // Note: version slug pattern must match VERSION_SLUG_PATTERN in productUtils.ts.
+  // Note: version slug pattern must match VERSION_SLUG_PATTERN in src/productUtils.ts.
   (() => {
     const versionPattern = /\/v\d+-\d+\//;
     document.querySelectorAll('.starlight-sidebar-topics-dropdown-menu a').forEach(a => {

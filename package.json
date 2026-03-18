@@ -28,6 +28,7 @@
     "starlight-sidebar-topics-dropdown": "^0.5.4",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.7.3",
+    "unist-util-visit": "^5.1.0",
     "vanilla-cookieconsent": "^3.0.1"
   },
   "devDependencies": {

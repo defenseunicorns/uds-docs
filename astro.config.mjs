@@ -11,6 +11,8 @@ import { LikeC4VitePlugin } from 'likec4/vite-plugin';
 import starlightImageZoom from 'starlight-image-zoom';
 import react from '@astrojs/react';
 import starlightGitHubAlerts from 'starlight-github-alerts';
+import { fileURLToPath } from 'node:url';
+import { remarkLinkRewrite } from './src/plugins/remark-link-rewrite.ts';
 
 // Read per-product versions from .versions JSON (written by scripts/discover-versions.mjs).
 // Format: { "owner/repo": { "repo": "...", "branch": "...", "versions": [...], "latestTag": "..." } }
@@ -36,6 +38,21 @@ const productLatestTags = Object.fromEntries(
     return tag ? [[p.id, tag]] : [];
   })
 );
+
+// Build remark-link-rewrite options from product configs.
+// versionedSections provides per-version overrides for archived docs whose
+// sidebarOrder differs from the current product config.
+const linkRewriteProducts = PRODUCTS.map(p => ({
+  contentDir: p.contentDir,
+  sections: p.sidebarOrder.map(e => typeof e === 'string' ? e : e.dir),
+  versionedSections: Object.fromEntries(
+    (productVersions[p.id] ?? []).map(ver => {
+      const verSlug = versionSlug(ver);
+      const verSidebarOrder = loadVersionSidebarOrder(p.repo, verSlug) ?? p.sidebarOrder;
+      return [verSlug, verSidebarOrder.map(e => typeof e === 'string' ? e : e.dir)];
+    })
+  ),
+}));
 
 function titleCase(name) {
   return name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -124,7 +141,7 @@ export default defineConfig({
       plugins: [
         starlightGitHubAlerts(),
         starlightLinksValidator({
-          exclude: ({ slug }) => /(?:^|\/)404$/.test(slug) || /(?:^|\/)v\d+-\d+\//.test(slug),
+          exclude: ({ slug }) => /(?:^|\/)404$/.test(slug),
         }),
         starlightImageZoom(),
         starlightLlmsTxt({
@@ -197,6 +214,14 @@ export default defineConfig({
       ],
     },
     )],
+  markdown: {
+    remarkPlugins: [
+      [remarkLinkRewrite, {
+        products: linkRewriteProducts,
+        srcDir: fileURLToPath(new URL('./src/content/docs/', import.meta.url)),
+      }],
+    ],
+  },
   vite: {
     resolve: { preserveSymlinks: true },
     define: {
