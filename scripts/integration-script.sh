@@ -163,7 +163,7 @@ while IFS= read -r repo; do
 
   echo "Copying docs from ${docs_source}/ to ${dest_dir}"
   mkdir -p "$dest_dir"
-  rsync -rtL --delete --exclude='404.md' --exclude='docs.config.json' "$docs_source/" "$dest_dir/"
+  rsync -rtL --safe-links --delete --exclude='404.md' --exclude='docs.config.json' "$docs_source/" "$dest_dir/"
 
   cleanup_unlisted_dirs "$dest_dir" "${CONFIG_DIR}/${repo_name}.json" "$contentDir"
 
