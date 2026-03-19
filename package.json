@@ -32,5 +32,8 @@
   },
   "devDependencies": {
     "likec4": "^1.42.1"
+  },
+  "overrides": {
+    "vite": "^7.3.1"
   }
 }
