@@ -238,3 +238,17 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
     }
   })();
 </script>
+
+<script is:inline>
+  // Ensure the section containing the current page is always expanded,
+  // even after SidebarPersister restores a stale collapsed state from sessionStorage.
+  (() => {
+    const current = document.querySelector('nav [aria-current="page"]');
+    if (!current) return;
+    let el = current.closest('details');
+    while (el) {
+      el.open = true;
+      el = el.parentElement?.closest('details') ?? null;
+    }
+  })();
+</script>
