@@ -8,8 +8,8 @@ import { PRODUCTS, versionSlug, versionedContentDir, versionedLink } from './src
 
 import tailwindcss from '@tailwindcss/vite';
 import { LikeC4VitePlugin } from 'likec4/vite-plugin';
-import starlightImageZoom from 'starlight-image-zoom';
 import react from '@astrojs/react';
+import starlightImageZoom from 'starlight-image-zoom';
 import starlightGitHubAlerts from 'starlight-github-alerts';
 import { fileURLToPath } from 'node:url';
 import { remarkLinkRewrite } from './src/plugins/remark-link-rewrite.ts';
@@ -134,7 +134,6 @@ export default defineConfig({
   },
 
   integrations: [
-    react(),
     starlight({
       pagination: false,
       routeMiddleware: './src/routeData.ts',
@@ -213,7 +212,9 @@ export default defineConfig({
         }
       ],
     },
-    )],
+    ),
+    react(),
+  ],
   markdown: {
     remarkPlugins: [
       [remarkLinkRewrite, {

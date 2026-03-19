@@ -18,6 +18,40 @@
         text-transform: capitalize;
     }
 
+    /* Match rounded corners on group headers to individual page links */
+    .sidebar-content summary {
+        border-radius: 0.25rem;
+    }
+
+    /* Text highlights on hover over text or whitespace, but not when hovering the caret */
+    .sidebar-content summary:hover:not(:has(svg:hover)) .group-label .large {
+        color: var(--sl-color-text-accent);
+    }
+
+    .sidebar-content summary svg:hover {
+        color: var(--sl-color-text-accent);
+    }
+
+    /* No hover color change on the active/highlighted group summary */
+    .sidebar-content summary.overview-section-active:hover:not(:has(svg:hover)) .group-label .large {
+        color: var(--sl-color-text-invert) !important;
+    }
+
+    .sidebar-content summary.overview-section-active svg:hover {
+        color: var(--sl-color-text-invert) !important;
+    }
+
+    /* No hover color change on already-selected page links */
+    .sidebar-content a[aria-current='page']:hover {
+        color: var(--sl-color-text-invert) !important;
+        cursor: default;
+    }
+
+    /* Improve chevron contrast on selected/active sidebar items */
+    .sidebar-content [aria-current='page'] .caret {
+        color: var(--sl-color-text-invert);
+    }
+
     --sl-color-bg: #111827;
     --sl-color-text: #ffffff;
 
@@ -91,7 +125,25 @@
     border-radius: 0.75rem;
 }
 
-/* Hero logo — used on both the ecosystem landing page and product landing pages */
+.footer-link {
+    color: var(--sl-color-gray-3);
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    color: var(--sl-color-gray-2);
+    text-decoration: underline;
+}
+
+/* Hide the default Starlight page title on product landing pages that use a custom hero.
+   In Astro 6, MDX <style> blocks are bundled into a shared stylesheet (no longer page-scoped),
+   so the upstream unscoped rules leak globally. This scoped override ensures the title is only
+   hidden on pages that actually have a .custom-hero element. */
+.main-pane:has(.custom-hero) .content-panel:has(h1#_top) { display: none; }
+.main-pane:has(.custom-hero) .content-panel:has(h1#_top) + .content-panel { border-top: none; }
+
+/* Hero — defaults match the ecosystem landing page.
+   Product landing pages (core, cli) get tighter padding via the data-has-sidebar selector below. */
 .custom-hero {
     display: flex;
     flex-direction: column;
@@ -106,6 +158,15 @@
     max-width: 28rem;
     width: 100%;
     height: auto;
+}
+
+/* Product landing pages (core, cli) have a sidebar; the ecosystem page does not. */
+html[data-has-sidebar] .custom-hero {
+    padding: 2rem 0 0.5rem;
+}
+
+html[data-has-sidebar] .custom-hero .hero-logo {
+    max-width: 36rem;
 }
 
 .hero-logo.hero-logo-light { display: none; }
