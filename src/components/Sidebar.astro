@@ -13,12 +13,6 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   </div>
 )}
 
-{/* Clear persisted sidebar state BEFORE Starlight's restore script runs,
-    so the sidebar always reflects the current page's tree on navigation. */}
-<script is:inline>
-  try { sessionStorage.removeItem("sl-sidebar-state"); } catch { /* sessionStorage may throw in private browsing */ }
-</script>
-
 {/* Render the default sidebar. */}
 <Default><slot /></Default>
 
@@ -63,11 +57,16 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   :global(nav details summary.overview-section-active:hover),
   :global(nav details summary.overview-section-active:focus) {
     background-color: var(--sl-color-text-accent) !important;
+    border-radius: 0.25rem;
   }
 
   :global(nav details summary.overview-section-active .group-label span) {
     color: var(--sl-color-text-invert);
     font-weight: 600;
+  }
+
+  :global(nav details summary.overview-section-active .caret) {
+    color: var(--sl-color-text-invert);
   }
 
 </style>
@@ -191,11 +190,42 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
           e.stopPropagation();
           if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
 
-          details.open = true;
-
           const target = strip(href).replace(/\/$/, "");
           const current = strip(window.location.pathname).replace(/\/$/, "");
-          if (target !== current) window.location.assign(href);
+
+          if (target !== current) {
+            details.open = true;
+
+            // Manually snapshot sidebar open/closed state to sessionStorage before
+            // navigating, since stopPropagation prevents Starlight's SidebarPersistState
+            // click handler from firing.
+            try {
+              const persist = document.querySelector("sl-sidebar-state-persist");
+              if (persist) {
+                const hash = persist.dataset.hash || "";
+                const allDetails = persist.querySelectorAll("details");
+                const open = [];
+                allDetails.forEach((d) => {
+                  const restore = d.querySelector("sl-sidebar-restore");
+                  if (restore) {
+                    const idx = parseInt(restore.dataset.index || "");
+                    if (!isNaN(idx)) open[idx] = d.open;
+                  }
+                });
+                const scroller = document.getElementById("starlight__sidebar");
+                sessionStorage.setItem("sl-sidebar-state", JSON.stringify({
+                  hash,
+                  open,
+                  scroll: scroller ? scroller.scrollTop : 0,
+                }));
+              }
+            } catch {}
+
+            window.location.assign(href);
+          } else {
+            // Already on this overview — toggle the section
+            details.open = !details.open;
+          }
         },
         true
       );
