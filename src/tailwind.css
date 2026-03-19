@@ -23,8 +23,8 @@
         border-radius: 0.25rem;
     }
 
-    /* Independent hover states for group label text and expand/collapse caret */
-    .sidebar-content summary .group-label:hover .large {
+    /* Text highlights on hover over text or whitespace, but not when hovering the caret */
+    .sidebar-content summary:hover:not(:has(svg:hover)) .group-label .large {
         color: var(--sl-color-text-accent);
     }
 
@@ -33,7 +33,7 @@
     }
 
     /* No hover color change on the active/highlighted group summary */
-    .sidebar-content summary.overview-section-active .group-label:hover .large {
+    .sidebar-content summary.overview-section-active:hover:not(:has(svg:hover)) .group-label .large {
         color: var(--sl-color-text-invert) !important;
     }
 
