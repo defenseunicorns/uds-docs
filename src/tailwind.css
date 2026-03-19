@@ -162,7 +162,7 @@
 
 /* Product landing pages (core, cli) have a sidebar; the ecosystem page does not. */
 html[data-has-sidebar] .custom-hero {
-    padding: 1rem 0 0.5rem;
+    padding: 2rem 0 0.5rem;
 }
 
 html[data-has-sidebar] .custom-hero .hero-logo {
