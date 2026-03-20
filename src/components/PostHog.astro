@@ -11,7 +11,7 @@
     var session_id = hashParams.get('session_id');
 
     var config = {
-      api_host: 'https://us.i.posthog.com',
+      api_host: 'https://f.defenseunicorns.com',
       cross_subdomain_cookie: true
     };
 
@@ -26,7 +26,7 @@
         window.posthog.init('phc_bXFVKWRZnEDUWbXQf3VjlAHeemyJDSsTqkpvDINHGFG', config);
       } catch (error) {
         console.warn('PostHog: init with window.posthog failed, using fallback', error);
-        posthog.init('phc_bXFVKWRZnEDUWbXQf3VjlAHeemyJDSsTqkpvDINHGFG', {api_host: 'https://us.i.posthog.com'});
+        posthog.init('phc_bXFVKWRZnEDUWbXQf3VjlAHeemyJDSsTqkpvDINHGFG', {api_host: 'https://f.defenseunicorns.com'});
       }
     }
 
