@@ -172,6 +172,10 @@ html[data-has-sidebar] .custom-hero .hero-logo {
 .hero-logo.hero-logo-light { display: none; }
 .hero-logo.hero-logo-dark  { display: block; }
 
+/* The second img always follows the first in the DOM, so Starlight's adjacent-sibling
+   margin rule adds margin-top to hero-logo-light even when hero-logo-dark is hidden. */
+.hero-logo + .hero-logo { margin-top: 0; }
+
 :root[data-theme='light'] {
     .hero-logo.hero-logo-light { display: block; }
     .hero-logo.hero-logo-dark  { display: none; }
