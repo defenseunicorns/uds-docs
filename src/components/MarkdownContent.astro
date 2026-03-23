@@ -1,5 +1,6 @@
 ---
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+import ImageZoom from 'starlight-image-zoom/components/ImageZoom.astro';
 import { VERSION_SLUG_PATTERN } from '../productUtils';
 
 // Determine the pagefind version filter for this page.
@@ -7,6 +8,7 @@ import { VERSION_SLUG_PATTERN } from '../productUtils';
 const version = Astro.url.pathname.split('/').find(s => VERSION_SLUG_PATTERN.test(s)) ?? 'current';
 ---
 
+<ImageZoom />
 <Default {...Astro.props}>
   {/* Annotate each page with its version so pagefind can filter natively at query time. */}
   <span data-pagefind-filter={`version:${version}`} aria-hidden="true" style="display:none" />
