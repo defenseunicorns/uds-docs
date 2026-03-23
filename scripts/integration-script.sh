@@ -373,22 +373,13 @@ done < <(find "$TARGET_DIR" -depth -mindepth 3 -type d -not -path '*/.c4*' -not 
 # Write the rename map so routeData.ts can resolve edit URLs without
 # duplicating the rename logic. Keys are renamed (Title Case) dir names,
 # values are the original kebab-case names from upstream repos.
+# Uses jq for JSON generation to correctly handle special characters in names.
 echo "Writing directory rename map to ${CONFIG_DIR}/dir-renames.json..."
-if [[ ${#DIR_RENAMES[@]} -eq 0 ]]; then
-  echo "{}" > "${CONFIG_DIR}/dir-renames.json"
-else
-  {
-    echo "{"
-    first=true
-    while IFS= read -r key; do
-      $first || echo ","
-      printf '  "%s": "%s"' "$key" "${DIR_RENAMES[$key]}"
-      first=false
-    done < <(printf '%s\n' "${!DIR_RENAMES[@]}" | sort)
-    echo ""
-    echo "}"
-  } > "${CONFIG_DIR}/dir-renames.json"
-fi
+json='{}'
+for key in $(printf '%s\n' "${!DIR_RENAMES[@]}" | sort); do
+  json=$(echo "$json" | jq --arg k "$key" --arg v "${DIR_RENAMES[$key]}" '. + {($k): $v}')
+done
+echo "$json" > "${CONFIG_DIR}/dir-renames.json"
 
 # Rewrite internal links in all markdown files to use the updated slugs.
 if [[ ${#SLUG_RENAMES[@]} -gt 0 ]]; then
