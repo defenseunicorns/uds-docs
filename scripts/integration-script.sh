@@ -376,9 +376,9 @@ done < <(find "$TARGET_DIR" -depth -mindepth 3 -type d -not -path '*/.c4*' -not 
 # Uses jq for JSON generation to correctly handle special characters in names.
 echo "Writing directory rename map to ${CONFIG_DIR}/dir-renames.json..."
 json='{}'
-for key in $(printf '%s\n' "${!DIR_RENAMES[@]}" | sort); do
+while IFS= read -r key; do
   json=$(echo "$json" | jq --arg k "$key" --arg v "${DIR_RENAMES[$key]}" '. + {($k): $v}')
-done
+done < <(printf '%s\n' "${!DIR_RENAMES[@]}" | sort)
 echo "$json" > "${CONFIG_DIR}/dir-renames.json"
 
 # Rewrite internal links in all markdown files to use the updated slugs.
