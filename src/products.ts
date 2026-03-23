@@ -74,7 +74,7 @@ export function loadProductConfigs(): ProductConfig[] {
   }
 
   return readdirSync(configDir)
-    .filter(f => f.endsWith('.json') && !/\.v\d+-\d+\.json$/.test(f))
+    .filter(f => f.endsWith('.json') && !/\.v\d+-\d+\.json$/.test(f) && f !== 'dir-renames.json')
     .map(f => {
       const path = `${configDir}/${f}`;
       try {
