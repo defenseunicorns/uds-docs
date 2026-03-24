@@ -235,6 +235,8 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 </script>
 
 <script>
+  import { prefetch } from 'astro:prefetch';
+
   // Close the TopicsDropdown when clicking outside it.
   // Registered once at module load — queries elements fresh on each click so it
   // always targets the current DOM after Client Router swaps.
@@ -268,7 +270,16 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 
       clone.addEventListener('click', (e) => {
           e.stopPropagation();
+          const opening = menu.hidden;
           menu.hidden = !menu.hidden;
+          // Prefetch all dropdown links when the menu opens so the target page is
+          // already in cache by the time the user clicks — eliminates the brief
+          // delay on overview pages that haven't been visited yet.
+          if (opening) {
+              menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+                  prefetch(a.href);
+              });
+          }
       });
   });
 
