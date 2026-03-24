@@ -273,22 +273,6 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
     });
 
-    // Overview <a> elements are hidden (display:none), so Astro's hover-prefetch
-    // never fires for them. Replicate it with <link rel="prefetch"> — same
-    // mechanism Astro uses for visible links, low-priority so it doesn't compete
-    // with critical resources.
-    const OVERVIEW_SLUGS_SET = new Set(['overview', 'Overview', 'index', 'Index']);
-    const stripForPrefetch = (href: string) => href.split('#')[0].split('?')[0];
-    document.querySelectorAll<HTMLAnchorElement>('nav details a[href]').forEach((a) => {
-      const parts = stripForPrefetch(a.getAttribute('href') || '').split('/').filter(Boolean);
-      const last = parts[parts.length - 1];
-      if (!last || !OVERVIEW_SLUGS_SET.has(last)) return;
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = a.href;
-      link.as = 'document';
-      document.head.appendChild(link);
-    });
   });
 
   document.addEventListener('astro:before-swap', () => {
@@ -336,6 +320,14 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       if (!last || !OVERVIEW_SLUGS.has(last)) return;
       const li = link.closest('li');
       if (li) (li as HTMLElement).style.display = 'none';
+      // Prefetch as early as possible (astro:after-swap fires before astro:page-load)
+      // so the page is cached before the user can click the section label.
+      // Overview links are hidden so Astro's hover-prefetch never fires for them.
+      const prefetchLink = document.createElement('link');
+      prefetchLink.rel = 'prefetch';
+      prefetchLink.href = (link as HTMLAnchorElement).href;
+      prefetchLink.as = 'document';
+      document.head.appendChild(prefetchLink);
       if (isOnOverview && normalize(href) === normalize(currentPath)) {
         const details = link.closest('details');
         if (details) {
