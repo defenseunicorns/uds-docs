@@ -140,10 +140,32 @@ import Default from '@astrojs/starlight/components/Search.astro';
     return 'current';
   }
 
-  const pageVersion = detectPageVersion(window.location.pathname);
+  let pageVersion = detectPageVersion(window.location.pathname);
 
-  // Initialize topic filter functionality
-  document.addEventListener('DOMContentLoaded', () => {
+  // Track active observer/timer so they can be cleaned up on navigation.
+  let activeObserver: MutationObserver | null = null;
+  let waitTimer: ReturnType<typeof setTimeout> | undefined;
+
+  // Clean up stale observer and retry timer before each Client Router swap.
+  // Without this, detached DOM trees would be kept alive by the old observer.
+  document.addEventListener('astro:before-swap', () => {
+    clearTimeout(waitTimer);
+    if (activeObserver) {
+      activeObserver.disconnect();
+      activeObserver = null;
+    }
+  });
+
+  // Initialize topic filter functionality.
+  // Uses astro:page-load (fires on both initial MPA load and Client Router SPA navigations)
+  // so the search filter re-initializes correctly when navigating between products.
+  document.addEventListener('astro:page-load', () => {
+    // Re-detect product/version for the current page after SPA navigation
+    currentFilter = detectDefaultFilter();
+    pageVersion = detectPageVersion(window.location.pathname);
+    savedPagefindCount = null;
+    autoLoadingForCount = false;
+
     let retries = 0;
     const waitForPagefindUI = () => {
       const pagefindForm = document.querySelector('.pagefind-ui__form');
@@ -151,7 +173,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
         injectTopicFilter(pagefindForm);
         setupFilterBehavior(pagefindForm);
       } else if (retries++ < 50) {
-        setTimeout(waitForPagefindUI, 100);
+        waitTimer = setTimeout(waitForPagefindUI, 100);
       } else {
         console.warn('Search: Pagefind UI form not found after 5s — product filter not injected.');
       }
@@ -247,7 +269,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
     let isInjecting = false;
     let filterTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const observer = new MutationObserver(() => {
+    activeObserver = new MutationObserver(() => {
       if (isInjecting) return;
       clearTimeout(filterTimer);
       // During auto-loading for count, use a near-zero delay so batches are consumed rapidly.
@@ -275,7 +297,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
       }, delay);
     });
 
-    observer.observe(pagefindContainer, { childList: true, subtree: true });
+    activeObserver.observe(pagefindContainer, { childList: true, subtree: true });
   }
 
   /**

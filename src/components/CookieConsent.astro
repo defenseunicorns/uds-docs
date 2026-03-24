@@ -80,4 +80,37 @@ import 'vanilla-cookieconsent/dist/cookieconsent.css';
             }
         }
     });
+
+    // Preserve cookie consent across Client Router page swaps.
+    // Two things must survive: the #cc-main DOM element and the CSS classes on <html>
+    // (show--consent, show--preferences, cc--darkmode) that control modal visibility.
+    // swapRootAttributes replaces all <html> attributes from the new document, so we
+    // copy cookie consent classes to the new doc before the swap to preserve them.
+    document.addEventListener('astro:before-swap', (e) => {
+        const newDoc = (e as Event & { newDocument: Document }).newDocument;
+
+        // Copy cookie consent classes to new document's <html> so swapRootAttributes keeps them.
+        // Snapshot the classList first — it's a live DOMTokenList.
+        const classes = [...document.documentElement.classList];
+        for (const cls of classes) {
+            if (cls.startsWith('cc--') || cls.startsWith('show--')) {
+                newDoc.documentElement.classList.add(cls);
+            }
+        }
+
+        // Move #cc-main out of <body> before the swap destroys it.
+        // IMPORTANT: #cc-main is a direct child of <html> only between before-swap and
+        // after-swap. vanilla-cookieconsent's CSS uses #cc-main directly (not body > #cc-main),
+        // so this temporary reparenting does not break styles.
+        const ccMain = document.getElementById('cc-main');
+        if (ccMain) document.documentElement.appendChild(ccMain);
+    });
+
+    document.addEventListener('astro:after-swap', () => {
+        // Move #cc-main back into <body>
+        const ccMain = document.getElementById('cc-main');
+        if (ccMain && ccMain.parentElement === document.documentElement) {
+            document.body.appendChild(ccMain);
+        }
+    });
 </script>

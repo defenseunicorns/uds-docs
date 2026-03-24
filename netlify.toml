@@ -12,3 +12,14 @@
 
     # Clickjacking protection (legacy but still widely scanned)
     X-Frame-Options = "DENY"
+
+    # Serve cached HTML immediately while revalidating in the background.
+    # Netlify invalidates the CDN on every deploy, so stale content is never
+    # served beyond the current deploy cycle.
+    Cache-Control = "public, max-age=0, stale-while-revalidate=3600"
+
+# Hashed Astro assets are content-addressed — safe to cache indefinitely.
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

@@ -41,57 +41,65 @@
 <script>
   import { productVersions, productLatestTags, versionSlug, detectProduct, detectVersionSlug } from '../productUtils';
 
-  const select = document.getElementById('version-select') as HTMLSelectElement;
-  if (select) {
+  function initVersionPicker() {
+    const select = document.getElementById('version-select') as HTMLSelectElement;
+    if (!select || select.dataset.initialized) return;
+    select.dataset.initialized = 'true';
+
     const product = detectProduct(window.location.pathname);
     if (!product) {
       // no matching product — stay hidden
-    } else {
-      const versions = productVersions[product.id] ?? [];
-      if (versions.length === 0) {
-        // This product has no archived versions — stay hidden
-      } else {
-        // Show the picker (hidden by default to prevent FOUC)
-        const picker = select.closest('.version-picker') as HTMLElement | null;
-        if (picker) picker.style.display = '';
-
-        // Label the default "Latest" option with the release tag when known
-        const latestTag = productLatestTags[product.id];
-        const latestOption = select.querySelector('option[value=""]') as HTMLOptionElement | null;
-        if (latestOption && latestTag) {
-          latestOption.textContent = `Latest (${latestTag.replace(/\.\d+$/, '')})`;
-        }
-
-        // Populate version options
-        versions.forEach(ver => {
-          const opt = document.createElement('option');
-          opt.value = versionSlug(ver);
-          opt.textContent = ver.replace(/\.\d+$/, '');
-          select.appendChild(opt);
-        });
-
-        // Set current value
-        select.value = detectVersionSlug(window.location.pathname, product) ?? '';
-
-        select.addEventListener('change', () => {
-          const selected = select.value;
-          const prefix = product.link;
-          // Strip the current version prefix from the path
-          const afterPrefix = window.location.pathname.startsWith(prefix)
-            ? window.location.pathname.slice(prefix.length)
-            : window.location.pathname;
-          const strippedPath = afterPrefix.replace(/^v\d+-\d+\//, '');
-
-          const target = selected
-            ? `${prefix}${selected}/${strippedPath}`
-            : `${prefix}${strippedPath}`;
-
-          // Navigate directly to the target URL. If the page doesn't exist,
-          // the root 404 page will fetch the versioned 404 and swap in its
-          // sidebar, so the user sees the correct sidebar context for that version.
-          window.location.href = target;
-        });
-      }
+      return;
     }
+
+    const versions = productVersions[product.id] ?? [];
+    if (versions.length === 0) {
+      // This product has no archived versions — stay hidden
+      return;
+    }
+
+    // Show the picker (hidden by default to prevent FOUC)
+    const picker = select.closest('.version-picker') as HTMLElement | null;
+    if (picker) picker.style.display = '';
+
+    // Label the default "Latest" option with the release tag when known
+    const latestTag = productLatestTags[product.id];
+    const latestOption = select.querySelector('option[value=""]') as HTMLOptionElement | null;
+    if (latestOption && latestTag) {
+      latestOption.textContent = `Latest (${latestTag.replace(/\.\d+$/, '')})`;
+    }
+
+    // Populate version options
+    versions.forEach(ver => {
+      const opt = document.createElement('option');
+      opt.value = versionSlug(ver);
+      opt.textContent = ver.replace(/\.\d+$/, '');
+      select.appendChild(opt);
+    });
+
+    // Set current value
+    select.value = detectVersionSlug(window.location.pathname, product) ?? '';
+
+    select.addEventListener('change', () => {
+      const selected = select.value;
+      const prefix = product.link;
+      // Strip the current version prefix from the path
+      const afterPrefix = window.location.pathname.startsWith(prefix)
+        ? window.location.pathname.slice(prefix.length)
+        : window.location.pathname;
+      const strippedPath = afterPrefix.replace(/^v\d+-\d+\//, '');
+
+      const target = selected
+        ? `${prefix}${selected}/${strippedPath}`
+        : `${prefix}${strippedPath}`;
+
+      // Navigate directly to the target URL via full page reload.
+      // Version switching changes sidebar structure, so a full reload is intentional.
+      window.location.href = target;
+    });
   }
+
+  // Re-initialize on each navigation (Client Router swaps the header DOM,
+  // so the old select element and its listeners are gone).
+  document.addEventListener('astro:page-load', initVersionPicker);
 </script>
