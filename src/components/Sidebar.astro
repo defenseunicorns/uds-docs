@@ -237,6 +237,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 <script>
   const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
   const strip = (href: string) => href.split('#')[0].split('?')[0];
+  const prefetchedOverviews = new Set<string>();
 
   // Close the TopicsDropdown when clicking outside it. Queries elements fresh
   // on each click so it always targets the current DOM after SPA swaps.
@@ -289,7 +290,8 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       const parts = strip(a.getAttribute('href') || '').split('/').filter(Boolean);
       const last = parts[parts.length - 1];
       if (!last || !OVERVIEW_SLUGS.has(last)) return;
-      if (document.head.querySelector(`link[rel="prefetch"][href="${a.href}"]`)) return;
+      if (prefetchedOverviews.has(a.href)) return;
+      prefetchedOverviews.add(a.href);
       const link = document.createElement('link');
       link.rel = 'prefetch';
       link.href = a.href;
