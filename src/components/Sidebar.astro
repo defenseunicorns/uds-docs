@@ -235,6 +235,9 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 </script>
 
 <script>
+  const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
+  const strip = (href: string) => href.split('#')[0].split('?')[0];
+
   // Close the TopicsDropdown when clicking outside it. Queries elements fresh
   // on each click so it always targets the current DOM after SPA swaps.
   document.addEventListener('click', (e) => {
@@ -275,6 +278,26 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 
   });
 
+  // Overview <a> elements are hidden (display:none), so Astro's hover-prefetch
+  // never fires for them. Replicate it with <link rel="prefetch"> — same
+  // mechanism Astro uses for visible links, low-priority so it doesn't compete
+  // with critical resources. Deduplication guard prevents accumulating duplicate
+  // tags across SPA navigations. Separate listener so this is never gated on
+  // the topics dropdown being present.
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLAnchorElement>('nav details a[href]').forEach((a) => {
+      const parts = strip(a.getAttribute('href') || '').split('/').filter(Boolean);
+      const last = parts[parts.length - 1];
+      if (!last || !OVERVIEW_SLUGS.has(last)) return;
+      if (document.head.querySelector(`link[rel="prefetch"][href="${a.href}"]`)) return;
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = a.href;
+      link.as = 'document';
+      document.head.appendChild(link);
+    });
+  });
+
   document.addEventListener('astro:before-swap', () => {
     // Save sidebar state before every swap. Starlight's SidebarPersistState
     // holds stale DOM refs after the first SPA navigation, so we do this manually.
@@ -306,8 +329,6 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   // correct state. Also applies overview link hiding here (rather than waiting
   // for the inline script) to prevent a visible flash before first paint.
   document.addEventListener('astro:after-swap', () => {
-    const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
-    const strip = (href: string) => href.split('#')[0].split('?')[0];
     const currentPath = strip(window.location.pathname);
     const currentParts = currentPath.split('/').filter(Boolean);
     const currentLast = currentParts[currentParts.length - 1];
@@ -320,14 +341,6 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       if (!last || !OVERVIEW_SLUGS.has(last)) return;
       const li = link.closest('li');
       if (li) (li as HTMLElement).style.display = 'none';
-      // Prefetch as early as possible (astro:after-swap fires before astro:page-load)
-      // so the page is cached before the user can click the section label.
-      // Overview links are hidden so Astro's hover-prefetch never fires for them.
-      const prefetchLink = document.createElement('link');
-      prefetchLink.rel = 'prefetch';
-      prefetchLink.href = (link as HTMLAnchorElement).href;
-      prefetchLink.as = 'document';
-      document.head.appendChild(prefetchLink);
       if (isOnOverview && normalize(href) === normalize(currentPath)) {
         const details = link.closest('details');
         if (details) {
