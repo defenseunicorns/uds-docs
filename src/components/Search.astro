@@ -237,7 +237,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
         const scheduleInit = (cb: () => void): number =>
           window.requestIdleCallback
             ? window.requestIdleCallback(cb as IdleRequestCallback, { timeout: 2000 })
-            : setTimeout(cb, 1);
+            : window.setTimeout(cb, 1);
         pendingIdleId = scheduleInit(async () => {
           pendingIdleId = null;
           // @ts-expect-error — Missing types for @pagefind/default-ui package.
