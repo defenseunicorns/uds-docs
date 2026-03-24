@@ -272,6 +272,23 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
     menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
       fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
     });
+
+    // Overview <a> elements are hidden (display:none), so Astro's hover-prefetch
+    // never fires for them. Replicate it with <link rel="prefetch"> — same
+    // mechanism Astro uses for visible links, low-priority so it doesn't compete
+    // with critical resources.
+    const OVERVIEW_SLUGS_SET = new Set(['overview', 'Overview', 'index', 'Index']);
+    const stripForPrefetch = (href: string) => href.split('#')[0].split('?')[0];
+    document.querySelectorAll<HTMLAnchorElement>('nav details a[href]').forEach((a) => {
+      const parts = stripForPrefetch(a.getAttribute('href') || '').split('/').filter(Boolean);
+      const last = parts[parts.length - 1];
+      if (!last || !OVERVIEW_SLUGS_SET.has(last)) return;
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = a.href;
+      link.as = 'document';
+      document.head.appendChild(link);
+    });
   });
 
   document.addEventListener('astro:before-swap', () => {
