@@ -149,14 +149,33 @@ import Default from '@astrojs/starlight/components/Search.astro';
   // Set to true by astro:before-swap to detect SPA navigations in astro:page-load.
   let pendingSpaPagefindInit = false;
 
-  // Clean up stale observer and retry timer before each Client Router swap.
-  // Without this, detached DOM trees would be kept alive by the old observer.
+  // ID of any pending requestIdleCallback (or setTimeout fallback) for PagefindUI init.
+  // Cancelled in astro:before-swap to prevent stale callbacks from firing against new DOM.
+  let pendingIdleId: number | null = null;
+
+  // The active PagefindUI instance. Stored so we can attempt teardown before re-init.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let pagefindInstance: any = null;
+
+  // Clean up stale observer, retry timer, and pending idle callback before each swap.
+  // Without this, detached DOM trees would be kept alive by the old observer, and a
+  // stale idle callback from a previous navigation could fire against the new DOM.
   document.addEventListener('astro:before-swap', () => {
     clearTimeout(waitTimer);
     if (activeObserver) {
       activeObserver.disconnect();
       activeObserver = null;
     }
+    if (pendingIdleId !== null) {
+      if (window.cancelIdleCallback) {
+        window.cancelIdleCallback(pendingIdleId);
+      } else {
+        clearTimeout(pendingIdleId);
+      }
+      pendingIdleId = null;
+    }
+    pagefindInstance?.destroy?.();
+    pagefindInstance = null;
     pendingSpaPagefindInit = true;
   });
 
@@ -170,12 +189,39 @@ import Default from '@astrojs/starlight/components/Search.astro';
     savedPagefindCount = null;
     autoLoadingForCount = false;
 
-    // After SPA navigation, the upstream SiteSearch custom element registers a
-    // DOMContentLoaded listener to initialize PagefindUI, but DOMContentLoaded never
-    // fires again during ClientRouter SPA swaps. Initialize PagefindUI directly instead.
+    // Defined here (before the SPA block) so the onIdle closure can reference it.
+    // On the SPA path it is called from inside onIdle after PagefindUI mounts,
+    // guaranteeing the form element exists when polling starts.
+    // On the initial load path it is called directly at the end of this handler.
+    let retries = 0;
+    const waitForPagefindUI = () => {
+      const pagefindForm = document.querySelector('.pagefind-ui__form');
+      if (pagefindForm) {
+        injectTopicFilter(pagefindForm);
+        setupFilterBehavior(pagefindForm);
+      } else if (retries++ < 50) {
+        waitTimer = setTimeout(waitForPagefindUI, 100);
+      } else {
+        console.warn('Search: Pagefind UI form not found after 5s — product filter not injected.');
+      }
+    };
+
+    // WORKAROUND for upstream Starlight bug: the SiteSearch custom element constructor
+    // initializes PagefindUI inside window.addEventListener('DOMContentLoaded', ...), but
+    // DOMContentLoaded never re-fires after ClientRouter SPA swaps. We initialize directly.
+    //
+    // This mirrors the DOMContentLoaded handler in @astrojs/starlight Search.astro
+    // (SiteSearch constructor, lines 135-158). Must be kept in sync with upstream on
+    // Starlight upgrades.
+    //
+    // NOTE: pagefindUserConfig from 'virtual:starlight/pagefind-config' is not spread here
+    // because the virtual module type declarations are inaccessible in this component override
+    // context. This is safe as long as no pagefind options are set in astro.config.mjs. If
+    // custom pagefind config is ever added there, this block must be updated to include it
+    // or SPA search will silently diverge from initial-load search behavior.
     if (pendingSpaPagefindInit && !import.meta.env.DEV) {
       pendingSpaPagefindInit = false;
-      const siteSearch = document.querySelector('site-search') as HTMLElement | null;
+      const siteSearch = document.querySelector<HTMLElement>('site-search');
       if (siteSearch) {
         const shouldStrip = siteSearch.dataset.stripTrailingSlash !== undefined;
         const stripTrailingSlash = (path: string) => path.replace(/(.)\/(#.*)?$/, '$1$2');
@@ -183,12 +229,20 @@ import Default from '@astrojs/starlight/components/Search.astro';
         let translations: Record<string, string> = {};
         try {
           translations = JSON.parse(siteSearch.dataset.translations || '{}');
-        } catch {}
-        const onIdle = window.requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1));
-        onIdle(async () => {
+        } catch (e) {
+          console.warn('Search: failed to parse translations from site-search element:', e);
+        }
+        // Use requestIdleCallback with a 2s timeout so the callback is guaranteed to fire
+        // within the waitForPagefindUI polling window (5s) even under CPU pressure.
+        const scheduleInit = (cb: () => void): number =>
+          window.requestIdleCallback
+            ? window.requestIdleCallback(cb as IdleRequestCallback, { timeout: 2000 })
+            : setTimeout(cb, 1);
+        pendingIdleId = scheduleInit(async () => {
+          pendingIdleId = null;
           // @ts-expect-error — Missing types for @pagefind/default-ui package.
           const { PagefindUI } = await import('@pagefind/default-ui');
-          new PagefindUI({
+          pagefindInstance = new PagefindUI({
             element: '#starlight__search',
             baseUrl: import.meta.env.BASE_URL,
             bundlePath: import.meta.env.BASE_URL.replace(/\/$/, '') + '/pagefind/',
@@ -203,23 +257,18 @@ import Default from '@astrojs/starlight/components/Search.astro';
               });
             },
           });
+          // Call waitForPagefindUI here — after PagefindUI has mounted — to guarantee
+          // the form element exists when polling starts, eliminating the race condition.
+          waitForPagefindUI();
         });
+      } else {
+        console.warn('Search: <site-search> element not found after SPA navigation — PagefindUI not initialized.');
       }
+      return;
     }
 
-    let retries = 0;
-    const waitForPagefindUI = () => {
-      const pagefindForm = document.querySelector('.pagefind-ui__form');
-      if (pagefindForm) {
-        injectTopicFilter(pagefindForm);
-        setupFilterBehavior(pagefindForm);
-      } else if (retries++ < 50) {
-        waitTimer = setTimeout(waitForPagefindUI, 100);
-      } else {
-        console.warn('Search: Pagefind UI form not found after 5s — product filter not injected.');
-      }
-    };
-
+    // Initial page load: upstream SiteSearch DOMContentLoaded handler initializes PagefindUI.
+    // Poll until it mounts so the topic filter and filter behavior can be injected.
     waitForPagefindUI();
   });
 
