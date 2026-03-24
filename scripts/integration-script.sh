@@ -330,6 +330,7 @@ done
 # Processed deepest-first so nested renames don't invalidate parent paths.
 echo "Renaming hyphenated directories to Title Case..."
 SLUG_RENAMES=()
+declare -A DIR_RENAMES  # new_name → old_name, written to dir-renames.json for edit URL resolution
 while IFS= read -r dir; do
   base=$(basename "$dir")
   if [[ "$base" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)+$ ]]; then
@@ -354,6 +355,7 @@ while IFS= read -r dir; do
     if [[ ! -e "$new_path" ]]; then
       echo "  $base -> $new_base"
       mv "$dir" "$new_path"
+      DIR_RENAMES["$new_base"]="$base"
       # Track dirs renamed to contain '&': github-slugger strips '&' and
       # leaves surrounding spaces as hyphens, producing a double hyphen.
       # "-and-" in the old slug becomes "--" in the URL slug.
@@ -367,6 +369,17 @@ while IFS= read -r dir; do
     fi
   fi
 done < <(find "$TARGET_DIR" -depth -mindepth 3 -type d -not -path '*/.c4*' -not -path '*/.images*' -not -path '*/v[0-9]*-[0-9]*/*')
+
+# Write the rename map so routeData.ts can resolve edit URLs without
+# duplicating the rename logic. Keys are renamed (Title Case) dir names,
+# values are the original kebab-case names from upstream repos.
+# Uses jq for JSON generation to correctly handle special characters in names.
+echo "Writing directory rename map to ${CONFIG_DIR}/dir-renames.json..."
+json='{}'
+while IFS= read -r key; do
+  json=$(echo "$json" | jq --arg k "$key" --arg v "${DIR_RENAMES[$key]}" '. + {($k): $v}')
+done < <(printf '%s\n' "${!DIR_RENAMES[@]}" | sort)
+echo "$json" > "${CONFIG_DIR}/dir-renames.json"
 
 # Rewrite internal links in all markdown files to use the updated slugs.
 if [[ ${#SLUG_RENAMES[@]} -gt 0 ]]; then
