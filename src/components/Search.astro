@@ -146,6 +146,9 @@ import Default from '@astrojs/starlight/components/Search.astro';
   let activeObserver: MutationObserver | null = null;
   let waitTimer: ReturnType<typeof setTimeout> | undefined;
 
+  // Set to true by astro:before-swap to detect SPA navigations in astro:page-load.
+  let pendingSpaPagefindInit = false;
+
   // Clean up stale observer and retry timer before each Client Router swap.
   // Without this, detached DOM trees would be kept alive by the old observer.
   document.addEventListener('astro:before-swap', () => {
@@ -154,6 +157,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
       activeObserver.disconnect();
       activeObserver = null;
     }
+    pendingSpaPagefindInit = true;
   });
 
   // Initialize topic filter functionality.
@@ -165,6 +169,43 @@ import Default from '@astrojs/starlight/components/Search.astro';
     pageVersion = detectPageVersion(window.location.pathname);
     savedPagefindCount = null;
     autoLoadingForCount = false;
+
+    // After SPA navigation, the upstream SiteSearch custom element registers a
+    // DOMContentLoaded listener to initialize PagefindUI, but DOMContentLoaded never
+    // fires again during ClientRouter SPA swaps. Initialize PagefindUI directly instead.
+    if (pendingSpaPagefindInit && !import.meta.env.DEV) {
+      pendingSpaPagefindInit = false;
+      const siteSearch = document.querySelector('site-search') as HTMLElement | null;
+      if (siteSearch) {
+        const shouldStrip = siteSearch.dataset.stripTrailingSlash !== undefined;
+        const stripTrailingSlash = (path: string) => path.replace(/(.)\/(#.*)?$/, '$1$2');
+        const formatURL = shouldStrip ? stripTrailingSlash : (path: string) => path;
+        let translations: Record<string, string> = {};
+        try {
+          translations = JSON.parse(siteSearch.dataset.translations || '{}');
+        } catch {}
+        const onIdle = window.requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1));
+        onIdle(async () => {
+          // @ts-expect-error — Missing types for @pagefind/default-ui package.
+          const { PagefindUI } = await import('@pagefind/default-ui');
+          new PagefindUI({
+            element: '#starlight__search',
+            baseUrl: import.meta.env.BASE_URL,
+            bundlePath: import.meta.env.BASE_URL.replace(/\/$/, '') + '/pagefind/',
+            showImages: false,
+            translations,
+            showSubResults: true,
+            processResult: (result: { url: string; sub_results: Array<{ url: string }> }) => {
+              result.url = formatURL(result.url);
+              result.sub_results = result.sub_results.map((sub_result) => {
+                sub_result.url = formatURL(sub_result.url);
+                return sub_result;
+              });
+            },
+          });
+        });
+      }
+    }
 
     let retries = 0;
     const waitForPagefindUI = () => {
