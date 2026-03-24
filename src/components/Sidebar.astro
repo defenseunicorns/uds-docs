@@ -235,8 +235,6 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 </script>
 
 <script>
-  import { prefetch } from 'astro:prefetch';
-
   // Close the TopicsDropdown when clicking outside it.
   // Registered once at module load — queries elements fresh on each click so it
   // always targets the current DOM after Client Router swaps.
@@ -273,10 +271,13 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
           menu.hidden = !menu.hidden;
       });
 
-      // Prefetch all product links in the background as soon as the page is ready,
-      // so navigation is instant even if the user opens the dropdown immediately.
+      // Warm the browser cache for all product links immediately on page load.
+      // astro:prefetch uses <link rel="prefetch"> (idle-time, low priority) which
+      // may not complete before the user opens the dropdown and clicks. fetch()
+      // runs at normal priority and populates the same HTTP cache the Client
+      // Router reads from, so navigation is instant even on first visit.
       menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
-          prefetch(a.href);
+          fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
       });
   });
 
