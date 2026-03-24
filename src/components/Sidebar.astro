@@ -270,16 +270,13 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 
       clone.addEventListener('click', (e) => {
           e.stopPropagation();
-          const opening = menu.hidden;
           menu.hidden = !menu.hidden;
-          // Prefetch all dropdown links when the menu opens so the target page is
-          // already in cache by the time the user clicks — eliminates the brief
-          // delay on overview pages that haven't been visited yet.
-          if (opening) {
-              menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
-                  prefetch(a.href);
-              });
-          }
+      });
+
+      // Prefetch all product links in the background as soon as the page is ready,
+      // so navigation is instant even if the user opens the dropdown immediately.
+      menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+          prefetch(a.href);
       });
   });
 
