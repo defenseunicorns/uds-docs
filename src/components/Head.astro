@@ -40,8 +40,7 @@ import { ClientRouter } from 'astro:transitions';
     const origin = window.location.origin;
     document.querySelectorAll('main a[href]').forEach((link) => {
       const anchor = link as HTMLAnchorElement;
-      // Only process http/https links — mailto:, tel:, javascript: etc. have
-      // anchor.origin === "null" and should not get target/_blank treatment.
+      // Skip non-http links (mailto:, tel:, etc.) — their anchor.origin is "null".
       if ((anchor.protocol === 'http:' || anchor.protocol === 'https:') && anchor.origin !== origin) {
         if (!anchor.hasAttribute('target')) {
           anchor.setAttribute('target', '_blank');

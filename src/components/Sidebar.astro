@@ -235,9 +235,8 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 </script>
 
 <script>
-  // Close the TopicsDropdown when clicking outside it.
-  // Registered once at module load — queries elements fresh on each click so it
-  // always targets the current DOM after Client Router swaps.
+  // Close the TopicsDropdown when clicking outside it. Queries elements fresh
+  // on each click so it always targets the current DOM after SPA swaps.
   document.addEventListener('click', (e) => {
       const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
       const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
@@ -248,16 +247,13 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       }
   });
 
-  // Initialize the TopicsDropdown toggle on every page (initial + SPA).
-  // The plugin's own is:inline script may also run and add a handler — cloning
-  // the button removes ALL prior handlers so we always have exactly one toggle.
+  // Re-initialize the TopicsDropdown toggle on every page. Cloning the button
+  // strips all prior handlers (including any added by the plugin's is:inline
+  // script) so there is always exactly one toggle handler.
   //
-  // stopPropagation is required: the plugin registers `closeDropdown` on `document`
-  // via a closure that captures the *original* dropdownButton element. After a SPA
-  // swap the button is a new DOM node, so the stale closure's
-  // `!dropdownButton.contains(event.target)` always returns true for new button
-  // clicks — the menu would open then immediately close. stopPropagation keeps the
-  // click event from reaching those stale document-level handlers.
+  // stopPropagation is required because the plugin's closeDropdown closure
+  // captures the original button element — after a SPA swap that reference is
+  // stale, so it would immediately close the menu on every button click.
   document.addEventListener('astro:page-load', () => {
       const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
       const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
@@ -271,21 +267,16 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
           menu.hidden = !menu.hidden;
       });
 
-      // Warm the browser cache for all product links immediately on page load.
-      // astro:prefetch uses <link rel="prefetch"> (idle-time, low priority) which
-      // may not complete before the user opens the dropdown and clicks. fetch()
-      // runs at normal priority and populates the same HTTP cache the Client
-      // Router reads from, so navigation is instant even on first visit.
+      // Pre-warm the browser cache for all product links so dropdown navigation
+      // is instant even on first visit.
       menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
           fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
       });
   });
 
   document.addEventListener('astro:before-swap', () => {
-      // Save sidebar state before every swap.
-      // Starlight's SidebarPersistState module captures DOM refs at load time — after the
-      // first SPA navigation those refs are stale, so its click/visibilitychange handlers
-      // stop saving state. This ensures state is always captured before navigation.
+      // Save sidebar state before every swap. Starlight's SidebarPersistState
+      // holds stale DOM refs after the first SPA navigation, so we do this manually.
       try {
           const persist = document.querySelector('sl-sidebar-state-persist');
           if (!persist) return;
@@ -309,17 +300,11 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       }
   });
 
-  // Restore sidebar state after swap but before scripts re-execute, so the is:inline
-  // scripts (applyOverviewBehavior, expand current section) operate on correct state.
-  // Starlight's SidebarPersister uses customElements.define in an is:inline script,
-  // which fails on SPA navigations (element already registered). The connectedCallback
-  // uses the initial page load's stale closure — this handler reads the latest state.
+  // Restore sidebar state after swap. Runs before runScripts() re-executes the
+  // inline scripts, so applyOverviewBehavior and expand-current operate on the
+  // correct state. Also applies overview link hiding here (rather than waiting
+  // for the inline script) to prevent a visible flash before first paint.
   document.addEventListener('astro:after-swap', () => {
-      // Hide overview links and apply the active section highlight immediately —
-      // before the browser paints the new DOM. The is:inline applyOverviewBehavior
-      // script does the same work but runs in runScripts() after after-swap, which
-      // can allow a frame to render with the overview link visible and no highlight.
-      // Doing it here eliminates the visible "settling" on overview pages.
       const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
       const strip = (href: string) => href.split('#')[0].split('?')[0];
       const currentPath = strip(window.location.pathname);
@@ -343,7 +328,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
           }
       });
 
-      // Restore sidebar state from sessionStorage.
+      // Restore sidebar open/closed state and scroll position.
       try {
           const target = document.querySelector('sl-sidebar-state-persist');
           const raw = sessionStorage.getItem('sl-sidebar-state');
