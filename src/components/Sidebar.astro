@@ -315,6 +315,34 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   // which fails on SPA navigations (element already registered). The connectedCallback
   // uses the initial page load's stale closure — this handler reads the latest state.
   document.addEventListener('astro:after-swap', () => {
+      // Hide overview links and apply the active section highlight immediately —
+      // before the browser paints the new DOM. The is:inline applyOverviewBehavior
+      // script does the same work but runs in runScripts() after after-swap, which
+      // can allow a frame to render with the overview link visible and no highlight.
+      // Doing it here eliminates the visible "settling" on overview pages.
+      const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
+      const strip = (href: string) => href.split('#')[0].split('?')[0];
+      const currentPath = strip(window.location.pathname);
+      const currentParts = currentPath.split('/').filter(Boolean);
+      const currentLast = currentParts[currentParts.length - 1];
+      const isOnOverview = Boolean(currentLast && OVERVIEW_SLUGS.has(currentLast));
+      const normalize = (p: string) => strip(p).replace(/\/$/, '');
+      document.querySelectorAll('nav a[href]').forEach((link) => {
+          const href = strip(link.getAttribute('href') || '');
+          const parts = href.split('/').filter(Boolean);
+          const last = parts[parts.length - 1];
+          if (!last || !OVERVIEW_SLUGS.has(last)) return;
+          const li = link.closest('li');
+          if (li) (li as HTMLElement).style.display = 'none';
+          if (isOnOverview && normalize(href) === normalize(currentPath)) {
+              const details = link.closest('details');
+              if (details) {
+                  const summary = details.querySelector(':scope > summary');
+                  if (summary) summary.classList.add('overview-section-active');
+              }
+          }
+      });
+
       // Restore sidebar state from sessionStorage.
       try {
           const target = document.querySelector('sl-sidebar-state-persist');
