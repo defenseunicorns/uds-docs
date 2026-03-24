@@ -71,7 +71,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 
 </style>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   // Remove versioned topics from the product dropdown — versions use the VersionPicker instead.
   // Runs immediately so there's no flash of versioned items in the dropdown.
   // Note: version slug pattern must match VERSION_SLUG_PATTERN in productUtils.ts
@@ -86,7 +86,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   })();
 </script>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   (() => {
     // Sidebar group labels (e.g. "Getting Started") navigate to the section's overview page
     // when clicked, rather than just toggling the group open/closed. This set defines which
@@ -196,32 +196,13 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
           if (target !== current) {
             details.open = true;
 
-            // Manually snapshot sidebar open/closed state to sessionStorage before
-            // navigating, since stopPropagation prevents Starlight's SidebarPersistState
-            // click handler from firing.
-            try {
-              const persist = document.querySelector("sl-sidebar-state-persist");
-              if (persist) {
-                const hash = persist.dataset.hash || "";
-                const allDetails = persist.querySelectorAll("details");
-                const open = [];
-                allDetails.forEach((d) => {
-                  const restore = d.querySelector("sl-sidebar-restore");
-                  if (restore) {
-                    const idx = parseInt(restore.dataset.index || "");
-                    if (!isNaN(idx)) open[idx] = d.open;
-                  }
-                });
-                const scroller = document.getElementById("starlight__sidebar");
-                sessionStorage.setItem("sl-sidebar-state", JSON.stringify({
-                  hash,
-                  open,
-                  scroll: scroller ? scroller.scrollTop : 0,
-                }));
-              }
-            } catch {}
-
-            window.location.assign(href);
+            // Sidebar state is saved by the astro:before-swap handler in the
+            // bundled script below — no need to snapshot here manually.
+            if (window.__astroNavigate) {
+              window.__astroNavigate(href);
+            } else {
+              window.location.assign(href);
+            }
           } else {
             // Already on this overview — toggle the section
             details.open = !details.open;
@@ -239,7 +220,7 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   })();
 </script>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   // Ensure the section containing the current page is always expanded,
   // even after SidebarPersister restores a stale collapsed state from sessionStorage.
   (() => {
@@ -251,4 +232,96 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
       el = el.parentElement?.closest('details') ?? null;
     }
   })();
+</script>
+
+<script>
+  // Close the TopicsDropdown when clicking outside it.
+  // Registered once at module load — queries elements fresh on each click so it
+  // always targets the current DOM after Client Router swaps.
+  document.addEventListener('click', (e) => {
+      const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
+      const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
+      if (!menu || !button) return;
+      const target = e.target as Element | null;
+      if (target && !menu.contains(target) && !button.contains(target)) {
+          menu.hidden = true;
+      }
+  });
+
+  // Initialize the TopicsDropdown toggle on every page (initial + SPA).
+  // The plugin's own is:inline script may also run and add a handler — cloning
+  // the button removes ALL prior handlers so we always have exactly one toggle.
+  //
+  // stopPropagation is required: the plugin registers `closeDropdown` on `document`
+  // via a closure that captures the *original* dropdownButton element. After a SPA
+  // swap the button is a new DOM node, so the stale closure's
+  // `!dropdownButton.contains(event.target)` always returns true for new button
+  // clicks — the menu would open then immediately close. stopPropagation keeps the
+  // click event from reaching those stale document-level handlers.
+  document.addEventListener('astro:page-load', () => {
+      const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
+      const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
+      if (!button || !menu) return;
+
+      const clone = button.cloneNode(true) as HTMLElement;
+      button.replaceWith(clone);
+
+      clone.addEventListener('click', (e) => {
+          e.stopPropagation();
+          menu.hidden = !menu.hidden;
+      });
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+      // Save sidebar state before every swap.
+      // Starlight's SidebarPersistState module captures DOM refs at load time — after the
+      // first SPA navigation those refs are stale, so its click/visibilitychange handlers
+      // stop saving state. This ensures state is always captured before navigation.
+      try {
+          const persist = document.querySelector('sl-sidebar-state-persist');
+          if (!persist) return;
+          const hash = (persist as HTMLElement).dataset.hash || '';
+          const open: Array<boolean | null> = [];
+          persist.querySelectorAll('details').forEach((d) => {
+              const restore = d.querySelector('sl-sidebar-restore');
+              if (restore) {
+                  const idx = parseInt((restore as HTMLElement).dataset.index || '');
+                  if (!isNaN(idx)) open[idx] = d.open;
+              }
+          });
+          const scroller = document.getElementById('starlight__sidebar');
+          sessionStorage.setItem('sl-sidebar-state', JSON.stringify({
+              hash,
+              open,
+              scroll: scroller ? scroller.scrollTop : 0,
+          }));
+      } catch (err) {
+          if (import.meta.env.DEV) console.warn('Sidebar state save failed:', err);
+      }
+  });
+
+  // Restore sidebar state after swap but before scripts re-execute, so the is:inline
+  // scripts (applyOverviewBehavior, expand current section) operate on correct state.
+  // Starlight's SidebarPersister uses customElements.define in an is:inline script,
+  // which fails on SPA navigations (element already registered). The connectedCallback
+  // uses the initial page load's stale closure — this handler reads the latest state.
+  document.addEventListener('astro:after-swap', () => {
+      // Restore sidebar state from sessionStorage.
+      try {
+          const target = document.querySelector('sl-sidebar-state-persist');
+          const raw = sessionStorage.getItem('sl-sidebar-state');
+          if (!target || !raw) return;
+          const state = JSON.parse(raw);
+          if ((target as HTMLElement).dataset.hash !== state.hash) return;
+          target.querySelectorAll('sl-sidebar-restore').forEach((el) => {
+              const idx = parseInt((el as HTMLElement).dataset.index || '');
+              const details = el.closest('details');
+              if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+          });
+          const scroller = document.getElementById('starlight__sidebar');
+          if (scroller && typeof state.scroll === 'number') scroller.scrollTop = state.scroll;
+      } catch (err) {
+          if (import.meta.env.DEV) console.warn('Sidebar state restore failed:', err);
+      }
+  });
 </script>

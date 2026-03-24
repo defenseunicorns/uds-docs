@@ -1,7 +1,15 @@
 ---
 import Default from '@astrojs/starlight/components/Head.astro';
 import PostHog from './PostHog.astro';
+import { ClientRouter } from 'astro:transitions';
 ---
+
+<ClientRouter />
+
+<script>
+  import { navigate } from 'astro:transitions/client';
+  window.__astroNavigate = navigate;
+</script>
 
 <link rel="sitemap" href="/sitemap-index.xml" />
 <script
@@ -32,17 +40,15 @@ import PostHog from './PostHog.astro';
     const origin = window.location.origin;
     document.querySelectorAll('main a[href]').forEach((link) => {
       const anchor = link as HTMLAnchorElement;
-      try {
-        const url = new URL(anchor.href, window.location.href);
-        if (url.origin !== origin) {
-          if (!anchor.hasAttribute('target')) {
-            anchor.setAttribute('target', '_blank');
-          }
-          anchor.setAttribute('rel', 'noopener noreferrer');
+      // Only process http/https links — mailto:, tel:, javascript: etc. have
+      // anchor.origin === "null" and should not get target/_blank treatment.
+      if ((anchor.protocol === 'http:' || anchor.protocol === 'https:') && anchor.origin !== origin) {
+        if (!anchor.hasAttribute('target')) {
+          anchor.setAttribute('target', '_blank');
         }
-      } catch { /* ignore unparseable hrefs */ }
+        anchor.setAttribute('rel', 'noopener noreferrer');
+      }
     });
   }
-  document.addEventListener('DOMContentLoaded', applyExternalLinks);
   document.addEventListener('astro:page-load', applyExternalLinks);
 </script>
