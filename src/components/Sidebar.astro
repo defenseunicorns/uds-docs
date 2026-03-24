@@ -238,13 +238,13 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   // Close the TopicsDropdown when clicking outside it. Queries elements fresh
   // on each click so it always targets the current DOM after SPA swaps.
   document.addEventListener('click', (e) => {
-      const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
-      const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
-      if (!menu || !button) return;
-      const target = e.target as Element | null;
-      if (target && !menu.contains(target) && !button.contains(target)) {
-          menu.hidden = true;
-      }
+    const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
+    const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
+    if (!menu || !button) return;
+    const target = e.target as Element | null;
+    if (target && !menu.contains(target) && !button.contains(target)) {
+      menu.hidden = true;
+    }
   });
 
   // Re-initialize the TopicsDropdown toggle on every page. Cloning the button
@@ -255,49 +255,49 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   // captures the original button element — after a SPA swap that reference is
   // stale, so it would immediately close the menu on every button click.
   document.addEventListener('astro:page-load', () => {
-      const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
-      const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
-      if (!button || !menu) return;
+    const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
+    const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
+    if (!button || !menu) return;
 
-      const clone = button.cloneNode(true) as HTMLElement;
-      button.replaceWith(clone);
+    const clone = button.cloneNode(true) as HTMLElement;
+    button.replaceWith(clone);
 
-      clone.addEventListener('click', (e) => {
-          e.stopPropagation();
-          menu.hidden = !menu.hidden;
-      });
+    clone.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+    });
 
-      // Pre-warm the browser cache for all product links so dropdown navigation
-      // is instant even on first visit.
-      menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
-          fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
-      });
+    // Pre-warm the browser cache for all product links so dropdown navigation
+    // is instant even on first visit.
+    menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+      fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
+    });
   });
 
   document.addEventListener('astro:before-swap', () => {
-      // Save sidebar state before every swap. Starlight's SidebarPersistState
-      // holds stale DOM refs after the first SPA navigation, so we do this manually.
-      try {
-          const persist = document.querySelector('sl-sidebar-state-persist');
-          if (!persist) return;
-          const hash = (persist as HTMLElement).dataset.hash || '';
-          const open: Array<boolean | null> = [];
-          persist.querySelectorAll('details').forEach((d) => {
-              const restore = d.querySelector('sl-sidebar-restore');
-              if (restore) {
-                  const idx = parseInt((restore as HTMLElement).dataset.index || '');
-                  if (!isNaN(idx)) open[idx] = d.open;
-              }
-          });
-          const scroller = document.getElementById('starlight__sidebar');
-          sessionStorage.setItem('sl-sidebar-state', JSON.stringify({
-              hash,
-              open,
-              scroll: scroller ? scroller.scrollTop : 0,
-          }));
-      } catch (err) {
-          if (import.meta.env.DEV) console.warn('Sidebar state save failed:', err);
-      }
+    // Save sidebar state before every swap. Starlight's SidebarPersistState
+    // holds stale DOM refs after the first SPA navigation, so we do this manually.
+    try {
+      const persist = document.querySelector('sl-sidebar-state-persist');
+      if (!persist) return;
+      const hash = (persist as HTMLElement).dataset.hash || '';
+      const open: Array<boolean | null> = [];
+      persist.querySelectorAll('details').forEach((d) => {
+        const restore = d.querySelector('sl-sidebar-restore');
+        if (restore) {
+          const idx = parseInt((restore as HTMLElement).dataset.index || '');
+          if (!isNaN(idx)) open[idx] = d.open;
+        }
+      });
+      const scroller = document.getElementById('starlight__sidebar');
+      sessionStorage.setItem('sl-sidebar-state', JSON.stringify({
+        hash,
+        open,
+        scroll: scroller ? scroller.scrollTop : 0,
+      }));
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('Sidebar state save failed:', err);
+    }
   });
 
   // Restore sidebar state after swap. Runs before runScripts() re-executes the
@@ -305,45 +305,45 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   // correct state. Also applies overview link hiding here (rather than waiting
   // for the inline script) to prevent a visible flash before first paint.
   document.addEventListener('astro:after-swap', () => {
-      const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
-      const strip = (href: string) => href.split('#')[0].split('?')[0];
-      const currentPath = strip(window.location.pathname);
-      const currentParts = currentPath.split('/').filter(Boolean);
-      const currentLast = currentParts[currentParts.length - 1];
-      const isOnOverview = Boolean(currentLast && OVERVIEW_SLUGS.has(currentLast));
-      const normalize = (p: string) => strip(p).replace(/\/$/, '');
-      document.querySelectorAll('nav a[href]').forEach((link) => {
-          const href = strip(link.getAttribute('href') || '');
-          const parts = href.split('/').filter(Boolean);
-          const last = parts[parts.length - 1];
-          if (!last || !OVERVIEW_SLUGS.has(last)) return;
-          const li = link.closest('li');
-          if (li) (li as HTMLElement).style.display = 'none';
-          if (isOnOverview && normalize(href) === normalize(currentPath)) {
-              const details = link.closest('details');
-              if (details) {
-                  const summary = details.querySelector(':scope > summary');
-                  if (summary) summary.classList.add('overview-section-active');
-              }
-          }
-      });
-
-      // Restore sidebar open/closed state and scroll position.
-      try {
-          const target = document.querySelector('sl-sidebar-state-persist');
-          const raw = sessionStorage.getItem('sl-sidebar-state');
-          if (!target || !raw) return;
-          const state = JSON.parse(raw);
-          if ((target as HTMLElement).dataset.hash !== state.hash) return;
-          target.querySelectorAll('sl-sidebar-restore').forEach((el) => {
-              const idx = parseInt((el as HTMLElement).dataset.index || '');
-              const details = el.closest('details');
-              if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
-          });
-          const scroller = document.getElementById('starlight__sidebar');
-          if (scroller && typeof state.scroll === 'number') scroller.scrollTop = state.scroll;
-      } catch (err) {
-          if (import.meta.env.DEV) console.warn('Sidebar state restore failed:', err);
+    const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
+    const strip = (href: string) => href.split('#')[0].split('?')[0];
+    const currentPath = strip(window.location.pathname);
+    const currentParts = currentPath.split('/').filter(Boolean);
+    const currentLast = currentParts[currentParts.length - 1];
+    const isOnOverview = Boolean(currentLast && OVERVIEW_SLUGS.has(currentLast));
+    const normalize = (p: string) => strip(p).replace(/\/$/, '');
+    document.querySelectorAll('nav a[href]').forEach((link) => {
+      const href = strip(link.getAttribute('href') || '');
+      const parts = href.split('/').filter(Boolean);
+      const last = parts[parts.length - 1];
+      if (!last || !OVERVIEW_SLUGS.has(last)) return;
+      const li = link.closest('li');
+      if (li) (li as HTMLElement).style.display = 'none';
+      if (isOnOverview && normalize(href) === normalize(currentPath)) {
+        const details = link.closest('details');
+        if (details) {
+          const summary = details.querySelector(':scope > summary');
+          if (summary) summary.classList.add('overview-section-active');
+        }
       }
+    });
+
+    // Restore sidebar open/closed state and scroll position.
+    try {
+      const target = document.querySelector('sl-sidebar-state-persist');
+      const raw = sessionStorage.getItem('sl-sidebar-state');
+      if (!target || !raw) return;
+      const state = JSON.parse(raw);
+      if ((target as HTMLElement).dataset.hash !== state.hash) return;
+      target.querySelectorAll('sl-sidebar-restore').forEach((el) => {
+        const idx = parseInt((el as HTMLElement).dataset.index || '');
+        const details = el.closest('details');
+        if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+      });
+      const scroller = document.getElementById('starlight__sidebar');
+      if (scroller && typeof state.scroll === 'number') scroller.scrollTop = state.scroll;
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('Sidebar state restore failed:', err);
+    }
   });
 </script>
