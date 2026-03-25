@@ -4,21 +4,20 @@ This guide explains how to contribute content to the UDS documentation site. It 
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
-2. [Local Development](#local-development)
-3. [Content Structure](#content-structure)
-4. [Navigation & Sidebar](#navigation--sidebar)
-5. [Home Page Cards](#home-page-cards)
-6. [Adding, Editing, and Moving Pages](#adding-editing-and-moving-pages)
-7. [Images & Media](#images--media)
-8. [Writing & Style Guidelines](#writing--style-guidelines)
-9. [Links & Cross-References](#links--cross-references)
-10. [Redirects (Required when Moving/Renaming)](#redirects-required-when-movingrenaming)
-11. [LLM-Friendly Documentation](#llm-friendly-documentation)
-12. [Adding a New Product](#adding-a-new-product)
-13. [Checks Before Opening a PR](#checks-before-opening-a-pr)
-14. [Submitting a PR](#submitting-a-pr)
-15. [Troubleshooting](#troubleshooting)
-16. [Resources](#resources)
+1. [Local Development](#local-development)
+1. [Content Structure](#content-structure)
+1. [Navigation & Sidebar](#navigation--sidebar)
+1. [Home Page Cards](#home-page-cards)
+1. [Adding, Editing, and Moving Pages](#adding-editing-and-moving-pages)
+1. [Images & Media](#images--media)
+1. [Writing & Style Guidelines](#writing--style-guidelines)
+1. [Links & Cross-References](#links--cross-references)
+1. [Redirects (Required when Moving/Renaming)](#redirects-required-when-movingrenaming)
+1. [Adding a New Product](#adding-a-new-product)
+1. [Checks Before Opening a PR](#checks-before-opening-a-pr)
+1. [Submitting a PR](#submitting-a-pr)
+1. [Troubleshooting](#troubleshooting)
+1. [Resources](#resources)
 
 ## Project Overview
 - **Framework**: Astro + Starlight.
@@ -155,51 +154,6 @@ After the integration script runs, the image will be at `src/content/docs/{conte
   ```
 - Keep trailing slashes consistent with the target page.
 - Include the smallest set needed to preserve working links from prior URLs.
-
-## LLM-Friendly Documentation
-
-The docs site generates `llms.txt`, `llms-full.txt`, and `llms-small.txt` via the `starlight-llms-txt` Astro plugin. These files let AI coding assistants and LLMs consume the entire documentation as structured text. Many developers now ask an LLM to help them configure or troubleshoot UDS; the quality of these files directly affects the quality of AI-generated answers.
-
-### Required: `description` frontmatter on every page
-
-Every page must have a `description` field in its frontmatter. This is required, not optional.
-
-```yaml
----
-title: Configure TLS certificates for gateways
-description: Configure valid TLS certificates for UDS Core ingress gateways using cert-manager, manual secrets, or cloud-managed certificate options.
----
-```
-
-**The `description` field is used by:**
-- **`llms.txt`**: listed next to each page link so LLMs decide which content to fetch without downloading everything
-- **Pagefind search**: shown as the snippet beneath each search result
-- **SEO**: used as the HTML `<meta name="description">` tag
-
-**Writing a good description:**
-- 1–2 sentences, active voice
-- For how-to guides: start with a verb, e.g. "Configure...", "Enable...", "Set up..."
-- For reference pages: start with "Complete reference for...", e.g. "Complete reference for UDS Core identity and authorization configuration..."
-- For concept pages: describe how the component works, e.g. "How UDS Core uses Falco to detect runtime threats..."
-- For runbooks: start with "Diagnose and resolve..." or "Recover..."
-- For overview/index pages: start with "Guides for..." or "Index of...", e.g. "Guides for configuring UDS Core networking: TLS, gateways, and network access rules."
-- Avoid "This page..." or "Learn about..." openings
-
-**Where descriptions live:**
-- For pages maintained in this repo: write the `description` directly in the page frontmatter.
-- For pages sourced from an upstream product repo: write the `description` in the upstream repo. Do not edit synced pages in `src/content/docs/{contentDir}/` directly; those are overwritten on integration.
-
-### llms.txt plugin configuration
-
-The plugin is configured in `astro.config.mjs` inside the `starlightLlmsTxt()` call. Key settings:
-
-- **`description`**: overall description of UDS that LLMs see first; should explain what UDS is, its components, and how the docs are organized.
-- **`details`**: the `## Products` section is auto-derived from each product's `description` field in `docs.config.json`; no manual update needed when adding a product.
-- **`customSets`**: auto-derived from `PRODUCTS` + `sidebarOrder`; no manual update needed when adding a product.
-- **`promote`**: auto-derived from `sidebarOrder`; no manual update needed.
-- **`minify`**: `caution` and `danger` callouts are **not** minified (kept in `llms-small.txt`) because they contain safety-critical information.
-
----
 
 ## Adding a New Product
 
