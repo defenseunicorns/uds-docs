@@ -7,7 +7,9 @@
     "start": "astro dev",
     "build": "bash scripts/integration-script.sh && astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -31,6 +33,7 @@
     "vanilla-cookieconsent": "^3.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "likec4": "^1.42.1"
   },
   "overrides": {
