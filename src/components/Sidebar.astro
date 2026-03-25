@@ -235,6 +235,10 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 </script>
 
 <script>
+  const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
+  const strip = (href: string) => href.split('#')[0].split('?')[0];
+  const prefetchedOverviews = new Set<string>();
+
   // Close the TopicsDropdown when clicking outside it. Queries elements fresh
   // on each click so it always targets the current DOM after SPA swaps.
   document.addEventListener('click', (e) => {
@@ -272,6 +276,28 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
     menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
       fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
     });
+
+  });
+
+  // Overview <a> elements are hidden (display:none), so Astro's hover-prefetch
+  // never fires for them. Replicate it with <link rel="prefetch"> — same
+  // mechanism Astro uses for visible links, low-priority so it doesn't compete
+  // with critical resources. Deduplication guard prevents accumulating duplicate
+  // tags across SPA navigations. Separate listener so this is never gated on
+  // the topics dropdown being present.
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLAnchorElement>('nav details a[href]').forEach((a) => {
+      const parts = strip(a.getAttribute('href') || '').split('/').filter(Boolean);
+      const last = parts[parts.length - 1];
+      if (!last || !OVERVIEW_SLUGS.has(last)) return;
+      if (prefetchedOverviews.has(a.href)) return;
+      prefetchedOverviews.add(a.href);
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = a.href;
+      link.as = 'document';
+      document.head.appendChild(link);
+    });
   });
 
   document.addEventListener('astro:before-swap', () => {
@@ -305,8 +331,6 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
   // correct state. Also applies overview link hiding here (rather than waiting
   // for the inline script) to prevent a visible flash before first paint.
   document.addEventListener('astro:after-swap', () => {
-    const OVERVIEW_SLUGS = new Set(['overview', 'Overview', 'index', 'Index']);
-    const strip = (href: string) => href.split('#')[0].split('?')[0];
     const currentPath = strip(window.location.pathname);
     const currentParts = currentPath.split('/').filter(Boolean);
     const currentLast = currentParts[currentParts.length - 1];
