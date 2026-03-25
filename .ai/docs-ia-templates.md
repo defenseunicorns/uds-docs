@@ -4,7 +4,34 @@
 
 This document provides templates for common documentation page types in UDS Core docs.
 
+## Frontmatter requirements
+
+Every page **must** include a `description` field in its frontmatter:
+
+```yaml
 ---
+title: Page Title
+description: Configure valid TLS certificates for UDS Core ingress gateways using cert-manager, manual secrets, or cloud-managed certificate options.
+---
+```
+
+**Why it's required:** The `description` field is used in three places:
+1. **`llms.txt`**: LLMs read the description to decide which document set to fetch. Without it, AI-assisted navigation degrades.
+2. **Search**: Pagefind displays the description as the snippet below each result.
+3. **SEO**: Used as the page meta description.
+
+**Writing a good description:**
+- 1–2 sentences, active voice
+- For how-to guides: start with a verb, for example "Configure...", "Enable...", "Set up..."
+- For reference pages: start with "Complete reference for...", e.g. "Complete reference for UDS Core identity and authorization configuration..."
+- For concept pages: describe how the component works, e.g. "How UDS Core uses Falco to detect runtime threats..."
+- For runbooks: start with "Diagnose and resolve..." or "Recover..."
+- For overview/index pages: start with "Guides for..." or "Index of..."
+- Avoid "This page..." or "Learn about..." openings; lead with the actual content
+
+---
+
+> **Note:** The templates below are legacy reference structures. The authoritative, up-to-date templates for each page type live in the upstream product repos at `.ai/docs/` (e.g., `uds-core/.ai/docs/how-to-guide-template.md`). If you are writing docs for a product repo, use the templates there instead of these. The templates below may differ in section structure, heading style, and conventions.
 
 ## Template 1: How-To Guide Template
 

@@ -16,7 +16,7 @@ This document defines the final Information Architecture (IA) for the UDS docume
 
 ## Quick Summary: What's Changing?
 
-- **Complete IA restructure for UDS Core**: sections reorganized (Overview → Getting Started → Concepts → How-To → Reference → Operations) and content moved to new paths—expect URL changes and redirects.
+- **Complete IA restructure for UDS Core**: sections reorganized (Overview → Getting Started → Concepts → How-To → Reference → Operations) and content moved to new paths; expect URL changes and redirects.
 - **Multi-product tabs** at the sidebar top (UDS Core, Registry, Fleet) with shared search and consistent templates.
 - **Default-expanded “Overview” + “Getting Started”** for UDS Core; predictable navigation (breadcrumbs, sticky TOC, prev/next links).
 - **Task-first organization with Packaging Applications highlighted** to support self-service/Foundry.
@@ -604,6 +604,45 @@ UDS Fleet Documentation
 - Refine based on support ticket trends
 - [Utilize Astro plugin for future products to combine docs](https://starlight-sidebar-topics.netlify.app/docs/getting-started/)
 - migrate to new templates
+
+---
+
+## Appendix: LLM-Friendly Documentation
+
+The docs site generates `llms.txt`, `llms-full.txt`, and `llms-small.txt` via the `starlight-llms-txt` plugin. These files allow AI coding assistants and LLMs to consume the full documentation as structured text.
+
+### Required: `description` frontmatter on every page
+
+Every page must have a `description` field in its frontmatter. This is not optional.
+
+```yaml
+---
+title: Configure TLS certificates for gateways
+description: Configure valid TLS certificates for UDS Core ingress gateways using cert-manager, manual secrets, or cloud-managed certificate options.
+---
+```
+
+The description is used by:
+- **`llms.txt`**: listed as the page's purpose so LLMs can decide which document set to retrieve
+- **Pagefind search**: displayed as the snippet below each search result
+- **SEO**: used as the HTML `<meta name="description">` tag
+
+### Writing good descriptions
+
+| Page type | Pattern | Example |
+|---|---|---|
+| How-to guide | "Configure/Enable/Set up... [what] [for whom/when]." | "Configure Keycloak for production HA with an external PostgreSQL database and horizontal pod autoscaling." |
+| Reference | "Complete reference for... [surface] including [key fields]." | "Complete reference for the Package v1alpha1 custom resource, which declares an application's network access, SSO clients, and monitoring configuration." |
+| Concept | "How [component] [does thing] in UDS Core." | "How UDS Core uses Falco to detect runtime threats by monitoring system calls, file access, and network connections inside running containers." |
+| Runbook | "Diagnose and resolve [problem]." | "Diagnose and resolve issues where UDS Exemption or Package CRs are not being reconciled by the UDS Operator." |
+| Overview/index | "Index of/Guides for [section] covering [topics]." | "Guides for common Keycloak and Authservice tasks: SSO configuration, identity providers, login policies, and branding." |
+
+### Adding a new product
+
+When adding a new product to the docs site:
+- All docs pages in the product's repo must have `description` frontmatter
+- The product's `index.mdx` description is especially important; the `promote` config in `astro.config.mjs` explicitly promotes product index pages ahead of all section pages so LLMs encounter the product summary before individual pages in `llms-full.txt` and `llms-small.txt`
+- `customSets` and `promote` in `astro.config.mjs` auto-derive from `sidebarOrder`; no manual update required when adding a product
 
 ---
 
