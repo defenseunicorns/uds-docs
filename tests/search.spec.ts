@@ -23,7 +23,7 @@ async function getVisibleResultHrefs(page: import('@playwright/test').Page): Pro
     const hrefs: string[] = [];
     results.forEach(result => {
       const el = result as HTMLElement;
-      if (el.style.display === 'none') return;
+      if (getComputedStyle(el).display === 'none') return;
       const link = el.querySelector('a.pagefind-ui__result-link');
       if (link) hrefs.push(link.getAttribute('href') || '');
     });

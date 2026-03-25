@@ -10,7 +10,8 @@ test.describe.skip('Version Picker', () => {
     const options = select.locator('option');
     const versionOption = options.nth(1);
     const value = await versionOption.getAttribute('value');
-    await select.selectOption(value!);
+    expect(value).not.toBeNull();
+    await select.selectOption(value as string);
 
     await expect(page).toHaveURL(/\/core\/v\d+-\d+\//);
   });
