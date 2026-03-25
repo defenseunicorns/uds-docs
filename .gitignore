@@ -41,3 +41,7 @@ temp/
 src/content/docs/*
 !src/content/docs/*.md
 !src/content/docs/*.mdx
+
+# Playwright
+test-results/
+playwright-report/
