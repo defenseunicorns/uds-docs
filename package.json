@@ -8,8 +8,8 @@
     "build": "bash scripts/integration-script.sh && astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test": "npm run build && playwright test",
+    "test:ui": "npm run build && playwright test --ui"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
