@@ -270,6 +270,7 @@ The integration script will rsync from your local path instead of cloning from G
 
 ## Checks Before Opening a PR
 - **Build locally**: `npm run build` (runs `astro check` + build).
+- **Run tests**: `npm test` (builds the site and runs Playwright E2E tests against it).
 - **Validate links**: Broken internal links will fail due to `starlight-links-validator` integration.
 - **Review navigation**: Confirm the page appears in the expected sidebar section.
 - **Review home page** (if updated): Verify card links render and route correctly.
