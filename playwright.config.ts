@@ -7,7 +7,7 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'html',
   use: {
     baseURL: 'http://localhost:4321',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
   },
   webServer: {
     command: 'npm run preview',
