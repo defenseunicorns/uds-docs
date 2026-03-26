@@ -125,7 +125,7 @@ const topicsOption = Object.fromEntries([
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://uds.defenseunicorns.com/docs/',
+  site: 'https://docs.defenseunicorns.com/docs/',
   prefetch: true,
   redirects:
   {
