@@ -3,7 +3,7 @@
  *
  * To add a new product:
  *   1. Add an entry to src/products.json (repo, optional branch).
- *   2. Ensure the upstream repo has a docs/docs.config.json defining id, label, contentDir, sidebarOrder.
+ *   2. Ensure the upstream repo has a docs/docs.config.json defining id, label, contentDir, description, sidebarOrder.
  *   3. Run `npm run build` to verify everything wires up.
  *
  * See CONTRIBUTING.md → "Adding a New Product" for the full walkthrough.
@@ -21,6 +21,7 @@ export interface ProductConfig {
   link: string;
   contentDir: string;
   repo: string;
+  description?: string;
   sidebarOrder: (string | { dir: string; label: string })[];
 }
 
@@ -91,6 +92,7 @@ export function loadProductConfigs(): ProductConfig[] {
           link: `/${data.contentDir}/`,
           contentDir: data.contentDir,
           repo: data.repo,
+          description: data.description,
           sidebarOrder: data.sidebarOrder ?? [],
         };
       } catch (err) {

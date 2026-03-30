@@ -4,20 +4,20 @@ This guide explains how to contribute content to the UDS documentation site. It 
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
-2. [Local Development](#local-development)
-3. [Content Structure](#content-structure)
-4. [Navigation & Sidebar](#navigation--sidebar)
-5. [Home Page Cards](#home-page-cards)
-6. [Adding, Editing, and Moving Pages](#adding-editing-and-moving-pages)
-7. [Images & Media](#images--media)
-8. [Writing & Style Guidelines](#writing--style-guidelines)
-9. [Links & Cross-References](#links--cross-references)
-10. [Redirects (Required when Moving/Renaming)](#redirects-required-when-movingrenaming)
-11. [Adding a New Product](#adding-a-new-product)
-12. [Checks Before Opening a PR](#checks-before-opening-a-pr)
-13. [Submitting a PR](#submitting-a-pr)
-14. [Troubleshooting](#troubleshooting)
-15. [Resources](#resources)
+1. [Local Development](#local-development)
+1. [Content Structure](#content-structure)
+1. [Navigation & Sidebar](#navigation--sidebar)
+1. [Home Page Cards](#home-page-cards)
+1. [Adding, Editing, and Moving Pages](#adding-editing-and-moving-pages)
+1. [Images & Media](#images--media)
+1. [Writing & Style Guidelines](#writing--style-guidelines)
+1. [Links & Cross-References](#links--cross-references)
+1. [Redirects (Required when Moving/Renaming)](#redirects-required-when-movingrenaming)
+1. [Adding a New Product](#adding-a-new-product)
+1. [Checks Before Opening a PR](#checks-before-opening-a-pr)
+1. [Submitting a PR](#submitting-a-pr)
+1. [Troubleshooting](#troubleshooting)
+1. [Resources](#resources)
 
 ## Project Overview
 - **Framework**: Astro + Starlight.
@@ -55,11 +55,11 @@ Notes:
 - Sidebar sections and ordering are defined by the upstream repo's `docs/docs.config.json` via the `sidebarOrder` field.
 - Only directories listed in `sidebarOrder` appear in the sidebar. The integration script removes unlisted directories to prevent orphaned pages.
 
-Recommended file frontmatter for pages (example):
+Required file frontmatter for pages:
 ```yaml
   ---
   title: Deploying UDS on RKE2
-  description: Step-by-step guide to deploy UDS on RKE2.
+  description: Deploy UDS Core on an RKE2 cluster using Zarf packages and bundle overrides.
   sidebar:
     order: 10   # Optional, controls ordering within a section
   ---
@@ -91,7 +91,7 @@ Recommended file frontmatter for pages (example):
 
 ### Product-supplied images
 
-Product repos can include images alongside their docs and reference them with relative paths. The integration script rsyncs all files from a product's `docs/` directory — not just Markdown — so images are copied automatically.
+Product repos can include images alongside their docs and reference them with relative paths. The integration script rsyncs all files from a product's `docs/` directory (not just Markdown), so images are copied automatically.
 
 Convention: place images in a `.images/` subdirectory (leading dot keeps it out of sidebar autogeneration):
 
@@ -168,6 +168,7 @@ Each upstream repo must have a `docs/docs.config.json` that defines how the prod
   "id": "myproduct",
   "label": "My Product",
   "contentDir": "my-product",
+  "description": "One to two sentences describing the product: what it does and its key components.",
   "archiveCount": 2,
   "sidebarOrder": [
     "getting-started",
@@ -178,13 +179,14 @@ Each upstream repo must have a `docs/docs.config.json` that defines how the prod
 }
 ```
 
-- `id` — unique product identifier. **Do not use hyphens** — use underscores instead (e.g. `my_product` not `my-product`). The id is used as an environment variable suffix for version overrides.
-- `label` — display name shown in navigation.
-- `contentDir` — directory under `src/content/docs/` where docs are placed. Also determines the URL prefix (`/{contentDir}/`).
-- `archiveCount` (optional) — number of archived minor versions to keep alongside the latest. Omit (or set to `0`) for latest-only.
-- `sidebarOrder` — ordered list of sidebar sections. Each entry is a directory name string (label auto-generated via title-casing) or an object `{ "dir": "...", "label": "..." }` for custom labels. Only listed directories appear in the sidebar — unlisted directories are removed by the integration script. Directories listed in `sidebarOrder` that don't exist on disk are silently skipped.
+- `id`: unique product identifier. **Do not use hyphens**; use underscores instead (e.g. `my_product` not `my-product`). The id is used as an environment variable suffix for version overrides.
+- `label`: display name shown in navigation.
+- `contentDir`: directory under `src/content/docs/` where docs are placed. Also determines the URL prefix (`/{contentDir}/`).
+- `description`: product summary used in `llms.txt` so AI assistants know what the product does and which docs to consult. Write 1–2 sentences covering what the product does and its key components (e.g. bundled services, CLIs, CRDs). This text appears in the `## Products` section of `llms.txt` and is the first thing an LLM reads about your product. **Required** for LLM-friendly docs.
+- `archiveCount` (optional): number of archived minor versions to keep alongside the latest. Omit (or set to `0`) for latest-only.
+- `sidebarOrder`: ordered list of sidebar sections. Each entry is a directory name string (label auto-generated via title-casing) or an object `{ "dir": "...", "label": "..." }` for custom labels. Only listed directories appear in the sidebar; unlisted directories are removed by the integration script. Directories listed in `sidebarOrder` that don't exist on disk are silently skipped.
 
-Different versions of a product can have different `sidebarOrder` — the config is read per-version at build time. Archived versions without a `docs.config.json` are skipped with a warning.
+Different versions of a product can have different `sidebarOrder`; the config is read per-version at build time. Archived versions without a `docs.config.json` are skipped with a warning.
 
 ### Steps
 
@@ -196,15 +198,21 @@ Different versions of a product can have different `sidebarOrder` — the config
      "repo": "org/my-product"
    }
    ```
-   - `repo` (required) — GitHub repo in `owner/name` format.
-   - `branch` (optional) — override branch for development. Omit to auto-discover the latest release tag.
+   - `repo` (required): GitHub repo in `owner/name` format.
+   - `branch` (optional): override branch for development. Omit to auto-discover the latest release tag.
 
 3. **Create a product landing page** at `docs/index.mdx` in the upstream repo:
    - Use `.mdx` (not `.md`) so you can import and use Starlight components like `<CardGrid>` and `<Card>`.
    - See [`uds-cli/docs/index.mdx`](https://github.com/defenseunicorns/uds-cli/blob/main/docs/index.mdx) for a complete example.
-   - Set `sidebar: hidden: true` and `tableOfContents: false` in frontmatter — the landing page is linked from the sidebar topic header, not listed as a sidebar item.
+   - Set `sidebar: hidden: true` and `tableOfContents: false` in frontmatter; the landing page is linked from the sidebar topic header, not listed as a sidebar item.
+   - The `description` field on `index.mdx` is especially important: the `promote` config in `astro.config.mjs` explicitly promotes product index pages above all section pages, so LLMs encounter the product summary first in `llms-full.txt` and `llms-small.txt`.
 
-4. **Run `npm run build`** to verify everything wires up (sidebar, links, search filtering).
+4. **Add `description` frontmatter to all docs pages** in the upstream repo. Every page must have a description before the product is added. See [LLM-Friendly Documentation](#llm-friendly-documentation) for guidance on writing good descriptions.
+
+5. **Run `npm run build`** to verify everything wires up (sidebar, links, search filtering).
+
+> [!NOTE]
+> `customSets`, `promote`, and the `## Products` listing in `astro.config.mjs` are all auto-derived from `PRODUCTS`, `sidebarOrder`, and each product's `description`. You do not need to update `astro.config.mjs` manually when adding a new product.
 
 ### How it all connects
 
@@ -256,7 +264,7 @@ DOCS_OVERRIDES="uds-cli=/path/to/uds-cli" npm run build
 DOCS_OVERRIDES="uds-core=/path/to/uds-core;uds-cli=/path/to/uds-cli" npm run build
 ```
 
-To also use a local path for a specific archived version, append `@tag` to the repo name. Without a version-specific key, archived versions are always cloned from GitHub at their tag — there is no fallback to the repo-level key:
+To also use a local path for a specific archived version, append `@tag` to the repo name. Without a version-specific key, archived versions are always cloned from GitHub at their tag; there is no fallback to the repo-level key:
 
 ```bash
 # Latest uses ../uds-core, v0.62.0 uses a different local path:
@@ -266,7 +274,7 @@ DOCS_OVERRIDES="uds-core=/path/to/uds-core;uds-core@v0.62.0=/path/to/uds-core-ol
 DOCS_OVERRIDES="uds-core@v0.62.0=/path/to/uds-core-old" npm run build
 ```
 
-The integration script will rsync from your local path instead of cloning from GitHub. This is the fastest way to preview docs changes locally — no commit or push required.
+The integration script will rsync from your local path instead of cloning from GitHub. This is the fastest way to preview docs changes locally; no commit or push required.
 
 ## Checks Before Opening a PR
 - **Build locally**: `npm run build` (runs `astro check` + build).
