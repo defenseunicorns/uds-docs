@@ -17,7 +17,7 @@ function versionedProduct(contentDir: string, maybeVersion: string | undefined) 
   return prefixToProduct.get(contentDir) ?? null;
 }
 
-// Directory rename map written by integration-script.sh.
+// Directory rename map written by integration.ts (step 7).
 // Maps Title Case names back to original kebab-case: { "Local Demo": "local-demo", ... }
 // Empty in local dev when the integration script hasn't run.
 // NOTE: Relative path works because Astro sets CWD to the project root during build.
@@ -84,7 +84,7 @@ export const onRequest = defineRouteMiddleware((context) => {
   if (product) {
     // Product page — link to the upstream repo's docs/ directory.
     // Strip the contentDir prefix and resolve any Title Case directory names
-    // back to their original kebab-case names using the map from integration-script.sh.
+    // back to their original kebab-case names using the map from integration.ts.
     const parts = relativePath.split('/').slice(1); // drop contentDir prefix
     if (parts.length === 0) return;
     // Resolve all segments except the last (filename) — only directories are renamed.

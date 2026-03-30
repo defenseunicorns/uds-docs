@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "bash scripts/integration-script.sh && astro check && astro build",
+    "build": "tsx src/build/integration.ts && astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "npm run build && playwright test",
-    "test:ui": "npm run build && playwright test --ui"
+    "test": "vitest run && npm run test:e2e && npm run test:versioned",
+    "test:e2e": "npm run build && playwright test tests/*.spec.ts",
+    "test:e2e:ui": "npm run build && playwright test --ui tests/*.spec.ts",
+    "test:versioned": "git clean -xfd src/content/docs/ && PRODUCTS_JSON=tests/fixtures/products.versioned.json DOCS_OVERRIDES='test-product=tests/fixtures/test-product;test-product@v0.1.0=tests/fixtures/test-product-v0-1' tsx src/build/integration.ts && mkdir -p src/content/docs/.c4 && echo 'specification {}' > src/content/docs/.c4/model.c4 && astro build && playwright test tests/versioned/; EXIT=$?; git clean -xfd src/content/docs/; exit $EXIT",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -34,7 +38,10 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "likec4": "^1.42.1"
+    "@types/node": "^22.0.0",
+    "likec4": "^1.42.1",
+    "tsx": "^4.21.0",
+    "vitest": "^4.1.2"
   },
   "overrides": {
     "vite": "^7.3.1"

@@ -1,15 +1,15 @@
-name: Playwright Tests
+name: Tests
 
 on:
   pull_request:
 
 concurrency:
-  group: playwright-${{ github.ref }}
+  group: tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test:
-    name: Playwright Tests
+    name: Unit & E2E Tests
     permissions:
       contents: read
     runs-on: ubuntu-latest
