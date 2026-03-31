@@ -14,6 +14,8 @@ export interface DocsConfig {
   label: string;
   contentDir: string;
   archiveCount?: number;
+  /** `"branch"` pulls archived versions from `release/*` branches; `"tag"` (default) uses GitHub release tags. */
+  versionSource?: 'tag' | 'branch';
   description?: string;
   sidebarOrder: (string | { dir: string; label: string })[];
 }
@@ -22,11 +24,21 @@ export interface DocsConfig {
 // .versions file
 // ---------------------------------------------------------------------------
 
+/** A single archived version — pre-computed ref, display label, and URL slug. */
+export interface ArchivedVersion {
+  /** Git ref to clone: a tag like `"v1.0.0"` or a branch like `"release/1.0"`. */
+  ref: string;
+  /** Human-readable label for the version picker: `"v1.0"`. */
+  display: string;
+  /** URL/directory slug: `"v1-0"`. */
+  slug: string;
+}
+
 export interface VersionEntry {
   repo: string;
   branch: string;
   latestTag?: string;
-  versions: string[];
+  versions: ArchivedVersion[];
 }
 
 export type VersionsFile = Record<string, VersionEntry>;

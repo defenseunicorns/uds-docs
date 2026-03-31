@@ -4,7 +4,7 @@ import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
-import { PRODUCTS, versionSlug, versionedContentDir, versionedLink } from './src/products.ts';
+import { PRODUCTS } from './src/products.ts';
 
 import tailwindcss from '@tailwindcss/vite';
 import { LikeC4VitePlugin } from 'likec4/vite-plugin';
@@ -22,12 +22,13 @@ try {
 } catch { /* not present in local dev; no archived versions built */ }
 
 // Index .versions by repo for O(1) lookups, then re-key by product id.
+// Versions are now objects: { ref, display, slug }.
 const versionsByRepo = Object.fromEntries(Object.values(versionsFile).map(v => [v.repo, v]));
 const productVersions = Object.fromEntries(
   PRODUCTS.map(p => {
     const allVersions = versionsByRepo[p.repo]?.versions ?? [];
-    const available = allVersions.filter(ver =>
-      existsSync(`./src/content/docs/${versionedContentDir(p, ver)}`)
+    const available = allVersions.filter(v =>
+      existsSync(`./src/content/docs/${p.contentDir}/${v.slug}`)
     );
     return [p.id, available];
   })
@@ -46,10 +47,9 @@ const linkRewriteProducts = PRODUCTS.map(p => ({
   contentDir: p.contentDir,
   sections: p.sidebarOrder.map(e => typeof e === 'string' ? e : e.dir),
   versionedSections: Object.fromEntries(
-    (productVersions[p.id] ?? []).map(ver => {
-      const verSlug = versionSlug(ver);
-      const verSidebarOrder = loadVersionSidebarOrder(p.repo, verSlug) ?? p.sidebarOrder;
-      return [verSlug, verSidebarOrder.map(e => typeof e === 'string' ? e : e.dir)];
+    (productVersions[p.id] ?? []).map(v => {
+      const verSidebarOrder = loadVersionSidebarOrder(p.repo, v.slug) ?? p.sidebarOrder;
+      return [v.slug, verSidebarOrder.map(e => typeof e === 'string' ? e : e.dir)];
     })
   ),
 }));
@@ -94,14 +94,13 @@ const productTopics = PRODUCTS.map((product) => ({
 // One sidebar topic per archived version of each product.
 const versionedTopics = PRODUCTS.flatMap(product => {
   const versions = productVersions[product.id] ?? [];
-  return versions.map(ver => {
-    const verSlug = versionSlug(ver);
-    const verSidebarOrder = loadVersionSidebarOrder(product.repo, verSlug) ?? product.sidebarOrder;
+  return versions.map(v => {
+    const verSidebarOrder = loadVersionSidebarOrder(product.repo, v.slug) ?? product.sidebarOrder;
     return {
-      id: `${product.id}-${verSlug}`,
+      id: `${product.id}-${v.slug}`,
       label: product.label,
-      link: versionedLink(product, ver),
-      items: makeSidebarItems(versionedContentDir(product, ver), verSidebarOrder),
+      link: `/${product.contentDir}/${v.slug}/`,
+      items: makeSidebarItems(`${product.contentDir}/${v.slug}`, verSidebarOrder),
     };
   });
 });
@@ -116,9 +115,9 @@ const topicsOption = Object.fromEntries([
   ]),
   ...PRODUCTS.flatMap(product => {
     const versions = productVersions[product.id] ?? [];
-    return versions.map(ver => {
-      const contentDir = versionedContentDir(product, ver);
-      return [`${product.id}-${versionSlug(ver)}`, [`/${contentDir}/404`, `/${contentDir}`]];
+    return versions.map(v => {
+      const contentDir = `${product.contentDir}/${v.slug}`;
+      return [`${product.id}-${v.slug}`, [`/${contentDir}/404`, `/${contentDir}`]];
     });
   }),
 ]);
@@ -242,8 +241,15 @@ export default defineConfig({
   vite: {
     resolve: { preserveSymlinks: true },
     define: {
-      // Per-product archived versions for VersionPicker & Search
-      __PRODUCT_VERSIONS__: JSON.stringify(productVersions),
+      // Per-product archived versions for VersionPicker, Search, and Header
+      __PRODUCT_VERSIONS__: JSON.stringify(
+        Object.fromEntries(
+          Object.entries(productVersions).map(([id, versions]) => [
+            id,
+            versions.map(v => ({ display: v.display, slug: v.slug, ref: v.ref })),
+          ])
+        )
+      ),
       // Per-product latest release tags for VersionPicker label
       __PRODUCT_LATEST_TAGS__: JSON.stringify(productLatestTags),
       // Product registry for client-side components (VersionPicker, Search)

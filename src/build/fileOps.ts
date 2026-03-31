@@ -121,8 +121,8 @@ export function copyC4(c4SrcDir: string, targetDocsDir: string): void {
 // Product config writing
 // ---------------------------------------------------------------------------
 
-/** Read `docs.config.json` from `docsDir`, merge in `repo`, and write to `outputPath`. */
-export function writeProductConfig(docsDir: string, repo: string, outputPath: string): void {
+/** Read `docs.config.json` from `docsDir`, merge in `repo` (and optional `ref`), and write to `outputPath`. */
+export function writeProductConfig(docsDir: string, repo: string, outputPath: string, ref?: string): void {
   const configPath = join(docsDir, 'docs.config.json');
   if (!existsSync(configPath)) {
     throw new Error(`docs.config.json not found in ${docsDir}`);
@@ -134,6 +134,7 @@ export function writeProductConfig(docsDir: string, repo: string, outputPath: st
     throw new Error(`Failed to parse ${configPath}: ${(err as Error).message}`);
   }
   config['repo'] = repo;
+  if (ref) config['ref'] = ref;
   writeFileSync(outputPath, JSON.stringify(config, null, 2) + '\n');
 }
 

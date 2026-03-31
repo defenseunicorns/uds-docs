@@ -39,7 +39,7 @@
 </style>
 
 <script>
-  import { productVersions, productLatestTags, versionSlug, detectProduct, detectVersionSlug } from '../productUtils';
+  import { productVersions, productLatestTags, detectProduct, detectVersionSlug } from '../productUtils';
 
   function initVersionPicker() {
     const select = document.getElementById('version-select') as HTMLSelectElement;
@@ -72,8 +72,8 @@
     // Populate version options
     versions.forEach(ver => {
       const opt = document.createElement('option');
-      opt.value = versionSlug(ver);
-      opt.textContent = ver.replace(/\.\d+$/, '');
+      opt.value = ver.slug;
+      opt.textContent = ver.display;
       select.appendChild(opt);
     });
 

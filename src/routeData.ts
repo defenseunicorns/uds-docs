@@ -1,6 +1,6 @@
 // src/routeData.ts
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { PRODUCTS, DIR_RENAMES_FILENAME } from './products';
 
 // Build a map from contentDir prefix → product at module load time.
@@ -17,9 +17,9 @@ function versionedProduct(contentDir: string, maybeVersion: string | undefined) 
   return prefixToProduct.get(contentDir) ?? null;
 }
 
-// Directory rename map written by integration.ts (step 7).
+// Directory rename map written by the integration build pipeline.
 // Maps Title Case names back to original kebab-case: { "Local Demo": "local-demo", ... }
-// Empty in local dev when the integration script hasn't run.
+// Empty in local dev when the integration pipeline hasn't run.
 // NOTE: Relative path works because Astro sets CWD to the project root during build.
 const dirRenames: Record<string, string> = (() => {
   const path = `.product-configs/${DIR_RENAMES_FILENAME}`;
@@ -30,6 +30,30 @@ const dirRenames: Record<string, string> = (() => {
     console.warn(`[routeData] Failed to parse ${DIR_RENAMES_FILENAME}: ${e}`);
     return {};
   }
+})();
+
+// Version-specific product configs written by the integration build pipeline.
+// Maps "{repoName}.{versionSlug}" → config object with `ref` field.
+// Used to determine if a version is branch-sourced for edit URL generation.
+interface VersionConfig { ref?: string; repo?: string }
+const versionConfigs: Record<string, VersionConfig> = (() => {
+  const configDir = '.product-configs';
+  if (!existsSync(configDir)) return {};
+  const configs: Record<string, VersionConfig> = {};
+  try {
+    for (const f of readdirSync(configDir)) {
+      if (!/\.v\d+-\d+\.json$/.test(f)) continue;
+      const key = f.replace(/\.json$/, '');
+      try {
+        configs[key] = JSON.parse(readFileSync(`${configDir}/${f}`, 'utf8'));
+      } catch (e) {
+        console.warn(`[routeData] Failed to parse version config ${f}: ${e}`);
+      }
+    }
+  } catch (e) {
+    console.warn(`[routeData] Failed to read ${configDir}: ${e}`);
+  }
+  return configs;
 })();
 
 const CONTENT_DOCS_PATH = 'src/content/docs/';
@@ -62,7 +86,29 @@ export const onRequest = defineRouteMiddleware((context) => {
       linkHref: versioned.link,
       linkText: 'Go to the latest',
     };
-    // No edit link for archived versions — they already show a "Go to the latest" banner.
+
+    // For branch-sourced versions, generate edit URL pointing to the release branch.
+    const repoName = versioned.repo.split('/').pop()!;
+    const verConfig = versionConfigs[`${repoName}.${maybeVersion}`];
+    if (verConfig?.ref?.startsWith('release/')) {
+      const filePath = route.entry.filePath;
+      if (filePath) {
+        const idx = filePath.indexOf(CONTENT_DOCS_PATH);
+        if (idx !== -1) {
+          const relativePath = filePath.slice(idx + CONTENT_DOCS_PATH.length);
+          // Strip contentDir + versionSlug prefix (e.g. "core/v1-0/getting-started/foo.md" → "getting-started/foo.md")
+          const parts = relativePath.split('/').slice(2);
+          if (parts.length > 0) {
+            const upstream = parts.map((seg, i) =>
+              i < parts.length - 1 ? (dirRenames[seg] ?? seg) : seg
+            );
+            route.editUrl = new URL(
+              `https://github.com/${versioned.repo}/blob/${verConfig.ref}/docs/${upstream.join('/')}`
+            );
+          }
+        }
+      }
+    }
     return;
   }
 

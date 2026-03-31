@@ -7,7 +7,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import type { DocsConfig, OverridesMap, VersionEntry, VersionsFile } from './types';
+import type { ArchivedVersion, DocsConfig, OverridesMap, VersionEntry, VersionsFile } from './types';
 
 // ---------------------------------------------------------------------------
 // Minor version key
@@ -16,6 +16,37 @@ import type { DocsConfig, OverridesMap, VersionEntry, VersionsFile } from './typ
 /** Strip the patch version from a semver tag: `v0.61.1` → `v0.61`. */
 export function minorKey(tag: string): string {
   return tag.replace(/\.\d+$/, '');
+}
+
+// ---------------------------------------------------------------------------
+// Archived version normalization
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a git ref (tag or branch) into an `ArchivedVersion` with
+ * pre-computed display label and URL slug.
+ *
+ * Tags:    `"v1.0.0"` → `{ ref: "v1.0.0", display: "v1.0", slug: "v1-0" }`
+ * Branches: `"release/1.0"` → `{ ref: "release/1.0", display: "v1.0", slug: "v1-0" }`
+ */
+export function toArchivedVersion(ref: string): ArchivedVersion {
+  let majorMinor: string;
+  if (ref.startsWith('release/')) {
+    majorMinor = ref.slice('release/'.length); // "1.0"
+  } else {
+    // Tag like "v1.0.0" — strip leading v, then take major.minor
+    const withoutV = ref.replace(/^v/, '');
+    const parts = withoutV.split('.');
+    if (parts.length < 2) {
+      throw new Error(`Cannot normalize ref "${ref}" — expected at least major.minor (e.g. "v1.0.0")`);
+    }
+    majorMinor = `${parts[0]}.${parts[1]}`;
+  }
+  return {
+    ref,
+    display: `v${majorMinor}`,
+    slug: `v${majorMinor.replace(/\./g, '-')}`,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -48,6 +79,17 @@ export async function fetchDocsConfig(
 }
 
 // ---------------------------------------------------------------------------
+// GitHub API helpers
+// ---------------------------------------------------------------------------
+
+function githubHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { Accept: 'application/vnd.github+json' };
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
+
+// ---------------------------------------------------------------------------
 // GitHub releases querying
 // ---------------------------------------------------------------------------
 
@@ -59,10 +101,8 @@ export async function fetchDocsConfig(
 export async function discoverVersions(
   repo: string,
   count = 0,
-): Promise<{ latestTag: string | null; archived: string[] }> {
-  const headers: Record<string, string> = { Accept: 'application/vnd.github+json' };
-  const token = process.env.GITHUB_TOKEN?.trim();
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+): Promise<{ latestTag: string | null; archived: ArchivedVersion[] }> {
+  const headers = githubHeaders();
 
   const perPage = Math.max((count + 1) * 5, 10);
   let res: Response;
@@ -111,8 +151,76 @@ export async function discoverVersions(
 
   return {
     latestTag: uniqueMinors[0] ?? null,
-    archived: uniqueMinors.slice(1, count + 1),
+    archived: uniqueMinors.slice(1, count + 1).flatMap(tag => {
+      try {
+        return [toArchivedVersion(tag)];
+      } catch {
+        console.warn(`Warning: skipping unparseable release tag "${tag}" for ${repo}`);
+        return [];
+      }
+    }),
   };
+}
+
+// ---------------------------------------------------------------------------
+// GitHub branch-based version discovery
+// ---------------------------------------------------------------------------
+
+/** Pattern matching `release/X.Y` (exactly two numeric parts). */
+const RELEASE_BRANCH_RE = /^release\/(\d+)\.(\d+)$/;
+
+/**
+ * Query GitHub refs API for `release/*` branches and return the latest `count`
+ * as `ArchivedVersion[]`, sorted by semver descending.
+ */
+export async function discoverBranchVersions(
+  repo: string,
+  count: number,
+): Promise<ArchivedVersion[]> {
+  const headers = githubHeaders();
+
+  let res: Response;
+  try {
+    res = await fetch(
+      `https://api.github.com/repos/${repo}/git/matching-refs/heads/release/?per_page=100`,
+      { headers },
+    );
+  } catch (err) {
+    console.warn(`Warning: network error fetching branch refs for ${repo}: ${err}`);
+    return [];
+  }
+
+  if (!res.ok) {
+    console.warn(`Warning: GitHub API returned ${res.status} ${res.statusText} for ${repo} branch refs`);
+    return [];
+  }
+
+  let refs: unknown;
+  try {
+    refs = await res.json();
+  } catch {
+    console.warn(`Warning: failed to parse GitHub refs API response for ${repo}`);
+    return [];
+  }
+  if (!Array.isArray(refs)) {
+    console.warn(
+      `Warning: unexpected GitHub refs API response for ${repo}: ${JSON.stringify(refs).slice(0, 200)}`,
+    );
+    return [];
+  }
+
+  // Extract branch names matching release/X.Y and pre-parse version numbers
+  const parsed = (refs as Array<{ ref: string }>)
+    .map(r => r.ref.startsWith('refs/heads/') ? r.ref.slice('refs/heads/'.length) : r.ref)
+    .flatMap(name => {
+      const m = name.match(RELEASE_BRANCH_RE);
+      return m ? [{ name, maj: Number(m[1]), min: Number(m[2]) }] : [];
+    });
+
+  // Sort by semver descending
+  parsed.sort((a, b) => b.maj - a.maj || b.min - a.min);
+
+  return parsed.slice(0, count).map(p => toArchivedVersion(p.name));
 }
 
 // ---------------------------------------------------------------------------
@@ -135,20 +243,46 @@ export async function discoverAllVersions(
       const configBranch = product.branch ?? 'main';
 
       if (product.archiveVersions) {
+        const versions = product.archiveVersions.map(toArchivedVersion);
         console.log(
-          `${repo}: using explicit archiveVersions (${product.archiveVersions.join(', ') || '(none)'})`,
+          `${repo}: using explicit archiveVersions (${versions.map(v => v.ref).join(', ') || '(none)'})`,
         );
-        return [repo, { repo, branch: product.branch ?? 'main', versions: product.archiveVersions }];
+        return [repo, { repo, branch: product.branch ?? 'main', versions }];
       }
 
       const localOverridePath = overrides[repoName];
       const docsConfig = await fetchDocsConfig(repo, configBranch, localOverridePath);
       const archiveCount = docsConfig?.archiveCount ?? 0;
+      const versionSource = docsConfig?.versionSource ?? 'tag';
 
-      console.log(`${repo}: discovering versions...`);
-      const { latestTag, archived: versions } = await discoverVersions(repo, archiveCount);
+      console.log(`${repo}: discovering versions (source: ${versionSource})...`);
+
+      let versions: ArchivedVersion[];
+      let latestTag: string | null;
+
+      if (versionSource === 'branch') {
+        // Branch-based: archived versions come from release/* branches,
+        // but latestTag still comes from the releases API.
+        // Request one extra in case we need to filter out the current release's branch.
+        const [candidates, releaseResult] = await Promise.all([
+          discoverBranchVersions(repo, archiveCount + 1),
+          discoverVersions(repo, 0),
+        ]);
+        latestTag = releaseResult.latestTag;
+        // Exclude the branch matching the current release (e.g. release/1.0 when latestTag is v1.0.x)
+        let latestDisplay: string | null = null;
+        if (latestTag) {
+          try { latestDisplay = toArchivedVersion(latestTag).display; } catch { /* unparseable tag */ }
+        }
+        versions = candidates.filter(v => v.display !== latestDisplay).slice(0, archiveCount);
+      } else {
+        const result = await discoverVersions(repo, archiveCount);
+        latestTag = result.latestTag;
+        versions = result.archived;
+      }
+
       console.log(
-        `${repo}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.join(', ') || '(none)'}`,
+        `${repo}: latest tag = ${latestTag ?? '(none)'}, archived = ${versions.map(v => v.ref).join(', ') || '(none)'}`,
       );
 
       // Branch: explicit > latest release tag > 'main'

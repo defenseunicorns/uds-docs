@@ -26,33 +26,6 @@ export interface ProductConfig {
 }
 
 /**
- * Convert a semver tag to a URL-safe slug (drop patch, dots → hyphens).
- * Hyphens are required because Astro strips dots from content collection slugs.
- * e.g. v0.61.0 → v0-61, v1.2.0 → v1-2
- */
-export function versionSlug(ver: string): string {
-  return ver.replace(/\.\d+$/, '').replace(/\./g, '-');
-}
-
-/**
- * Build the versioned content directory path for a product + version.
- * e.g. contentDir 'my-product' + ver 'v0.61.0' → 'my-product/v0-61'
- */
-export function versionedContentDir(product: ProductConfig, ver: string): string {
-  const slug = versionSlug(ver);
-  return product.contentDir ? `${product.contentDir}/${slug}` : slug;
-}
-
-/**
- * Build the versioned URL prefix for a product + version.
- * e.g. contentDir 'my-product' + ver 'v0.61.0' → '/my-product/v0-61/'
- */
-export function versionedLink(product: ProductConfig, ver: string): string {
-  const slug = versionSlug(ver);
-  return product.contentDir ? `/${product.contentDir}/${slug}/` : `/${slug}/`;
-}
-
-/**
  * Load resolved product configs from .product-configs/ directory.
  * The integration script writes these after cloning upstream repos and
  * reading their docs/docs.config.json files.
