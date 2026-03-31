@@ -2,7 +2,7 @@
  * Filesystem and subprocess I/O for the integration build pipeline.
  *
  * All side effects live here; pure logic lives in `dirRename.ts`,
- * `linkRewrite.ts`, and `cleanupDirs.ts`. Unit tests in `__tests__/fileOps.test.ts`.
+ * `linkRewrite.ts`, and `cleanupDirs.ts`. Unit tests in `tests/unit/fileOps.test.ts`.
  */
 
 import {
@@ -101,9 +101,7 @@ export function copyDocs(src: string, dest: string): void {
   for (const name of srcEntries) {
     if (COPY_EXCLUDES.has(name)) continue;
     const destPath = join(dest, name);
-    if (existsSync(destPath)) {
-      rmSync(destPath, { recursive: true, force: true });
-    }
+    rmSync(destPath, { recursive: true, force: true });
     copyTree(join(src, name), destPath);
   }
 }

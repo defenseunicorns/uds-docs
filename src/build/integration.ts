@@ -4,7 +4,7 @@
  * Pipeline: discover versions → clone docs → generate 404s → clone archived
  * versions → rename dirs to Title Case → rewrite links → bust Astro cache.
  *
- * Run directly via `tsx src/integration.ts` or imported for testing.
+ * Run directly via `tsx src/build/integration.ts` or imported for testing.
  */
 
 import {
