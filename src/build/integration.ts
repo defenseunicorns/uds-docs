@@ -18,7 +18,7 @@ import {
 } from 'fs';
 import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { versionSlug } from '../products';
+import { versionSlug } from '../productUtils';
 import { discoverAllVersions, parseOverrides, readProductsJson } from './versions';
 import { computeSlugRename, toTitleCase } from './dirRename';
 import { rewriteLinks } from './linkRewrite';

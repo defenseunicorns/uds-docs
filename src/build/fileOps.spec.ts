@@ -3,6 +3,7 @@ import {
   existsSync,
   lstatSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
   rmSync,
   symlinkSync,
@@ -10,7 +11,7 @@ import {
 } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { copyDocs, write404Page, writeProductConfig } from '../../src/build/fileOps';
+import { copyDocs, write404Page, writeProductConfig } from './fileOps';
 
 describe('copyDocs', () => {
   let tmpDir: string;
@@ -18,7 +19,7 @@ describe('copyDocs', () => {
   let dest: string;
 
   beforeEach(() => {
-    tmpDir = join(tmpdir(), `uds-filedops-copy-${Date.now()}`);
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-filedops-copy-'));
     src = join(tmpDir, 'src');
     dest = join(tmpDir, 'dest');
     mkdirSync(src, { recursive: true });
@@ -91,7 +92,7 @@ describe('writeProductConfig', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = join(tmpdir(), `uds-fileops-config-${Date.now()}`);
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-fileops-config-'));
     mkdirSync(tmpDir, { recursive: true });
   });
 
@@ -125,7 +126,7 @@ describe('write404Page', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = join(tmpdir(), `uds-fileops-404-${Date.now()}`);
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-fileops-404-'));
     mkdirSync(tmpDir, { recursive: true });
   });
 
