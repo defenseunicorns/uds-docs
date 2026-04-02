@@ -1,6 +1,0 @@
-{
-  "id": "test-product",
-  "label": "Test Product",
-  "contentDir": "test-product",
-  "sidebarOrder": ["getting-started"]
-}

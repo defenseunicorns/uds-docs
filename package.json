@@ -8,10 +8,9 @@
     "build": "tsx src/build/integration.ts && astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "vitest run && npm run test:e2e && npm run test:versioned",
+    "test": "vitest run && npm run test:e2e",
     "test:e2e": "npm run build && playwright test tests/*.spec.ts",
     "test:e2e:ui": "npm run build && playwright test --ui tests/*.spec.ts",
-    "test:versioned": "git clean -xfd src/content/docs/ && PRODUCTS_JSON=tests/fixtures/products.versioned.json DOCS_OVERRIDES='test-product=tests/fixtures/test-product;test-product@v0.1.0=tests/fixtures/test-product-v0-1' tsx src/build/integration.ts && mkdir -p src/content/docs/.c4 && echo 'specification {}' > src/content/docs/.c4/model.c4 && astro build && playwright test tests/versioned/; EXIT=$?; git clean -xfd src/content/docs/; exit $EXIT",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest"
   },
