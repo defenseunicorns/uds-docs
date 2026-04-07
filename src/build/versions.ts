@@ -30,18 +30,25 @@ export function minorKey(tag: string): string {
  * Branches: `"release/1.0"` → `{ ref: "release/1.0", display: "v1.0", slug: "v1-0" }`
  */
 export function toArchivedVersion(ref: string): ArchivedVersion {
-  let majorMinor: string;
-  if (ref.startsWith('release/')) {
-    majorMinor = ref.slice('release/'.length); // "1.0"
+  let major: string;
+  let minor: string;
+
+  const branchMatch = /^release\/(\d+)\.(\d+)$/.exec(ref);
+  if (branchMatch) {
+    major = branchMatch[1];
+    minor = branchMatch[2];
   } else {
-    // Tag like "v1.0.0" — strip leading v, then take major.minor
-    const withoutV = ref.replace(/^v/, '');
-    const parts = withoutV.split('.');
-    if (parts.length < 2) {
-      throw new Error(`Cannot normalize ref "${ref}" — expected at least major.minor (e.g. "v1.0.0")`);
+    const tagMatch = /^v?(\d+)\.(\d+)(?:\.\d+)?$/.exec(ref);
+    if (!tagMatch) {
+      throw new Error(
+        `Cannot normalize ref "${ref}" — expected tag like "v1.0.0" or branch "release/1.0" with numeric major/minor`,
+      );
     }
-    majorMinor = `${parts[0]}.${parts[1]}`;
+    major = tagMatch[1];
+    minor = tagMatch[2];
   }
+
+  const majorMinor = `${major}.${minor}`;
   return {
     ref,
     display: `v${majorMinor}`,
@@ -243,7 +250,14 @@ export async function discoverAllVersions(
       const configBranch = product.branch ?? 'main';
 
       if (product.archiveVersions) {
-        const versions = product.archiveVersions.map(toArchivedVersion);
+        const versions: ArchivedVersion[] = [];
+        for (const ref of product.archiveVersions) {
+          try {
+            versions.push(toArchivedVersion(ref));
+          } catch (err) {
+            console.warn(`${repo}: skipping invalid archiveVersions entry "${ref}" — ${(err as Error).message}`);
+          }
+        }
         console.log(
           `${repo}: using explicit archiveVersions (${versions.map(v => v.ref).join(', ') || '(none)'})`,
         );
