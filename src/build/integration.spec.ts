@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import {
   collectDirsDeepestFirst,
   collectMarkdownFiles,
   removeStaleVersionDirs,
-} from '../../src/build/integration';
+} from './integration';
 
 describe('collectDirsDeepestFirst', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = join(tmpdir(), `uds-collect-dirs-${Date.now()}`);
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-collect-dirs-'));
     mkdirSync(tmpDir, { recursive: true });
   });
 
@@ -68,7 +68,7 @@ describe('collectMarkdownFiles', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = join(tmpdir(), `uds-collect-md-${Date.now()}`);
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-collect-md-'));
     mkdirSync(tmpDir, { recursive: true });
   });
 
@@ -111,7 +111,7 @@ describe('removeStaleVersionDirs', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = join(tmpdir(), `uds-stale-vers-${Date.now()}`);
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-stale-vers-'));
     mkdirSync(tmpDir, { recursive: true });
   });
 

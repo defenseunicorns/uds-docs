@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { writeFileSync, mkdirSync, rmSync } from 'fs';
+import { writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import {
@@ -10,7 +10,7 @@ import {
   minorKey,
   parseOverrides,
   toArchivedVersion,
-} from '../../src/build/versions';
+} from './versions';
 
 describe('minorKey', () => {
   it('strips patch version', () => {
@@ -24,7 +24,7 @@ describe('fetchDocsConfig', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = join(tmpdir(), `uds-docs-test-${Date.now()}`);
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-docs-test-'));
     mkdirSync(join(tmpDir, 'docs'), { recursive: true });
   });
 

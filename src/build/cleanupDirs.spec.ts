@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { findUnlistedDirs } from '../../src/build/cleanupDirs';
+import { findUnlistedDirs } from './cleanupDirs';
 
 describe('findUnlistedDirs', () => {
   it('returns dirs not in the allowed list', () => {

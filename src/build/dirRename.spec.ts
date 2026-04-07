@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toTitleCase, computeSlugRename } from '../../src/build/dirRename';
+import { toTitleCase, computeSlugRename } from './dirRename';
 
 describe('toTitleCase', () => {
   it('title-cases hyphenated names', () => {

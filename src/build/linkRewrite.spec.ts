@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rewriteLinks } from '../../src/build/linkRewrite';
+import { rewriteLinks } from './linkRewrite';
 
 describe('rewriteLinks', () => {
   it('rewrites matching /old/ paths to /new/', () => {
