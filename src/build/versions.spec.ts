@@ -279,7 +279,7 @@ describe('discoverAllVersions with versionSource', () => {
     vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
       const urlStr = url.toString();
       calls.push(urlStr);
-      if (urlStr.includes('raw.githubusercontent.com')) {
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
         return {
           ok: true,
           json: () => Promise.resolve({
@@ -327,7 +327,7 @@ describe('discoverAllVersions with versionSource', () => {
     vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
       const urlStr = url.toString();
       calls.push(urlStr);
-      if (urlStr.includes('raw.githubusercontent.com')) {
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
         return {
           ok: true,
           json: () => Promise.resolve({
@@ -363,7 +363,7 @@ describe('discoverAllVersions with versionSource', () => {
   it('excludes the branch matching the current release', async () => {
     vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
       const urlStr = url.toString();
-      if (urlStr.includes('raw.githubusercontent.com')) {
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
         return {
           ok: true,
           json: () => Promise.resolve({
