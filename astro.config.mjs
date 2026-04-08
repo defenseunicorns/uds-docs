@@ -14,7 +14,7 @@ import starlightGitHubAlerts from 'starlight-github-alerts';
 import { fileURLToPath } from 'node:url';
 import { remarkLinkRewrite } from './src/plugins/remark-link-rewrite.ts';
 
-// Read per-product versions from .versions JSON (written by scripts/discover-versions.mjs).
+// Read per-product versions from .versions JSON (written by src/build/integration.ts).
 // Format: { "owner/repo": { "repo": "...", "branch": "...", "versions": [...], "latestTag": "..." } }
 let versionsFile = {};
 try {

@@ -28,11 +28,11 @@ This guide explains how to contribute content to the UDS documentation site. It 
 ### Repository Scope
 - **Docs site framework**: Astro + Starlight, Tailwind, and supporting plugins/config (e.g., `astro.config.mjs`, components under `src/`).
 - **CI / publishing**: Build and publishing configuration to Netlify (see `netlify.toml` and `.github/workflows/`).
-- **Integration scripts**: Pull reference/troubleshooting docs from upstream repos (see `scripts/integration-script.sh`).
+- **Integration pipeline**: Pulls reference/troubleshooting docs from upstream repos (see `src/build/integration.ts`).
 - **Some first‑party content**: High‑level docs and tutorials maintained here (e.g., `src/content/docs/getting-started/`, `src/content/docs/tutorials/`).
 
 ### Reference documentation source of truth
-Product docs are sourced from upstream repositories registered in `src/products.json`. If you need to change content for a product, make the update in its upstream repo. This site ingests those docs via automation (see `scripts/integration-script.sh`). Sidebar structure and labels are defined by each upstream repo's `docs/docs.config.json`.
+Product docs are sourced from upstream repositories registered in `src/products.json`. If you need to change content for a product, make the update in its upstream repo. This site ingests those docs via automation (see `src/build/integration.ts`). Sidebar structure and labels are defined by each upstream repo's `docs/docs.config.json`.
 
 ## Local Development
 Prereqs:
@@ -53,7 +53,7 @@ Notes:
 ## Content Structure
 - Each product's docs live under `src/content/docs/{contentDir}/`, pulled from its upstream repo.
 - Sidebar sections and ordering are defined by the upstream repo's `docs/docs.config.json` via the `sidebarOrder` field.
-- Only directories listed in `sidebarOrder` appear in the sidebar. The integration script removes unlisted directories to prevent orphaned pages.
+- Only directories listed in `sidebarOrder` appear in the sidebar. The integration pipeline removes unlisted directories to prevent orphaned pages.
 
 Required file frontmatter for pages:
 ```yaml
@@ -91,7 +91,7 @@ Required file frontmatter for pages:
 
 ### Product-supplied images
 
-Product repos can include images alongside their docs and reference them with relative paths. The integration script rsyncs all files from a product's `docs/` directory (not just Markdown), so images are copied automatically.
+Product repos can include images alongside their docs and reference them with relative paths. The integration pipeline copies all files from a product's `docs/` directory (not just Markdown), so images are copied automatically.
 
 Convention: place images in a `.images/` subdirectory (leading dot keeps it out of sidebar autogeneration):
 
@@ -110,7 +110,7 @@ Reference them in `.mdx` files with a relative path:
 ![Diagram](./.images/diagram.png)
 ```
 
-After the integration script runs, the image will be at `src/content/docs/{contentDir}/.images/diagram.png` and the relative reference will resolve correctly.
+After the integration pipeline runs, the image will be at `src/content/docs/{contentDir}/.images/diagram.png` and the relative reference will resolve correctly.
 
 ## Writing & Style Guidelines
 - **Audience-first**: Assume users are practitioners deploying/operating UDS. Start with the task, then provide necessary context.
@@ -184,7 +184,7 @@ Each upstream repo must have a `docs/docs.config.json` that defines how the prod
 - `contentDir`: directory under `src/content/docs/` where docs are placed. Also determines the URL prefix (`/{contentDir}/`).
 - `description`: product summary used in `llms.txt` so AI assistants know what the product does and which docs to consult. Write 1–2 sentences covering what the product does and its key components (e.g. bundled services, CLIs, CRDs). This text appears in the `## Products` section of `llms.txt` and is the first thing an LLM reads about your product. **Required** for LLM-friendly docs.
 - `archiveCount` (optional): number of archived minor versions to keep alongside the latest. Omit (or set to `0`) for latest-only.
-- `sidebarOrder`: ordered list of sidebar sections. Each entry is a directory name string (label auto-generated via title-casing) or an object `{ "dir": "...", "label": "..." }` for custom labels. Only listed directories appear in the sidebar; unlisted directories are removed by the integration script. Directories listed in `sidebarOrder` that don't exist on disk are silently skipped.
+- `sidebarOrder`: ordered list of sidebar sections. Each entry is a directory name string (label auto-generated via title-casing) or an object `{ "dir": "...", "label": "..." }` for custom labels. Only listed directories appear in the sidebar; unlisted directories are removed by the integration pipeline. Directories listed in `sidebarOrder` that don't exist on disk are silently skipped.
 
 Different versions of a product can have different `sidebarOrder`; the config is read per-version at build time. Archived versions without a `docs.config.json` are skipped with a warning.
 
@@ -221,9 +221,9 @@ Configuration lives in two places: `src/products.json` (repo references) and ups
 | File | What it does |
 |------|-------------|
 | `src/products.json` | Minimal list of repos to pull docs from, with optional branch overrides and archive counts. |
-| `scripts/discover-versions.mjs` | Reads `src/products.json`, queries GitHub API for release tags, writes `.versions` JSON. |
-| `scripts/integration-script.sh` | Reads `.versions`, clones repos, reads `docs/docs.config.json` from each, writes `.product-configs/`, copies docs into `src/content/docs/`. |
-| `.product-configs/` | Build artifact written by the integration script. Contains resolved product configs (upstream `docs.config.json` + repo info) for `astro.config.mjs` to read. |
+| `src/build/versions.ts` | Reads `src/products.json`, queries GitHub API for release tags, writes `.versions` JSON. |
+| `src/build/integration.ts` | Reads `.versions`, clones repos, reads `docs/docs.config.json` from each, writes `.product-configs/`, copies docs into `src/content/docs/`. |
+| `.product-configs/` | Build artifact written by the integration pipeline. Contains resolved product configs (upstream `docs.config.json` + repo info) for `astro.config.mjs` to read. |
 | `src/products.ts` | Reads `.product-configs/` and exports `PRODUCTS` for use by `astro.config.mjs` and `routeData.ts`. |
 | `astro.config.mjs` | Imports `PRODUCTS`, generates sidebar topics using `sidebarOrder` from upstream configs, injects `__PRODUCTS__` and `__PRODUCT_VERSIONS__` as Vite build-time constants. |
 | `src/components/VersionPicker.astro` | Client-side dropdown that reads `__PRODUCTS__` and `__PRODUCT_VERSIONS__` to show version options. |
@@ -233,8 +233,8 @@ Configuration lives in two places: `src/products.json` (repo references) and ups
 
 ### Versioning pipeline
 
-1. `discover-versions.mjs` reads `src/products.json`, fetches release tags from GitHub (reading `archiveCount` from each product's upstream `docs/docs.config.json`), deduplicates by minor version, and writes `.versions` JSON.
-2. `integration-script.sh` reads `.versions` and:
+1. `src/build/versions.ts` reads `src/products.json`, fetches release tags from GitHub (reading `archiveCount` from each product's upstream `docs/docs.config.json`), deduplicates by minor version, and writes `.versions` JSON.
+2. `src/build/integration.ts` reads `.versions` and:
    - Clones latest docs for each repo and reads `docs/docs.config.json` to determine `contentDir`, sidebar config, etc.
    - Clones each archived version tag, reads that version's `docs/docs.config.json`, and copies docs into versioned content directories (e.g. `src/content/docs/core/v0-61/`).
    - Writes `.product-configs/` with resolved configs for each product and version.
@@ -252,7 +252,7 @@ By default, the build uses the latest release tag. To target a specific branch (
 }
 ```
 
-This causes the integration script to clone that branch instead. Remove `branch` when the changes are merged.
+This causes the integration pipeline to clone that branch instead. Remove `branch` when the changes are merged.
 
 ### Using a local checkout (no commit required)
 
@@ -274,7 +274,7 @@ DOCS_OVERRIDES="uds-core=/path/to/uds-core;uds-core@v0.62.0=/path/to/uds-core-ol
 DOCS_OVERRIDES="uds-core@v0.62.0=/path/to/uds-core-old" npm run build
 ```
 
-The integration script will rsync from your local path instead of cloning from GitHub. This is the fastest way to preview docs changes locally; no commit or push required.
+The integration pipeline will copy from your local path instead of cloning from GitHub. This is the fastest way to preview docs changes locally; no commit or push required.
 
 ## Checks Before Opening a PR
 - **Build locally**: `npm run build` (runs `astro check` + build).
@@ -302,7 +302,7 @@ The integration script will rsync from your local path instead of cloning from G
 ## Resources
 - `astro.config.mjs` for sidebar, redirects, integrations.
 - `src/pages/index.astro` for landing page content/cards.
-- `scripts/integration-script.sh` for importing docs from other repos; keep its destinations aligned with the current
+- `src/build/integration.ts` for importing docs from other repos; keep its destinations aligned with the current
   IA when adding or moving imported content.
 - Astro Docs: https://docs.astro.build/
 - Starlight Docs: https://starlight.astro.build/

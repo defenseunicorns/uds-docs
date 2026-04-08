@@ -5,7 +5,7 @@ This is the UDS documentation site, built with [Starlight](https://starlight.ast
 ### Repository Scope
 - The **docs site framework**: Astro + Starlight and supporting plugins/config (e.g., `astro.config.mjs`, Tailwind, components under `src/`).
 - The **CI/publishing pipeline**: configuration used to build and publish the site to Netlify (see `netlify.toml` and GitHub Actions under `.github/workflows/`).
-- **Integration scripts**: tooling that pulls reference/troubleshooting content from upstream repos (see `scripts/integration-script.sh`).
+- **Integration pipeline**: tooling that pulls reference/troubleshooting content from upstream repos (see `src/build/integration.ts`).
 - **Some first‑party content**: high‑level and tutorial pages maintained here (e.g., `src/content/docs/getting-started/`, `src/content/docs/tutorials/`).
 
 Most reference documentation is sourced from upstream repositories (see “Document Sourcing” below). If you are updating reference docs, change them in their upstream repos rather than here.
@@ -50,7 +50,7 @@ Static assets, like favicons, can be placed in the `public/` directory.
 
 ### Document Sourcing
 
-Product docs are sourced from upstream repositories registered in `src/products.json`. Each upstream repo owns its docs configuration via a `docs/docs.config.json` file that defines sidebar order, labels, and content directory. The integration script (`scripts/integration-script.sh`) clones these repos and copies their docs into this site at build time.
+Product docs are sourced from upstream repositories registered in `src/products.json`. Each upstream repo owns its docs configuration via a `docs/docs.config.json` file that defines sidebar order, labels, and content directory. The integration pipeline (`src/build/integration.ts`) clones these repos and copies their docs into this site at build time.
 
 To update docs for a product, make the change in its upstream repository. See `CONTRIBUTING.md` for the full architecture.
 

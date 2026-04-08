@@ -1,6 +1,6 @@
 # build output
 dist/
-# build artifacts written by integration-script.sh at build time
+# build artifacts written by integration.ts at build time
 .versions
 .product-configs/
 # generated types
@@ -37,10 +37,11 @@ temp/
 # LikeC4 model directories (cloned from upstream)
 .c4/
 
-# Ignore cloned docs, while including top level pages like 404.md
+# All content under src/content/docs/ is generated at build time — ignore entirely.
+# Exception: the root-level 404 page is hand-maintained (contains product-aware JS)
+# and must remain tracked in git.
 src/content/docs/*
-!src/content/docs/*.md
-!src/content/docs/*.mdx
+!src/content/docs/404.md
 
 # Playwright
 test-results/
