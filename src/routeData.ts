@@ -88,9 +88,14 @@ export const onRequest = defineRouteMiddleware((context) => {
     };
 
     // For branch-sourced versions, generate edit URL pointing to the release branch.
+    // Respect frontmatter overrides: skip if editUrl is already set or explicitly disabled.
     const repoName = versioned.repo.split('/').pop()!;
     const verConfig = versionConfigs[`${repoName}.${maybeVersion}`];
-    if (verConfig?.ref?.startsWith('release/')) {
+    if (
+      verConfig?.ref?.startsWith('release/') &&
+      !route.editUrl &&
+      (route.entry.data as Record<string, unknown>).editUrl !== false
+    ) {
       const filePath = route.entry.filePath;
       if (filePath) {
         const idx = filePath.indexOf(CONTENT_DOCS_PATH);

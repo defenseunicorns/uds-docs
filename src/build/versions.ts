@@ -156,6 +156,15 @@ export async function discoverVersions(
     }
   }
 
+  // Sort by semver descending so latestTag is always the highest version,
+  // regardless of release creation order (guards against backports appearing first).
+  uniqueMinors.sort((a, b) => {
+    const parse = (t: string) => t.replace(/^v/, '').split('.').map(Number);
+    const [aMaj = 0, aMin = 0, aPat = 0] = parse(a);
+    const [bMaj = 0, bMin = 0, bPat = 0] = parse(b);
+    return bMaj - aMaj || bMin - aMin || bPat - aPat;
+  });
+
   return {
     latestTag: uniqueMinors[0] ?? null,
     archived: uniqueMinors.slice(1, count + 1).flatMap(tag => {

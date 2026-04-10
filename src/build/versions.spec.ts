@@ -115,6 +115,16 @@ describe('discoverVersions', () => {
     const result = await discoverVersions('defenseunicorns/uds-core', 1);
     expect(result.latestTag).toBeNull();
   });
+
+  it('selects highest semver as latest when a backport is published after a newer release', async () => {
+    // API returns v1.0.1 (backport, created after v1.1.0) first — latestTag must still be v1.1.0
+    mockReleases(['v1.0.1', 'v1.1.0', 'v1.0.0']);
+    const result = await discoverVersions('defenseunicorns/uds-core', 1);
+    expect(result.latestTag).toBe('v1.1.0');
+    expect(result.archived).toEqual([
+      { ref: 'v1.0.1', display: 'v1.0', slug: 'v1-0' },
+    ]);
+  });
 });
 
 describe('parseOverrides', () => {
