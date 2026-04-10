@@ -112,6 +112,30 @@ describe('writeProductConfig', () => {
     expect(result.repo).toBe('defenseunicorns/uds-core');
   });
 
+  it('includes ref field when provided', () => {
+    writeFileSync(join(tmpDir, 'docs.config.json'), JSON.stringify({
+      id: 'core', label: 'UDS Core', contentDir: 'core', sidebarOrder: [],
+    }));
+    const outputPath = join(tmpDir, 'output-ref.json');
+    writeProductConfig(tmpDir, 'defenseunicorns/uds-core', outputPath, 'release/1.0');
+
+    const result = JSON.parse(readFileSync(outputPath, 'utf8'));
+    expect(result.repo).toBe('defenseunicorns/uds-core');
+    expect(result.ref).toBe('release/1.0');
+  });
+
+  it('omits ref field when not provided', () => {
+    writeFileSync(join(tmpDir, 'docs.config.json'), JSON.stringify({
+      id: 'core', label: 'UDS Core', contentDir: 'core', sidebarOrder: [],
+    }));
+    const outputPath = join(tmpDir, 'output-noref.json');
+    writeProductConfig(tmpDir, 'defenseunicorns/uds-core', outputPath);
+
+    const result = JSON.parse(readFileSync(outputPath, 'utf8'));
+    expect(result.repo).toBe('defenseunicorns/uds-core');
+    expect(result.ref).toBeUndefined();
+  });
+
   it('throws when docs.config.json is missing or malformed', () => {
     expect(() => writeProductConfig(tmpDir, 'org/repo', join(tmpDir, 'out.json')))
       .toThrow('docs.config.json not found');
