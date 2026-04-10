@@ -18,8 +18,7 @@ import {
 } from 'fs';
 import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { versionSlug } from '../productUtils';
-import { discoverAllVersions, parseOverrides, readProductsJson } from './versions';
+import { discoverAllVersions, minorKey, parseOverrides, readProductsJson } from './versions';
 import { computeSlugRename, toTitleCase } from './dirRename';
 import { rewriteLinks } from './linkRewrite';
 import { VERSION_SLUG_RE } from './cleanupDirs';
@@ -174,27 +173,34 @@ export async function main(): Promise<void> {
       console.log(`Cloning versioned docs for ${productId} from ${repo}...`);
 
       for (const ver of entry.versions) {
-        const verSlug = versionSlug(ver);
+        const { ref: verRef, slug: verSlug } = ver;
         const versionDir = contentDir
           ? join(TARGET_DIR, contentDir, verSlug)
           : join(TARGET_DIR, verSlug);
-        const tempVerDir = join(TEMP_DIR, `${repoName}-${ver}`);
+        // Sanitize ref for temp dir path (release/1.0 → release-1.0)
+        const tempVerDir = join(TEMP_DIR, `${repoName}-${verRef.replace(/\//g, '-')}`);
 
-        const localOverride = overrides[`${repoName}@${ver}`];
+        // Support override by ref (release/0.63), display (v0.63), slug (v0-63),
+        // or full semver tag (v0.63.0) — strip patch to match display.
+        const localOverride =
+          overrides[`${repoName}@${verRef}`]
+          ?? overrides[`${repoName}@${ver.display}`]
+          ?? overrides[`${repoName}@${verSlug}`]
+          ?? findOverrideByTag(overrides, repoName, ver.display);
         let verDocsSource: string;
 
         if (localOverride) {
-          console.log(`Using local override for versioned ${productId} (${ver}): ${localOverride}`);
+          console.log(`Using local override for versioned ${productId} (${verRef}): ${localOverride}`);
           verDocsSource = join(localOverride, 'docs');
         } else {
           try {
-            cloneRepo(`https://github.com/${repo}`, ver, tempVerDir);
+            cloneRepo(`https://github.com/${repo}`, verRef, tempVerDir);
           } catch {
-            console.warn(`Warning: could not clone ${productId} at tag '${ver}'; skipping.`);
+            console.warn(`Warning: could not clone ${productId} at ref '${verRef}'; skipping.`);
             continue;
           }
           if (!existsSync(join(tempVerDir, 'docs'))) {
-            console.warn(`Warning: no docs/ found for ${productId} ${ver}; skipping.`);
+            console.warn(`Warning: no docs/ found for ${productId} ${verRef}; skipping.`);
             continue;
           }
           verDocsSource = join(tempVerDir, 'docs');
@@ -202,13 +208,13 @@ export async function main(): Promise<void> {
 
         const verConfigPath = join(CONFIG_DIR, `${repoName}.${verSlug}.json`);
         try {
-          writeProductConfig(verDocsSource, repo, verConfigPath);
+          writeProductConfig(verDocsSource, repo, verConfigPath, verRef);
         } catch {
           console.warn('');
-          console.warn(`WARNING: docs/docs.config.json not found in ${repo}@${ver}.`);
-          console.warn(`  Skipping archived version ${ver}.`);
+          console.warn(`WARNING: docs/docs.config.json not found in ${repo}@${verRef}.`);
+          console.warn(`  Skipping archived version ${verRef}.`);
           console.warn(
-            `  To include this version, backport docs/docs.config.json to the ${ver} tag.`,
+            `  To include this version, backport docs/docs.config.json to the ${verRef} ref.`,
           );
           console.warn('');
           continue;
@@ -228,7 +234,7 @@ export async function main(): Promise<void> {
         rmSync(join(versionDir, 'README.md'), { force: true });
 
         write404Page(join(versionDir, '404.md'), true);
-        console.log(`Versioned docs for ${productId} ${ver} written to ${versionDir}`);
+        console.log(`Versioned docs for ${productId} ${verRef} written to ${versionDir}`);
       }
     }
 
@@ -333,6 +339,25 @@ export function removeStaleVersionDirs(dir: string): void {
       rmSync(join(dir, entry.name), { recursive: true, force: true });
     }
   }
+}
+
+/**
+ * Find a version-specific override when the user provides a full semver tag
+ * like `uds-core@v0.63.0`. Strips the patch to match against display (`v0.63`).
+ */
+function findOverrideByTag(
+  overrides: Record<string, string>,
+  repoName: string,
+  display: string,
+): string | undefined {
+  const prefix = `${repoName}@`;
+  for (const key of Object.keys(overrides)) {
+    if (!key.startsWith(prefix)) continue;
+    const tag = key.slice(prefix.length);
+    const stripped = minorKey(tag);
+    if (stripped === display) return overrides[key];
+  }
+  return undefined;
 }
 
 function fatalMissingConfig(location: string): never {

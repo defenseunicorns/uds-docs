@@ -29,7 +29,7 @@ const isRoot = Astro.url.pathname === '/';
 </div>
 
 <script>
-  import { products, productVersions, versionSlug, detectProduct, detectVersionSlug } from '../productUtils';
+  import { products, productVersions, detectProduct, detectVersionSlug } from '../productUtils';
 
   function updateGitHubLink() {
     const githubLink = document.querySelector('a[href*="github.com/defenseunicorns"]') as HTMLAnchorElement | null;
@@ -45,9 +45,9 @@ const isRoot = Astro.url.pathname === '/';
     const currentVersionSlug = detectVersionSlug(window.location.pathname, product);
     if (currentVersionSlug) {
       const versions = productVersions[product.id] ?? [];
-      const fullVersion = versions.find(v => versionSlug(v) === currentVersionSlug);
-      if (fullVersion) {
-        githubLink.href = `https://github.com/${repo}/tree/${fullVersion}`;
+      const matched = versions.find(v => v.slug === currentVersionSlug);
+      if (matched) {
+        githubLink.href = `https://github.com/${repo}/tree/${matched.ref}`;
         return;
       }
     }
