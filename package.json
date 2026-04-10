@@ -43,6 +43,9 @@
     "vitest": "^4.1.2"
   },
   "overrides": {
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "@astrojs/check": {
+      "typescript": "^6.0.0"
+    }
   }
 }
