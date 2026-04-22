@@ -6,5 +6,9 @@
   {
     "repo": "defenseunicorns/uds-cli",
     "branch": "main"
+  },
+  {
+    "repo": "defenseunicorns/uds-registry",
+    "branch": "main"
   }
 ]
