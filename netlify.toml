@@ -12,3 +12,6 @@
 
     # Clickjacking protection (legacy but still widely scanned)
     X-Frame-Options = "DENY"
+
+    # Block search engine indexing.
+    X-Robots-Tag = "noindex, nofollow"
