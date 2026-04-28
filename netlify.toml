@@ -18,6 +18,9 @@
     # served beyond the current deploy cycle.
     Cache-Control = "public, max-age=0, stale-while-revalidate=3600"
 
+    # Block search engine indexing at the HTTP layer.
+    X-Robots-Tag = "noindex, nofollow"
+
 # Hashed Astro assets are content-addressed — safe to cache indefinitely.
 [[headers]]
   for = "/_astro/*"
