@@ -145,7 +145,7 @@ export default defineConfig({
         starlightLlmsTxt({
           projectName: 'UDS Documentation',
           description: [
-            'UDS (Unicorn Delivery Service) is a secure-by-default Kubernetes platform built on top of Zarf.',
+            'UDS (Unified Defense Stack) is a secure-by-default Kubernetes platform built on top of Zarf.',
             'It packages and operates production applications on air-gapped and internet-connected clusters.',
           ].join(' '),
           details: PRODUCTS.some(p => p.description) ? [
@@ -207,7 +207,7 @@ export default defineConfig({
       logo: {
         light: './src/assets/UDS_Logo_Dark.svg',
         dark: './src/assets/UDS_Logo_White.svg',
-        alt: 'Unicorn Delivery Service'
+        alt: 'Unified Defense Stack'
       },
       components: {
         Banner: './src/components/Banner.astro',
