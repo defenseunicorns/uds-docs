@@ -260,6 +260,7 @@ export default defineConfig({
       tailwindcss(),
       LikeC4VitePlugin({
         modelRoot: './src/content/docs/.c4/',
+        ai: 'disabled',
       }),
     ],
   },
