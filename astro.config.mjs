@@ -65,7 +65,7 @@ function makeSidebarItems(prefix, sidebarOrder) {
     .filter(({ dir }) => !prefix || existsSync(`./src/content/docs/${prefix}/${dir}`))
     .map(({ label, dir }) => ({
       label,
-      autogenerate: { directory: prefix ? `${prefix}/${dir}` : dir },
+      items: [{ autogenerate: { directory: prefix ? `${prefix}/${dir}` : dir, collapsed: true } }],
       collapsed: true,
     }));
 }
