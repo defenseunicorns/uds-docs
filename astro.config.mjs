@@ -231,6 +231,7 @@ export default defineConfig({
     react(),
   ],
   markdown: {
+    gfm: true,
     remarkPlugins: [
       [remarkLinkRewrite, {
         products: linkRewriteProducts,
