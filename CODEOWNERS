@@ -1,4 +1,4 @@
-* @defenseunicorns/uds-core
+* @defenseunicorns/uds-foundation
 
 /src/content/docs/registry/* @defenseunicorns/uds-registry
 /src/content/docs/uds-packages/* @defenseunicorns/uds-foundry
