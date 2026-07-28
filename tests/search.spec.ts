@@ -38,7 +38,7 @@ test.describe('Search', () => {
     await page.locator(selectors.searchButton).click();
     await page.locator(selectors.searchInput).fill('local demo');
 
-    const firstResult = page.locator(selectors.searchResult).first();
+    const firstResult = page.locator(`${selectors.searchResult}:visible`).first();
     await expect(firstResult).toBeVisible({ timeout: 10_000 });
 
     const href = await firstResult.locator('a').first().getAttribute('href');
@@ -54,9 +54,9 @@ test.describe('Search', () => {
 
     await page.locator(selectors.searchButton).click();
     await page.locator(selectors.searchInput).fill('getting started');
-    await expect(page.locator(selectors.searchResult).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator(`${selectors.searchResult}:visible`).first()).toBeVisible({ timeout: 10_000 });
 
-    await page.locator(selectors.filterButton).filter({ hasText: 'CLI' }).click();
+    await page.locator(selectors.filterButton).filter({ hasText: /^CLI$/ }).click();
     await waitForFilterToSettle(page);
 
     const hrefs = await getVisibleResultHrefs(page);
@@ -71,9 +71,9 @@ test.describe('Search', () => {
 
     await page.locator(selectors.searchButton).click();
     await page.locator(selectors.searchInput).fill('overview');
-    await expect(page.locator(selectors.searchResult).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator(`${selectors.searchResult}:visible`).first()).toBeVisible({ timeout: 10_000 });
 
-    await page.locator(selectors.filterButton).filter({ hasText: 'Core' }).click();
+    await page.locator(selectors.filterButton).filter({ hasText: /^Core$/ }).click();
     await waitForFilterToSettle(page);
 
     const hrefs = await getVisibleResultHrefs(page);
@@ -88,7 +88,7 @@ test.describe('Search', () => {
 
     await page.locator(selectors.searchButton).click();
     await page.locator(selectors.searchInput).fill('deploy');
-    await expect(page.locator(selectors.searchResult).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator(`${selectors.searchResult}:visible`).first()).toBeVisible({ timeout: 10_000 });
 
     await page.keyboard.press('Escape');
     await expect(page.locator(selectors.searchDialog)).not.toBeVisible();
