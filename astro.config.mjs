@@ -33,10 +33,10 @@ const productVersions = Object.fromEntries(
     return [p.id, available];
   })
 );
-const productLatestTags = Object.fromEntries(
+const productLatestSources = Object.fromEntries(
   PRODUCTS.flatMap(p => {
-    const tag = versionsByRepo[p.repo]?.latestTag;
-    return tag ? [[p.id, tag]] : [];
+    const source = versionsByRepo[p.repo]?.branch;
+    return source ? [[p.id, source]] : [];
   })
 );
 
@@ -251,8 +251,8 @@ export default defineConfig({
           ])
         )
       ),
-      // Per-product latest release tags for VersionPicker label
-      __PRODUCT_LATEST_TAGS__: JSON.stringify(productLatestTags),
+      // Per-product latest docs sources for the VersionPicker label
+      __PRODUCT_LATEST_SOURCES__: JSON.stringify(productLatestSources),
       // Product registry for client-side components (VersionPicker, Search)
       __PRODUCTS__: JSON.stringify(PRODUCTS.map(({ id, label, link, repo }) => ({ id, label, link, githubRepo: repo ?? null }))),
     },

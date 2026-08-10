@@ -39,7 +39,7 @@
 </style>
 
 <script>
-  import { productVersions, productLatestTags, detectProduct, detectVersionSlug } from '../productUtils';
+  import { productVersions, productLatestSources, detectProduct, detectVersionSlug } from '../productUtils';
 
   function initVersionPicker() {
     const select = document.getElementById('version-select') as HTMLSelectElement;
@@ -62,11 +62,14 @@
     const picker = select.closest('.version-picker') as HTMLElement | null;
     if (picker) picker.style.display = '';
 
-    // Label the default "Latest" option with the release tag when known
-    const latestTag = productLatestTags[product.id];
+    // Label the default option with the ref used for the unversioned docs.
+    const latestSource = productLatestSources[product.id];
     const latestOption = select.querySelector('option[value=""]') as HTMLOptionElement | null;
-    if (latestOption && latestTag) {
-      latestOption.textContent = `Latest (${latestTag.replace(/\.\d+$/, '')})`;
+    if (latestOption && latestSource) {
+      const sourceLabel = /^v?\d+\.\d+\.\d+$/.test(latestSource)
+        ? latestSource.replace(/\.\d+$/, '')
+        : latestSource;
+      latestOption.textContent = `Latest (${sourceLabel})`;
     }
 
     // Populate version options

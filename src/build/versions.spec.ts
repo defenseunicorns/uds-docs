@@ -332,6 +332,52 @@ describe('discoverAllVersions with versionSource', () => {
     expect(calls.some(c => c.includes('matching-refs'))).toBe(true);
   });
 
+  it('includes the current release when latest docs use an explicit branch', async () => {
+    vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
+      const urlStr = url.toString();
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
+        return {
+          ok: true,
+          json: () => Promise.resolve({
+            id: 'core', label: 'Core', contentDir: 'core',
+            archiveCount: 2, versionSource: 'branch', sidebarOrder: [],
+          }),
+        } as Response;
+      }
+      if (urlStr.includes('matching-refs')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve([
+            { ref: 'refs/heads/release/1.0' },
+            { ref: 'refs/heads/release/0.63' },
+            { ref: 'refs/heads/release/0.62' },
+          ]),
+        } as Response;
+      }
+      if (urlStr.includes('/releases')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve([
+            { tag_name: 'v1.0.0', prerelease: false, draft: false },
+          ]),
+        } as Response;
+      }
+      return { ok: false, status: 404 } as Response;
+    });
+
+    const result = await discoverAllVersions(
+      [{ repo: 'defenseunicorns/uds-core', branch: 'main' }],
+      {},
+    );
+    const entry = result['defenseunicorns/uds-core'];
+    expect(entry.branch).toBe('main');
+    expect(entry.latestTag).toBe('v1.0.0');
+    expect(entry.versions).toEqual([
+      { ref: 'release/1.0', display: 'v1.0', slug: 'v1-0' },
+      { ref: 'release/0.63', display: 'v0.63', slug: 'v0-63' },
+    ]);
+  });
+
   it('defaults to tag discovery when versionSource is not set', async () => {
     const calls: string[] = [];
     vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {

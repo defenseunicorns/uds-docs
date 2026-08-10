@@ -277,6 +277,7 @@ export async function discoverAllVersions(
       const docsConfig = await fetchDocsConfig(repo, configBranch, localOverridePath);
       const archiveCount = docsConfig?.archiveCount ?? 0;
       const versionSource = docsConfig?.versionSource ?? 'tag';
+      const hasExplicitLatestSource = product.branch !== undefined;
 
       console.log(`${repo}: discovering versions (source: ${versionSource})...`);
 
@@ -285,23 +286,37 @@ export async function discoverAllVersions(
 
       if (versionSource === 'branch') {
         // Branch-based: archived versions come from release/* branches,
-        // but latestTag still comes from the releases API.
-        // Request one extra in case we need to filter out the current release's branch.
+        // but latestTag still comes from the releases API. When the latest
+        // docs source is explicit, the current release is also versioned.
         const [candidates, releaseResult] = await Promise.all([
-          discoverBranchVersions(repo, archiveCount + 1),
+          discoverBranchVersions(repo, archiveCount + (hasExplicitLatestSource ? 0 : 1)),
           discoverVersions(repo, 0),
         ]);
         latestTag = releaseResult.latestTag;
-        // Exclude the branch matching the current release (e.g. release/1.0 when latestTag is v1.0.x)
+        // Exclude the branch matching the current release when the latest
+        // docs source comes from the latest release.
         let latestDisplay: string | null = null;
         if (latestTag) {
           try { latestDisplay = toArchivedVersion(latestTag).display; } catch { /* unparseable tag */ }
         }
-        versions = candidates.filter(v => v.display !== latestDisplay).slice(0, archiveCount);
+        versions = candidates
+          .filter(v => hasExplicitLatestSource || v.display !== latestDisplay)
+          .slice(0, archiveCount);
       } else {
-        const result = await discoverVersions(repo, archiveCount);
+        const result = await discoverVersions(
+          repo,
+          archiveCount + (hasExplicitLatestSource ? 1 : 0),
+        );
         latestTag = result.latestTag;
-        versions = result.archived;
+        if (hasExplicitLatestSource && latestTag && archiveCount > 0) {
+          try {
+            versions = [toArchivedVersion(latestTag), ...result.archived].slice(0, archiveCount);
+          } catch {
+            versions = result.archived.slice(0, archiveCount);
+          }
+        } else {
+          versions = result.archived;
+        }
       }
 
       console.log(
