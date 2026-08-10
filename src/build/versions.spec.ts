@@ -378,6 +378,37 @@ describe('discoverAllVersions with versionSource', () => {
     ]);
   });
 
+  it('does not add versions when archiveCount is zero with an explicit branch', async () => {
+    vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
+      const urlStr = url.toString();
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
+        return {
+          ok: true,
+          json: () => Promise.resolve({
+            id: 'cli', label: 'CLI', contentDir: 'cli',
+            archiveCount: 0, sidebarOrder: [],
+          }),
+        } as Response;
+      }
+      if (urlStr.includes('/releases')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve([
+            { tag_name: 'v1.0.0', prerelease: false, draft: false },
+            { tag_name: 'v0.63.0', prerelease: false, draft: false },
+          ]),
+        } as Response;
+      }
+      return { ok: false, status: 404 } as Response;
+    });
+
+    const result = await discoverAllVersions(
+      [{ repo: 'defenseunicorns/uds-cli', branch: 'main' }],
+      {},
+    );
+    expect(result['defenseunicorns/uds-cli'].versions).toEqual([]);
+  });
+
   it('defaults to tag discovery when versionSource is not set', async () => {
     const calls: string[] = [];
     vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
@@ -451,7 +482,7 @@ describe('discoverAllVersions with versionSource', () => {
     });
 
     const result = await discoverAllVersions(
-      [{ repo: 'defenseunicorns/uds-core' }],
+      [{ repo: 'defenseunicorns/uds-core', branch: 'release/1.0' }],
       {},
     );
     const entry = result['defenseunicorns/uds-core'];

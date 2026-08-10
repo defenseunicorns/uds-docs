@@ -286,21 +286,26 @@ export async function discoverAllVersions(
 
       if (versionSource === 'branch') {
         // Branch-based: archived versions come from release/* branches,
-        // but latestTag still comes from the releases API. When the latest
-        // docs source is explicit, the current release is also versioned.
+        // but latestTag still comes from the releases API. An explicit
+        // source gets the current release unless it is that release itself.
         const [candidates, releaseResult] = await Promise.all([
-          discoverBranchVersions(repo, archiveCount + (hasExplicitLatestSource ? 0 : 1)),
+          discoverBranchVersions(repo, archiveCount + 1),
           discoverVersions(repo, 0),
         ]);
         latestTag = releaseResult.latestTag;
-        // Exclude the branch matching the current release when the latest
-        // docs source comes from the latest release.
         let latestDisplay: string | null = null;
         if (latestTag) {
           try { latestDisplay = toArchivedVersion(latestTag).display; } catch { /* unparseable tag */ }
         }
+        let latestDocsUseCurrentRelease = false;
+        if (hasExplicitLatestSource && latestDisplay && product.branch) {
+          try {
+            latestDocsUseCurrentRelease = toArchivedVersion(product.branch).display === latestDisplay;
+          } catch { /* non-version branch such as main */ }
+        }
+        const includeCurrentRelease = hasExplicitLatestSource && !latestDocsUseCurrentRelease;
         versions = candidates
-          .filter(v => hasExplicitLatestSource || v.display !== latestDisplay)
+          .filter(v => includeCurrentRelease || v.display !== latestDisplay)
           .slice(0, archiveCount);
       } else {
         const result = await discoverVersions(
@@ -314,6 +319,8 @@ export async function discoverAllVersions(
           } catch {
             versions = result.archived.slice(0, archiveCount);
           }
+        } else if (hasExplicitLatestSource) {
+          versions = [];
         } else {
           versions = result.archived;
         }
