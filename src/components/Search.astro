@@ -101,7 +101,10 @@ import Default from '@astrojs/starlight/components/Search.astro';
    *    hides results, including auto-loading all pages to get an accurate total.
    */
   import {
+    detectMainPath,
+    productHasMain,
     products as configuredProducts,
+    productLatestVersions,
     VERSION_SLUG_PATTERN,
   } from '../productUtils';
 
@@ -131,13 +134,22 @@ import Default from '@astrojs/starlight/components/Search.astro';
   let autoLoadingForCount = false;
 
   // Detect the version the user is currently viewing from the page URL.
-  // Current docs have no version slug; archived pages have e.g. "v0-62".
+  // MAIN pages use "main"; all latest release pages share "latest" so the
+  // search scope works across products with different release numbers.
+  // Non-product pages use the latest release scope as well.
   function detectPageVersion(path: string): string {
+    const product = configuredProducts.find(p => path.startsWith(p.link));
+    if (!product) return 'latest';
+    if (detectMainPath(path, product)) return 'main';
+    const hasMain = productHasMain[product.id] === true;
+    const usesLatestRelease = hasMain || product.latestSource === null;
     const segs = path.split('/');
     for (const seg of segs) {
-      if (VERSION_SLUG_PATTERN.test(seg)) return seg;
+      if (VERSION_SLUG_PATTERN.test(seg)) {
+        return usesLatestRelease && productLatestVersions[product.id]?.slug === seg ? 'latest' : seg;
+      }
     }
-    return 'current';
+    return usesLatestRelease && productLatestVersions[product.id] ? 'latest' : 'current';
   }
 
   let pageVersion = detectPageVersion(window.location.pathname);

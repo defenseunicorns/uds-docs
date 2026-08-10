@@ -8,15 +8,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import type { ArchivedVersion, DocsConfig, OverridesMap, VersionEntry, VersionsFile } from './types';
+import { latestVersionFor, minorKey } from '../versionUtils';
 
-// ---------------------------------------------------------------------------
-// Minor version key
-// ---------------------------------------------------------------------------
-
-/** Strip the patch version from a semver tag: `v0.61.1` → `v0.61`. */
-export function minorKey(tag: string): string {
-  return tag.replace(/\.\d+$/, '');
-}
+export { minorKey };
 
 // ---------------------------------------------------------------------------
 // Archived version normalization
@@ -54,6 +48,15 @@ export function toArchivedVersion(ref: string): ArchivedVersion {
     display: `v${majorMinor}`,
     slug: `v${majorMinor.replace(/\./g, '-')}`,
   };
+}
+
+function refsShareMinorVersion(first: string | undefined, second: string | null): boolean {
+  if (!first || !second) return false;
+  try {
+    return toArchivedVersion(first).display === toArchivedVersion(second).display;
+  } catch {
+    return false;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -283,7 +286,6 @@ export async function discoverAllVersions(
 
       let versions: ArchivedVersion[];
       let latestTag: string | null;
-
       if (versionSource === 'branch') {
         // Branch-based: archived versions come from release/* branches,
         // but latestTag still comes from the releases API. An explicit
@@ -293,36 +295,28 @@ export async function discoverAllVersions(
           discoverVersions(repo, 0),
         ]);
         latestTag = releaseResult.latestTag;
-        let latestDisplay: string | null = null;
-        if (latestTag) {
-          try { latestDisplay = toArchivedVersion(latestTag).display; } catch { /* unparseable tag */ }
-        }
-        let latestDocsUseCurrentRelease = false;
-        if (hasExplicitLatestSource && latestDisplay && product.branch) {
-          try {
-            latestDocsUseCurrentRelease = toArchivedVersion(product.branch).display === latestDisplay;
-          } catch { /* non-version branch such as main */ }
-        }
-        const includeCurrentRelease = hasExplicitLatestSource && !latestDocsUseCurrentRelease;
+        const latestDocsUseCurrentRelease = refsShareMinorVersion(product.branch, latestTag);
+        const latestDisplay = latestTag ? latestVersionFor({ latestTag })?.display ?? null : null;
+        const includeLatestRelease = hasExplicitLatestSource && !latestDocsUseCurrentRelease;
         versions = candidates
-          .filter(v => includeCurrentRelease || v.display !== latestDisplay)
-          .slice(0, archiveCount);
+          .filter(v => includeLatestRelease || v.display !== latestDisplay)
+          .slice(0, archiveCount + (includeLatestRelease ? 1 : 0));
       } else {
         const result = await discoverVersions(
           repo,
           archiveCount + (hasExplicitLatestSource ? 1 : 0),
         );
         latestTag = result.latestTag;
-        if (hasExplicitLatestSource && latestTag && archiveCount > 0) {
+        const latestDocsUseCurrentRelease = refsShareMinorVersion(product.branch, latestTag);
+        const includeLatestRelease = hasExplicitLatestSource && !latestDocsUseCurrentRelease;
+        if (includeLatestRelease && latestTag) {
           try {
-            versions = [toArchivedVersion(latestTag), ...result.archived].slice(0, archiveCount);
+            versions = [toArchivedVersion(latestTag), ...result.archived].slice(0, archiveCount + 1);
           } catch {
             versions = result.archived.slice(0, archiveCount);
           }
-        } else if (hasExplicitLatestSource) {
-          versions = [];
         } else {
-          versions = result.archived;
+          versions = result.archived.slice(0, archiveCount);
         }
       }
 

@@ -27,7 +27,7 @@ test.describe('Sidebar', () => {
 
     // Navigate to CLI and verify sidebar context switched
     await menu.locator(`${selectors.productDropdownItem}[href="/cli/"]`).click();
-    await expect(page).toHaveURL('/cli/');
+    await expect(page).toHaveURL(/\/cli\/v\d+-\d+\//);
     await expect(page.locator(selectors.productDropdownButton)).toContainText('CLI');
   });
 });

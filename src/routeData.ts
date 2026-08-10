@@ -1,11 +1,13 @@
 // src/routeData.ts
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { existsSync, readdirSync, readFileSync } from 'fs';
-import { PRODUCTS, DIR_RENAMES_FILENAME } from './products';
+import { PRODUCTS, DIR_RENAMES_FILENAME, type ProductConfig } from './products';
+import { latestVersionFor } from './versionUtils';
 
 // Build a map from contentDir prefix → product at module load time.
 // Route ids look like "core/getting-started/foo" or "cli/reference/overview".
 const prefixToProduct = new Map(PRODUCTS.map(p => [p.contentDir, p]));
+const productByRepo = new Map(PRODUCTS.map(p => [p.repo, p]));
 
 // Version slugs look like "v0-61", "v1-2", etc.
 const VERSION_SLUG_RE = /^v\d+-\d+$/;
@@ -56,7 +58,68 @@ const versionConfigs: Record<string, VersionConfig> = (() => {
   return configs;
 })();
 
+interface VersionsEntry {
+  repo?: string;
+  latestTag?: string;
+  versions?: Array<{ display: string; slug: string }>;
+}
 const CONTENT_DOCS_PATH = 'src/content/docs/';
+
+const latestVersionsByRepo: Record<string, { slug: string; ref: string }> = (() => {
+  if (!existsSync('.versions')) return {};
+  try {
+    const versions = JSON.parse(readFileSync('.versions', 'utf8')) as Record<string, VersionsEntry>;
+    return Object.fromEntries(
+      Object.values(versions).flatMap(entry => {
+        if (!entry.repo) return [];
+        const latest = latestVersionFor(entry);
+        if (!latest) return [];
+        const product = productByRepo.get(entry.repo);
+        if (
+          product?.latestSource === 'main' &&
+          !existsSync(`${CONTENT_DOCS_PATH}${product.contentDir}/${latest.slug}`)
+        ) {
+          return [];
+        }
+        return [[entry.repo, { slug: latest.slug, ref: latest.ref }]];
+      }),
+    );
+  } catch (e) {
+    console.warn(`[routeData] Failed to parse .versions: ${e}`);
+    return {};
+  }
+})();
+const latestSlugsByRepo = Object.fromEntries(
+  Object.entries(latestVersionsByRepo).map(([repo, version]) => [repo, version.slug]),
+);
+
+export function latestReleaseHref(
+  product: Pick<ProductConfig, 'contentDir' | 'link' | 'latestSource'>,
+  latestSlug: string,
+  currentSlug: string,
+  routeId: string,
+  fileExists: (path: string) => boolean = existsSync,
+): string {
+  const fallback = product.link;
+  const routePrefix = `${product.contentDir}/${currentSlug}`;
+  if (routeId !== routePrefix && !routeId.startsWith(`${routePrefix}/`)) return fallback;
+
+  const latestContentPrefix = product.latestSource === 'main'
+    ? `${CONTENT_DOCS_PATH}${product.contentDir}/${latestSlug}`
+    : `${CONTENT_DOCS_PATH}${product.contentDir}`;
+  const relativePath = routeId.slice(routePrefix.length).replace(/^\/+|\/+$/g, '');
+  const latestPath = relativePath && relativePath !== 'index'
+    ? `${latestContentPrefix}/${relativePath}`
+    : latestContentPrefix;
+  const latestFiles = relativePath && relativePath !== 'index'
+    ? [`${latestPath}.md`, `${latestPath}.mdx`, `${latestPath}/index.md`, `${latestPath}/index.mdx`]
+    : [`${latestPath}/index.md`, `${latestPath}/index.mdx`];
+  if (!latestFiles.some(fileExists)) return fallback;
+
+  return relativePath && relativePath !== 'index'
+    ? `${product.link}${relativePath}/`
+    : product.link;
+}
 
 export const onRequest = defineRouteMiddleware((context) => {
   const route = context.locals.starlightRoute;
@@ -67,6 +130,19 @@ export const onRequest = defineRouteMiddleware((context) => {
   // Split once — used for both product detection and version detection below.
   const [contentDir, maybeVersion] = route.id.split('/');
   const product = prefixToProduct.get(contentDir);
+  const entryData = route.entry.data as Record<string, unknown>;
+  const latestSlug = product ? latestSlugsByRepo[product.repo] : undefined;
+  const latestPagefindVersion = product &&
+    (product.latestSource === 'main' || product.latestSource === undefined)
+    ? latestSlug
+    : undefined;
+  entryData.pagefindVersion = maybeVersion === 'main'
+    ? 'main'
+    : maybeVersion === latestPagefindVersion
+      ? 'latest'
+      : VERSION_SLUG_RE.test(maybeVersion ?? '')
+        ? maybeVersion
+        : latestPagefindVersion ?? 'current';
 
   // Pagefind supports inline metadata "key:value" in <head>.
   route.head.push({
@@ -78,14 +154,51 @@ export const onRequest = defineRouteMiddleware((context) => {
 
   // Inject an "older version" banner on all versioned pages.
   const versioned = versionedProduct(contentDir, maybeVersion);
+  if (product && maybeVersion === 'main') {
+    if (latestSlug) {
+      entryData.banner = {
+        text: "You're viewing unreleased documentation from main.",
+        linkHref: latestReleaseHref(product, latestSlug, 'main', route.id),
+        linkText: 'Go to the latest release',
+      };
+    }
+
+    if (!route.editUrl && entryData.editUrl !== false) {
+      const filePath = route.entry.filePath;
+      const idx = filePath?.indexOf(CONTENT_DOCS_PATH) ?? -1;
+      if (filePath && idx !== -1) {
+        const relativePath = filePath.slice(idx + CONTENT_DOCS_PATH.length);
+        const parts = relativePath.split('/').slice(2);
+        if (parts.length > 0) {
+          const upstream = parts.map((seg, i) =>
+            i < parts.length - 1 ? (dirRenames[seg] ?? seg) : seg
+          );
+          route.editUrl = new URL(
+            `https://github.com/${product.repo}/blob/${product.latestSource ?? 'main'}/docs/${upstream.join('/')}`
+          );
+        }
+      }
+    }
+    return;
+  }
+
   if (versioned) {
     // Replace all hyphens: "v0-61" → "v0.61" (version slugs use hyphens for Astro compat)
     const versionLabel = maybeVersion!.replace(/-/g, '.');
-    (route.entry.data as Record<string, unknown>).banner = {
-      text: `You're viewing docs for ${versionLabel}.`,
-      linkHref: versioned.link,
-      linkText: 'Go to the latest',
-    };
+    if (maybeVersion !== latestSlugsByRepo[versioned.repo]) {
+      (route.entry.data as Record<string, unknown>).banner = {
+        text: `You're viewing docs for ${versionLabel}.`,
+        linkHref: latestSlugsByRepo[versioned.repo]
+          ? latestReleaseHref(
+            versioned,
+            latestSlugsByRepo[versioned.repo],
+            maybeVersion!,
+            route.id,
+          )
+          : versioned.link,
+        linkText: 'Go to the latest release',
+      };
+    }
 
     // For branch-sourced versions, generate edit URL pointing to the release branch.
     // Respect frontmatter overrides: skip if editUrl is already set or explicitly disabled.
@@ -94,7 +207,7 @@ export const onRequest = defineRouteMiddleware((context) => {
     if (
       verConfig?.ref?.startsWith('release/') &&
       !route.editUrl &&
-      (route.entry.data as Record<string, unknown>).editUrl !== false
+      entryData.editUrl !== false
     ) {
       const filePath = route.entry.filePath;
       if (filePath) {
@@ -123,7 +236,7 @@ export const onRequest = defineRouteMiddleware((context) => {
   // When frontmatter.editUrl === false, Starlight leaves route.editUrl undefined,
   // so we check route.entry.data directly to catch the "disable" case.
   if (route.editUrl) return;
-  if ((route.entry.data as Record<string, unknown>).editUrl === false) return;
+  if (entryData.editUrl === false) return;
 
   const filePath = route.entry.filePath;
   if (!filePath) return;
@@ -142,8 +255,11 @@ export const onRequest = defineRouteMiddleware((context) => {
     const upstream = parts.map((seg, i) =>
       i < parts.length - 1 ? (dirRenames[seg] ?? seg) : seg
     );
+    const source = product.latestSource
+      ?? latestVersionsByRepo[product.repo]?.ref
+      ?? 'main';
     route.editUrl = new URL(
-      `https://github.com/${product.repo}/blob/main/docs/${upstream.join('/')}`
+      `https://github.com/${product.repo}/blob/${source}/docs/${upstream.join('/')}`
     );
   } else {
     // Non-product page (e.g. root-level docs) — link to uds-docs repo.

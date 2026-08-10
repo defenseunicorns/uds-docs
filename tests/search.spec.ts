@@ -32,6 +32,28 @@ async function getVisibleResultHrefs(page: import('@playwright/test').Page): Pro
 }
 
 test.describe('Search', () => {
+  test('searching from non-product pages includes product documentation', async ({ page }) => {
+    await page.goto('/core/');
+    const latestOption = page.locator(`${selectors.versionSelect} option[value="latest"]`);
+    await expect(latestOption).toHaveText(/^Latest \(\d+\.\d+\)$/);
+    const latestDisplay = await latestOption.textContent();
+    const latestMinor = latestDisplay?.match(/\((\d+\.\d+)\)/)?.[1];
+    expect(latestMinor).toBeTruthy();
+    const latestSlug = `v${latestMinor?.replace('.', '-')}`;
+
+    for (const path of ['/', '/not-a-real-page']) {
+      await page.goto(path);
+      await page.locator(selectors.searchButton).click();
+      await page.locator(selectors.searchInput).fill('local demo');
+      const firstResult = page.locator(selectors.searchResult).first();
+      await expect(firstResult).toBeVisible({ timeout: 10_000 });
+      await expect(firstResult.locator('a').first()).toHaveAttribute(
+        'href',
+        new RegExp(`^/core/${latestSlug}/`),
+      );
+    }
+  });
+
   test('searching and clicking a result navigates to that page', async ({ page }) => {
     await page.goto('/core/');
 
@@ -92,6 +114,6 @@ test.describe('Search', () => {
 
     await page.keyboard.press('Escape');
     await expect(page.locator(selectors.searchDialog)).not.toBeVisible();
-    await expect(page).toHaveURL('/core/');
+    await expect(page).toHaveURL(/\/core\/v\d+-\d+\//);
   });
 });

@@ -72,12 +72,12 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 </style>
 
 <script is:inline data-astro-rerun>
-  // Remove versioned topics from the product dropdown — versions use the VersionPicker instead.
+  // Remove MAIN and versioned topics from the product dropdown. The VersionPicker handles them.
   // Runs immediately so there's no flash of versioned items in the dropdown.
-  // Note: version slug pattern must match VERSION_SLUG_PATTERN in productUtils.ts
+  // Note: channel/version patterns must match productUtils.ts
   // and VERSION_SEGMENT_RE in 404.md.
   (() => {
-    const versionPattern = /\/v\d+-\d+(?:\/|$)/;
+    const versionPattern = /\/(?:main|v\d+-\d+)(?:\/|$)/;
     document.querySelectorAll('.starlight-sidebar-topics-dropdown-menu a').forEach(a => {
       if (versionPattern.test(a.getAttribute('href') || '')) {
         a.remove();

@@ -181,15 +181,19 @@ The page you're looking for doesn't exist or may have moved.
 Use the sidebar to navigate, or return to the product home.
 `;
 
-const VERSIONED_404_BODY = `
-The page you're looking for doesn't exist in this version.
+function versioned404Body(scope: string): string {
+  return `
+The page you're looking for doesn't exist in ${scope}.
 
 Use the sidebar to navigate, or use the **Version** selector to switch to a different version.
 `;
+}
 
-/** Write a `404.md` page — versioned variant mentions the Version selector. */
-export function write404Page(destPath: string, isVersioned: boolean): void {
-  const body = isVersioned ? VERSIONED_404_BODY : NON_VERSIONED_404_BODY;
+/** Write a `404.md` page for the applicable product/version channel. */
+export function write404Page(destPath: string, isVersioned: boolean, isLatest = false): void {
+  const body = !isVersioned
+    ? NON_VERSIONED_404_BODY
+    : versioned404Body(isLatest ? 'the latest release' : 'this version');
   writeFileSync(destPath, PAGE_FRONTMATTER + body);
 }
 

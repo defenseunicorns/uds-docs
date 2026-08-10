@@ -1,12 +1,13 @@
 ---
 // Version picker is hidden by default to avoid FOUC; the client-side script
-// shows it when the current product has archived versions.
+// shows it when the current product has multiple available channels or versions.
 ---
 
 <div class="version-picker not-content" style="display:none">
   <label for="version-select" class="version-label">Version</label>
   <select id="version-select" class="version-select">
-    <option value="">Latest</option>
+    <option value="main">MAIN</option>
+    <option value="latest">Latest</option>
   </select>
 </div>
 
@@ -39,7 +40,14 @@
 </style>
 
 <script>
-  import { productVersions, productLatestSources, detectProduct, detectVersionSlug } from '../productUtils';
+  import {
+    productHasMain,
+    productLatestVersions,
+    productVersions,
+    detectMainPath,
+    detectProduct,
+    detectVersionSlug,
+  } from '../productUtils';
 
   function initVersionPicker() {
     const select = document.getElementById('version-select') as HTMLSelectElement;
@@ -53,8 +61,12 @@
     }
 
     const versions = productVersions[product.id] ?? [];
-    if (versions.length === 0) {
-      // This product has no archived versions — stay hidden
+    const latest = productLatestVersions[product.id];
+    const hasMain = productHasMain[product.id] === true;
+    const versionOptions = versions.filter(ver => !hasMain || latest?.slug !== ver.slug);
+    const optionCount = Number(hasMain) + Number(Boolean(latest)) + versionOptions.length;
+    if (optionCount < 2) {
+      // No meaningful choice to show when this is the only available version.
       return;
     }
 
@@ -62,18 +74,18 @@
     const picker = select.closest('.version-picker') as HTMLElement | null;
     if (picker) picker.style.display = '';
 
-    // Label the default option with the ref used for the unversioned docs.
-    const latestSource = productLatestSources[product.id];
-    const latestOption = select.querySelector('option[value=""]') as HTMLOptionElement | null;
-    if (latestOption && latestSource) {
-      const sourceLabel = /^v?\d+\.\d+\.\d+$/.test(latestSource)
-        ? latestSource.replace(/\.\d+$/, '')
-        : latestSource;
-      latestOption.textContent = `Latest (${sourceLabel})`;
+    const mainOption = select.querySelector('option[value="main"]') as HTMLOptionElement | null;
+    if (!hasMain) mainOption?.remove();
+
+    const latestOption = select.querySelector('option[value="latest"]') as HTMLOptionElement | null;
+    if (!latest) {
+      latestOption?.remove();
+    } else if (latestOption) {
+      latestOption.textContent = `Latest (${latest.display.replace(/^v/, '')})`;
     }
 
     // Populate version options
-    versions.forEach(ver => {
+    versionOptions.forEach(ver => {
       const opt = document.createElement('option');
       opt.value = ver.slug;
       opt.textContent = ver.display;
@@ -81,7 +93,12 @@
     });
 
     // Set current value
-    select.value = detectVersionSlug(window.location.pathname, product) ?? '';
+    const currentSlug = detectVersionSlug(window.location.pathname, product);
+    select.value = detectMainPath(window.location.pathname, product)
+      ? 'main'
+      : currentSlug && latest?.slug === currentSlug
+        ? 'latest'
+        : currentSlug ?? 'latest';
 
     select.addEventListener('change', () => {
       const selected = select.value;
@@ -90,11 +107,15 @@
       const afterPrefix = window.location.pathname.startsWith(prefix)
         ? window.location.pathname.slice(prefix.length)
         : window.location.pathname;
-      const strippedPath = afterPrefix.replace(/^v\d+-\d+\//, '');
+      const strippedPath = afterPrefix.replace(/^(?:main|v\d+-\d+)\//, '');
 
-      const target = selected
-        ? `${prefix}${selected}/${strippedPath}`
-        : `${prefix}${strippedPath}`;
+      const target = selected === 'main'
+        ? `${prefix}main/${strippedPath}`
+        : selected === 'latest' && latest && hasMain
+          ? `${prefix}${latest.slug}/${strippedPath}`
+          : selected && selected !== 'latest'
+            ? `${prefix}${selected}/${strippedPath}`
+            : `${prefix}${strippedPath}`;
 
       // Navigate directly to the target URL via full page reload.
       // Version switching changes sidebar structure, so a full reload is intentional.

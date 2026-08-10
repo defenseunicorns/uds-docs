@@ -2,8 +2,8 @@
  * Shared client-side utilities for product/version detection from the URL.
  * Used by VersionPicker.astro and Search.astro to avoid duplicating logic.
  *
- * Depends on __PRODUCTS__, __PRODUCT_VERSIONS__, and __PRODUCT_LATEST_SOURCES__
- * injected via Vite define in astro.config.mjs.
+ * Depends on __PRODUCTS__, __PRODUCT_VERSIONS__, __PRODUCT_LATEST_VERSIONS__,
+ * and __PRODUCT_HAS_MAIN__ injected via Vite define in astro.config.mjs.
  */
 
 /** Client-side representation of an archived version. */
@@ -14,18 +14,34 @@ export interface ClientVersion {
 }
 
 // Injected at build time by Vite's define plugin in astro.config.mjs.
-declare const __PRODUCTS__: Array<{ id: string; label: string; link: string; githubRepo: string | null }>;
+declare const __PRODUCTS__: Array<{
+  id: string;
+  label: string;
+  link: string;
+  githubRepo: string | null;
+  latestSource: string | null;
+}>;
 declare const __PRODUCT_VERSIONS__: Record<string, ClientVersion[]>;
-declare const __PRODUCT_LATEST_SOURCES__: Record<string, string>;
+declare const __PRODUCT_LATEST_VERSIONS__: Record<string, ClientVersion>;
+declare const __PRODUCT_HAS_MAIN__: Record<string, boolean>;
 
-export const products: Array<{ id: string; label: string; link: string; githubRepo: string | null }> =
+export const products: Array<{
+  id: string;
+  label: string;
+  link: string;
+  githubRepo: string | null;
+  latestSource: string | null;
+}> =
   typeof __PRODUCTS__ !== 'undefined' ? __PRODUCTS__ : [];
 
 export const productVersions: Record<string, ClientVersion[]> =
   typeof __PRODUCT_VERSIONS__ !== 'undefined' ? __PRODUCT_VERSIONS__ : {};
 
-export const productLatestSources: Record<string, string> =
-  typeof __PRODUCT_LATEST_SOURCES__ !== 'undefined' ? __PRODUCT_LATEST_SOURCES__ : {};
+export const productLatestVersions: Record<string, ClientVersion> =
+  typeof __PRODUCT_LATEST_VERSIONS__ !== 'undefined' ? __PRODUCT_LATEST_VERSIONS__ : {};
+
+export const productHasMain: Record<string, boolean> =
+  typeof __PRODUCT_HAS_MAIN__ !== 'undefined' ? __PRODUCT_HAS_MAIN__ : {};
 
 /** Regex matching a version slug segment (e.g. "v0-61"). */
 export const VERSION_SLUG_PATTERN = /^v\d+-\d+$/;
@@ -45,6 +61,12 @@ export function detectVersionSlug(path: string, product: { link: string }): stri
   const after = path.startsWith(product.link) ? path.slice(product.link.length) : path;
   const m = after.match(/^(v\d+-\d+)\//);
   return m ? m[1] : null;
+}
+
+/** Determine whether the current product page belongs to the MAIN channel. */
+export function detectMainPath(path: string, product: { link: string }): boolean {
+  const after = path.startsWith(product.link) ? path.slice(product.link.length) : path;
+  return after === 'main' || after.startsWith('main/');
 }
 
 /** Determine both product and version from a URL path. */

@@ -3,9 +3,12 @@ import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 import ImageZoom from 'starlight-image-zoom/components/ImageZoom.astro';
 import { VERSION_SLUG_PATTERN } from '../productUtils';
 
-// Determine the pagefind version filter for this page.
-// Archived pages contain a version slug segment (e.g. "v0-62"); current pages use "current".
-const version = Astro.url.pathname.split('/').find(s => VERSION_SLUG_PATTERN.test(s)) ?? 'current';
+// Determine the pagefind version filter for this page. routeData distinguishes
+// the latest release root, MAIN, and older versioned pages.
+const routeData = Astro.locals.starlightRoute?.entry?.data as Record<string, unknown> | undefined;
+const version = typeof routeData?.pagefindVersion === 'string'
+  ? routeData.pagefindVersion
+  : Astro.url.pathname.split('/').find(s => VERSION_SLUG_PATTERN.test(s)) ?? 'current';
 ---
 
 <ImageZoom />

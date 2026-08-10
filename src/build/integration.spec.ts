@@ -1,12 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import {
   collectDirsDeepestFirst,
   collectMarkdownFiles,
   removeStaleVersionDirs,
+  writeMainRedirects,
 } from './integration';
+import type { DocsConfig } from './types';
 
 describe('collectDirsDeepestFirst', () => {
   let tmpDir: string;
@@ -146,5 +148,76 @@ describe('removeStaleVersionDirs', () => {
   it('handles nonexistent and empty directories', () => {
     expect(() => removeStaleVersionDirs(join(tmpDir, 'nonexistent'))).not.toThrow();
     expect(() => removeStaleVersionDirs(tmpDir)).not.toThrow();
+  });
+});
+
+describe('writeMainRedirects', () => {
+  let tmpDir: string;
+  let targetDir: string;
+  let configDir: string;
+
+  beforeEach(() => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-main-redirects-'));
+    targetDir = join(tmpDir, 'content');
+    configDir = join(tmpDir, 'config');
+    mkdirSync(join(targetDir, 'core', 'main', 'Configuration & Packaging'), { recursive: true });
+    mkdirSync(join(targetDir, 'core', 'v1-10'), { recursive: true });
+    mkdirSync(configDir, { recursive: true });
+    writeFileSync(join(targetDir, 'core', 'main', 'Configuration & Packaging', 'overview.md'), '');
+    writeFileSync(join(targetDir, 'core', 'main', 'Configuration & Packaging', 'some-and-page.md'), '');
+  });
+
+  afterEach(() => {
+    rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  const versions = {
+    'defenseunicorns/uds-core': {
+      latestTag: 'v1.10.0',
+      versions: [{ display: 'v1.10', slug: 'v1-10' }],
+    },
+  };
+  const config = {
+    repo: 'defenseunicorns/uds-core',
+    contentDir: 'core',
+  } as DocsConfig & { repo: string };
+
+  it('writes current and legacy double-hyphen routes to the latest release', () => {
+    writeMainRedirects(
+      versions,
+      new Map([['uds-core', config]]),
+      new Set(['uds-core']),
+      { 'Configuration & Packaging': 'configuration-and-packaging' },
+      targetDir,
+      configDir,
+    );
+
+    const redirects = JSON.parse(readFileSync(join(configDir, 'redirects.json'), 'utf8')) as Record<string, string>;
+    expect(redirects['/core/configuration-and-packaging/overview']).toBe(
+      '/core/v1-10/configuration-and-packaging/overview/',
+    );
+    expect(redirects['/core/configuration--packaging/overview']).toBe(
+      '/core/v1-10/configuration-and-packaging/overview/',
+    );
+    expect(redirects['/core/configuration--packaging/some-and-page']).toBe(
+      '/core/v1-10/configuration-and-packaging/some-and-page/',
+    );
+    expect(redirects['/core/configuration--packaging/some--page']).toBeUndefined();
+  });
+
+  it('keeps the root on MAIN when the latest clone is unavailable', () => {
+    rmSync(join(targetDir, 'core', 'v1-10'), { recursive: true, force: true });
+
+    writeMainRedirects(
+      versions,
+      new Map([['uds-core', config]]),
+      new Set(['uds-core']),
+      {},
+      targetDir,
+      configDir,
+    );
+
+    const redirects = JSON.parse(readFileSync(join(configDir, 'redirects.json'), 'utf8')) as Record<string, string>;
+    expect(redirects['/core']).toBe('/core/main/');
   });
 });
