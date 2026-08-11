@@ -2,6 +2,32 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Card, CardGrid } from '@astrojs/starlight/components';
 import '@fontsource/teko/index.css';
+import { existsSync, readFileSync } from 'node:fs';
+import { PRODUCTS } from '../products';
+import { latestVersionFor } from '../versionUtils';
+
+type VersionsFile = Record<string, Parameters<typeof latestVersionFor>[0]>;
+let versionsByRepo: VersionsFile = {};
+try {
+    versionsByRepo = JSON.parse(readFileSync('.versions', 'utf8')) as VersionsFile;
+} catch {
+    // Release metadata is unavailable before the integration build runs.
+}
+
+function productHref(contentDir: string): string {
+    const product = PRODUCTS.find(entry => entry.contentDir === contentDir);
+    if (!product) return `/${contentDir}/`;
+    if (!product.latestSource) return product.link;
+
+    const latest = latestVersionFor(versionsByRepo[product.repo] ?? {});
+    const target = latest && existsSync(`src/content/docs/${contentDir}/${latest.slug}`)
+        ? latest.slug
+        : product.latestSource;
+    return `${product.link}${target}/`;
+}
+
+const coreHref = productHref('core');
+const cliHref = productHref('cli');
 
 const frontmatter = {
     title: "Unified Defense Stack",
@@ -171,14 +197,14 @@ const frontmatter = {
             <img src="/assets/UDS_Core_Logo_White.svg" alt="UDS Core" class="card-logo card-logo-dark" />
             <img src="/assets/UDS_Core_Logo_Dark.svg" alt="UDS Core" class="card-logo card-logo-light" />
             The runtime platform that provides shared, security-hardened services to every application deployed on top of it. Handles networking, identity, logging, monitoring, runtime security, and compliance.
-            <a href="/core/" class="card-link" aria-label="UDS Core" data-astro-reload></a>
+            <a href={coreHref} class="card-link" aria-label="UDS Core" data-astro-reload></a>
         </Card>
 
         <Card title="">
             <img src="/assets/UDS_CLI_Logo_White.svg" alt="UDS CLI" class="card-logo card-logo-dark" />
             <img src="/assets/UDS_CLI_Logo_Dark.svg" alt="UDS CLI" class="card-logo card-logo-light" />
             The primary interface for packaging, deploying, and managing software on UDS Core. Designed for workflows from local development to production operations.
-            <a href="/cli/" class="card-link" aria-label="UDS CLI" data-astro-reload></a>
+            <a href={cliHref} class="card-link" aria-label="UDS CLI" data-astro-reload></a>
         </Card>
 
         <Card title="">
