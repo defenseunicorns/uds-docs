@@ -1,8 +1,10 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.astro';
+import { PRODUCTS } from '../products';
 
 const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? false;
+const channelNames = PRODUCTS.flatMap(product => product.latestSource ? [product.latestSource] : []);
 ---
 
 {/* Render the topics dropdown menu only when the page belongs to a topic. */}
@@ -71,15 +73,18 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 
 </style>
 
-<script is:inline data-astro-rerun>
-  // Remove MAIN and versioned topics from the product dropdown. The VersionPicker handles them.
+<script is:inline data-astro-rerun data-channel-names={JSON.stringify(channelNames)}>
+  // Remove configured channel and versioned topics from the product dropdown. The VersionPicker handles them.
   // Runs immediately so there's no flash of versioned items in the dropdown.
   // Note: channel/version patterns must match productUtils.ts
   // and VERSION_SEGMENT_RE in 404.md.
   (() => {
-    const versionPattern = /\/(?:main|v\d+-\d+)(?:\/|$)/;
+    const channelNames = new Set(JSON.parse(document.currentScript?.dataset.channelNames ?? '[]'));
+    const versionPattern = /\/v\d+-\d+(?:\/|$)/;
     document.querySelectorAll('.starlight-sidebar-topics-dropdown-menu a').forEach(a => {
-      if (versionPattern.test(a.getAttribute('href') || '')) {
+      const href = a.getAttribute('href') || '';
+      const channel = href.split('/')[2];
+      if (versionPattern.test(href) || channelNames.has(channel)) {
         a.remove();
       }
     });

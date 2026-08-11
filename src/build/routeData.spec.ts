@@ -4,7 +4,7 @@ import { latestReleaseHref } from '../routeData';
 const product = {
   contentDir: 'core',
   link: '/core/',
-  latestSource: 'main',
+  latestSource: 'develop',
 };
 
 describe('latestReleaseHref', () => {
@@ -19,7 +19,7 @@ describe('latestReleaseHref', () => {
         'core/v1-8/concepts/core-features/networking',
         path => path === latestFile,
       ),
-    ).toBe('/core/concepts/core-features/networking/');
+    ).toBe('/core/v1-10/concepts/core-features/networking/');
   });
 
   it('falls back to the product root when the latest page is missing', () => {
@@ -34,7 +34,7 @@ describe('latestReleaseHref', () => {
     ).toBe('/core/');
   });
 
-  it('checks the product root for products without a main channel', () => {
+  it('checks the product root for products without a configured channel', () => {
     const cliProduct = {
       contentDir: 'cli',
       link: '/cli/',
@@ -60,10 +60,10 @@ describe('latestReleaseHref', () => {
       latestReleaseHref(
         product,
         'v1-10',
-        'main',
-        'core/main/concepts/core-features/networking',
+        'develop',
+        'core/develop/concepts/core-features/networking',
         path => path === latestFile,
       ),
-    ).toBe('/core/concepts/core-features/networking/');
+    ).toBe('/core/v1-10/concepts/core-features/networking/');
   });
 });

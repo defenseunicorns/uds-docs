@@ -6,7 +6,7 @@ import {
   collectDirsDeepestFirst,
   collectMarkdownFiles,
   removeStaleVersionDirs,
-  writeMainRedirects,
+  writeChannelRedirects,
 } from './integration';
 import type { DocsConfig } from './types';
 
@@ -151,20 +151,20 @@ describe('removeStaleVersionDirs', () => {
   });
 });
 
-describe('writeMainRedirects', () => {
+describe('writeChannelRedirects', () => {
   let tmpDir: string;
   let targetDir: string;
   let configDir: string;
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(tmpdir(), 'uds-main-redirects-'));
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-channel-redirects-'));
     targetDir = join(tmpDir, 'content');
     configDir = join(tmpDir, 'config');
-    mkdirSync(join(targetDir, 'core', 'main', 'Configuration & Packaging'), { recursive: true });
+    mkdirSync(join(targetDir, 'core', 'develop', 'Configuration & Packaging'), { recursive: true });
     mkdirSync(join(targetDir, 'core', 'v1-10'), { recursive: true });
     mkdirSync(configDir, { recursive: true });
-    writeFileSync(join(targetDir, 'core', 'main', 'Configuration & Packaging', 'overview.md'), '');
-    writeFileSync(join(targetDir, 'core', 'main', 'Configuration & Packaging', 'some-and-page.md'), '');
+    writeFileSync(join(targetDir, 'core', 'develop', 'Configuration & Packaging', 'overview.md'), '');
+    writeFileSync(join(targetDir, 'core', 'develop', 'Configuration & Packaging', 'some-and-page.md'), '');
   });
 
   afterEach(() => {
@@ -183,10 +183,10 @@ describe('writeMainRedirects', () => {
   } as DocsConfig & { repo: string };
 
   it('writes current and legacy double-hyphen routes to the latest release', () => {
-    writeMainRedirects(
+    writeChannelRedirects(
       versions,
       new Map([['uds-core', config]]),
-      new Set(['uds-core']),
+      new Map([['uds-core', 'develop']]),
       { 'Configuration & Packaging': 'configuration-and-packaging' },
       targetDir,
       configDir,
@@ -205,19 +205,19 @@ describe('writeMainRedirects', () => {
     expect(redirects['/core/configuration--packaging/some--page']).toBeUndefined();
   });
 
-  it('keeps the root on MAIN when the latest clone is unavailable', () => {
+  it('keeps the root on the configured channel when the latest clone is unavailable', () => {
     rmSync(join(targetDir, 'core', 'v1-10'), { recursive: true, force: true });
 
-    writeMainRedirects(
+    writeChannelRedirects(
       versions,
       new Map([['uds-core', config]]),
-      new Set(['uds-core']),
+      new Map([['uds-core', 'develop']]),
       {},
       targetDir,
       configDir,
     );
 
     const redirects = JSON.parse(readFileSync(join(configDir, 'redirects.json'), 'utf8')) as Record<string, string>;
-    expect(redirects['/core']).toBe('/core/main/');
+    expect(redirects['/core']).toBe('/core/develop/');
   });
 });

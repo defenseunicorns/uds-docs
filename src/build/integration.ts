@@ -63,9 +63,12 @@ export async function main(): Promise<void> {
     // ------------------------------------------------------------------
 
     const products = readProductsJson(process.env.PRODUCTS_JSON);
-    const mainProducts = new Set(
-      products.filter(product => product.branch === 'main').map(product => product.repo.split('/').pop()!),
+    const productChannels = new Map(
+      products
+        .filter(product => product.branch)
+        .map(product => [product.repo.split('/').pop()!, product.branch!]),
     );
+    const channelNames = new Set(productChannels.values());
 
     const repoOverrides = Object.fromEntries(
       Object.entries(overrides).filter(([k]) => !k.includes('@')),
@@ -123,18 +126,18 @@ export async function main(): Promise<void> {
         throw new Error(`contentDir is missing or empty in docs.config.json for ${repo}`);
       }
       const productRoot = join(TARGET_DIR, contentDir);
-      const isMainProduct = mainProducts.has(repoName);
-      if (isMainProduct) {
-        // MAIN docs live behind an explicit URL channel. Remove any root
+      const channel = productChannels.get(repoName);
+      if (channel) {
+        // Channel docs live behind an explicit URL channel. Remove any root
         // content left by builds from the previous unversioned layout.
         rmSync(productRoot, { recursive: true, force: true });
       }
-      const destDir = isMainProduct ? join(productRoot, 'main') : productRoot;
+      const destDir = channel ? join(productRoot, channel) : productRoot;
 
       console.log(`Copying docs from ${docsSource}/ to ${destDir}`);
       copyDocs(docsSource, destDir);
-      cleanupUnlistedDirs(destDir, docsConfig, isMainProduct ? `${contentDir}/main` : contentDir);
-      if (isMainProduct) {
+      cleanupUnlistedDirs(destDir, docsConfig, channel ? `${contentDir}/${channel}` : contentDir);
+      if (channel) {
         write404Page(join(productRoot, '404.md'), false);
       }
 
@@ -154,11 +157,12 @@ export async function main(): Promise<void> {
       const contentDir = config.contentDir;
       if (!contentDir) continue;
       const repoName = config.repo.split('/').pop()!;
-      const dir = mainProducts.has(repoName)
-        ? join(TARGET_DIR, contentDir, 'main')
+      const channel = productChannels.get(repoName);
+      const dir = channel
+        ? join(TARGET_DIR, contentDir, channel)
         : join(TARGET_DIR, contentDir);
       if (!existsSync(dir)) continue;
-      write404Page(join(dir, '404.md'), mainProducts.has(repoName));
+      write404Page(join(dir, '404.md'), Boolean(channel));
     }
 
     // ------------------------------------------------------------------
@@ -262,8 +266,9 @@ export async function main(): Promise<void> {
     for (const config of configCache.values()) {
       rmSync(join(TARGET_DIR, config.contentDir, 'README.md'), { force: true });
       const repoName = config.repo.split('/').pop()!;
-      if (mainProducts.has(repoName)) {
-        rmSync(join(TARGET_DIR, config.contentDir, 'main', 'README.md'), { force: true });
+      const channel = productChannels.get(repoName);
+      if (channel) {
+        rmSync(join(TARGET_DIR, config.contentDir, channel, 'README.md'), { force: true });
       }
     }
 
@@ -276,7 +281,7 @@ export async function main(): Promise<void> {
     const dirRenames: Record<string, string> = {};
     const slugRenamesByScope = new Map<string, Array<[string, string]>>();
 
-    const dirsToRename = collectDirsDeepestFirst(TARGET_DIR);
+    const dirsToRename = collectDirsDeepestFirst(TARGET_DIR, channelNames);
     for (const fullPath of dirsToRename) {
       const base = basename(fullPath);
       const newBase = toTitleCase(base);
@@ -297,7 +302,7 @@ export async function main(): Promise<void> {
         const relOld = fullPath.slice(TARGET_DIR.length + 1);
         const parts = relOld.split('/');
         const contentDir = parts.shift()!;
-        const channel = VERSION_SLUG_RE.test(parts[0] ?? '') || parts[0] === 'main'
+        const channel = VERSION_SLUG_RE.test(parts[0] ?? '') || channelNames.has(parts[0] ?? '')
           ? parts.shift()!
           : '';
         const scope = `${contentDir}/${channel}`;
@@ -318,7 +323,7 @@ export async function main(): Promise<void> {
         .map(k => [k, dirRenames[k]]),
     );
     writeFileSync(join(CONFIG_DIR, 'dir-renames.json'), JSON.stringify(sortedRenames, null, 2) + '\n');
-    writeMainRedirects(versions, configCache, mainProducts, sortedRenames);
+    writeChannelRedirects(versions, configCache, productChannels, sortedRenames);
 
     // ------------------------------------------------------------------
     // Step 8: Rewrite internal markdown links
@@ -362,10 +367,10 @@ function readDocsConfig(configPath: string): DocsConfig {
   return JSON.parse(readFileSync(configPath, 'utf8')) as DocsConfig;
 }
 
-export function writeMainRedirects(
+export function writeChannelRedirects(
   versions: Record<string, { latestTag?: string; versions?: Array<{ display: string; slug: string }> }>,
   configCache: Map<string, DocsConfig & { repo: string }>,
-  mainProducts: Set<string>,
+  productChannels: Map<string, string>,
   dirRenames: Record<string, string>,
   targetDir = TARGET_DIR,
   configDir = CONFIG_DIR,
@@ -374,14 +379,15 @@ export function writeMainRedirects(
 
   for (const [repo, entry] of Object.entries(versions)) {
     const repoName = repo.split('/').pop()!;
-    if (!mainProducts.has(repoName)) continue;
+    const channel = productChannels.get(repoName);
+    if (!channel) continue;
 
     const config = configCache.get(repoName);
     if (!config) continue;
 
     const contentDir = config.contentDir;
     if (!entry.latestTag) {
-      redirects[`/${contentDir}`] = `/${contentDir}/main/`;
+      redirects[`/${contentDir}`] = `/${contentDir}/${channel}/`;
       continue;
     }
 
@@ -391,15 +397,15 @@ export function writeMainRedirects(
       ? join(targetDir, contentDir, latestVersion.slug)
       : '';
     if (!latestVersion || !existsSync(latestDir)) {
-      redirects[`/${contentDir}`] = `/${contentDir}/main/`;
+      redirects[`/${contentDir}`] = `/${contentDir}/${channel}/`;
       continue;
     }
 
-    const mainDir = join(targetDir, contentDir, 'main');
+    const channelDir = join(targetDir, contentDir, channel);
     redirects[`/${contentDir}`] = `/${contentDir}/${latestVersion.slug}/`;
 
-    for (const file of collectMarkdownFiles(mainDir)) {
-      const relativePath = file.slice(mainDir.length + 1);
+    for (const file of collectMarkdownFiles(channelDir)) {
+      const relativePath = file.slice(channelDir.length + 1);
       const segments = relativePath.split('/');
       if (segments.some(segment => segment.startsWith('.'))) continue;
       const filename = segments.pop()!;
@@ -484,7 +490,7 @@ function fatalMissingConfig(location: string): never {
  * Collect depth-3+ directories in post-order (deepest first).
  * Skips dot-directories and version directories.
  */
-export function collectDirsDeepestFirst(targetDir: string): string[] {
+export function collectDirsDeepestFirst(targetDir: string, channelNames = new Set<string>()): string[] {
   const result: string[] = [];
 
   function walk(dir: string, depth: number): void {
@@ -501,8 +507,8 @@ export function collectDirsDeepestFirst(targetDir: string): string[] {
       if (VERSION_SLUG_RE.test(entry.name)) continue;
 
       const fullPath = join(dir, entry.name);
-      if (entry.name === 'main') {
-        // MAIN is a URL channel, not a content section. Keep its children at
+      if (channelNames.has(entry.name)) {
+        // Configured channels are URL prefixes, not content sections. Keep their children at
         // the same depth as the product's regular sections.
         walk(fullPath, depth);
         continue;

@@ -1,16 +1,16 @@
 import { test, expect, selectors } from './fixtures';
 
 test.describe('Version Picker', () => {
-  test('latest release is selected by default and MAIN appears first', async ({ page }) => {
+  test('latest release is selected by default and the configured channel appears last', async ({ page }) => {
     await page.goto('/core/');
     const select = page.locator(selectors.versionSelect);
     await expect(select).toBeVisible();
-    await expect(select.locator('option').nth(0)).toHaveText('MAIN');
-    await expect(select.locator('option').nth(1)).toHaveText(/^Latest \(\d+\.\d+\)$/);
+    await expect(select.locator('option').nth(0)).toHaveText(/^Latest \(\d+\.\d+\)$/);
+    await expect(select.locator('option').last()).toHaveText('main');
     await expect(select).toHaveValue('latest');
   });
 
-  test('user can switch to MAIN and an older release', async ({ page }) => {
+  test('user can switch to the configured channel and an older release', async ({ page }) => {
     await page.goto('/core/');
     const select = page.locator(selectors.versionSelect);
     await expect(select).toBeVisible();

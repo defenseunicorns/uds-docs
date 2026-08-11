@@ -6,16 +6,16 @@ test.describe('Latest Release Banner', () => {
 
     await expect(page.locator('.sl-banner a')).toHaveAttribute(
       'href',
-      '/core/concepts/core-features/networking/',
+      '/core/v1-10/concepts/core-features/networking/',
     );
   });
 
-  test('keeps the current page path when navigating from MAIN', async ({ page }) => {
+  test('keeps the current page path when navigating from the configured channel', async ({ page }) => {
     await page.goto('/core/main/concepts/core-features/networking/');
 
     await expect(page.locator('.sl-banner a')).toHaveAttribute(
       'href',
-      '/core/concepts/core-features/networking/',
+      '/core/v1-10/concepts/core-features/networking/',
     );
   });
 });

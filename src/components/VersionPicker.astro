@@ -6,8 +6,8 @@
 <div class="version-picker not-content" style="display:none">
   <label for="version-select" class="version-label">Version</label>
   <select id="version-select" class="version-select">
-    <option value="main">MAIN</option>
     <option value="latest">Latest</option>
+    <option data-channel-option></option>
   </select>
 </div>
 
@@ -41,10 +41,9 @@
 
 <script>
   import {
-    productHasMain,
     productLatestVersions,
     productVersions,
-    detectMainPath,
+    detectChannelPath,
     detectProduct,
     detectVersionSlug,
   } from '../productUtils';
@@ -62,9 +61,10 @@
 
     const versions = productVersions[product.id] ?? [];
     const latest = productLatestVersions[product.id];
-    const hasMain = productHasMain[product.id] === true;
-    const versionOptions = versions.filter(ver => !hasMain || latest?.slug !== ver.slug);
-    const optionCount = Number(hasMain) + Number(Boolean(latest)) + versionOptions.length;
+    const channel = product.latestSource;
+    const hasChannel = Boolean(channel);
+    const versionOptions = versions.filter(ver => !hasChannel || latest?.slug !== ver.slug);
+    const optionCount = Number(hasChannel) + Number(Boolean(latest)) + versionOptions.length;
     if (optionCount < 2) {
       // No meaningful choice to show when this is the only available version.
       return;
@@ -74,8 +74,13 @@
     const picker = select.closest('.version-picker') as HTMLElement | null;
     if (picker) picker.style.display = '';
 
-    const mainOption = select.querySelector('option[value="main"]') as HTMLOptionElement | null;
-    if (!hasMain) mainOption?.remove();
+    const channelOption = select.querySelector('[data-channel-option]') as HTMLOptionElement | null;
+    if (!channel) {
+      channelOption?.remove();
+    } else if (channelOption) {
+      channelOption.value = channel;
+      channelOption.textContent = channel;
+    }
 
     const latestOption = select.querySelector('option[value="latest"]') as HTMLOptionElement | null;
     if (!latest) {
@@ -91,11 +96,12 @@
       opt.textContent = ver.display;
       select.appendChild(opt);
     });
+    if (channelOption && channel) select.appendChild(channelOption);
 
     // Set current value
     const currentSlug = detectVersionSlug(window.location.pathname, product);
-    select.value = detectMainPath(window.location.pathname, product)
-      ? 'main'
+    select.value = channel && detectChannelPath(window.location.pathname, product)
+      ? channel
       : currentSlug && latest?.slug === currentSlug
         ? 'latest'
         : currentSlug ?? 'latest';
@@ -107,11 +113,13 @@
       const afterPrefix = window.location.pathname.startsWith(prefix)
         ? window.location.pathname.slice(prefix.length)
         : window.location.pathname;
-      const strippedPath = afterPrefix.replace(/^(?:main|v\d+-\d+)\//, '');
+      const channelPrefix = channel ? new RegExp(`^${channel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/`) : null;
+      const strippedPath = (channelPrefix ? afterPrefix.replace(channelPrefix, '') : afterPrefix)
+        .replace(/^v\d+-\d+\//, '');
 
-      const target = selected === 'main'
-        ? `${prefix}main/${strippedPath}`
-        : selected === 'latest' && latest && hasMain
+      const target = selected === channel && channel
+        ? `${prefix}${channel}/${strippedPath}`
+        : selected === 'latest' && latest && hasChannel
           ? `${prefix}${latest.slug}/${strippedPath}`
           : selected && selected !== 'latest'
             ? `${prefix}${selected}/${strippedPath}`

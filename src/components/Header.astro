@@ -33,7 +33,7 @@ const isRoot = Astro.url.pathname === '/';
     productLatestVersions,
     products,
     productVersions,
-    detectMainPath,
+    detectChannelPath,
     detectProduct,
     detectVersionSlug,
   } from '../productUtils';
@@ -49,7 +49,7 @@ const isRoot = Astro.url.pathname === '/';
     const repo = productConfig?.githubRepo;
     if (!repo) return;
 
-    if (detectMainPath(window.location.pathname, product) && productConfig?.latestSource) {
+    if (detectChannelPath(window.location.pathname, product) && productConfig?.latestSource) {
       githubLink.href = `https://github.com/${repo}/tree/${productConfig.latestSource}`;
       return;
     }

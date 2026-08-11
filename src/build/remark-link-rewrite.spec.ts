@@ -4,13 +4,13 @@ import type { VFile } from 'vfile';
 import { remarkLinkRewrite } from '../plugins/remark-link-rewrite';
 
 const products = [
-  { contentDir: 'cli', sections: ['getting-started'], latestPrefix: '/cli/v9-8' },
-  { contentDir: 'core', sections: ['concepts'], latestPrefix: '/core/v2-3' },
+  { contentDir: 'cli', channel: 'develop', sections: ['getting-started'], latestPrefix: '/cli/v9-8' },
+  { contentDir: 'core', channel: 'develop', sections: ['concepts'], latestPrefix: '/core/v2-3' },
 ];
 
 function transform(tree: Root): Root {
   const rewrite = remarkLinkRewrite({ products, srcDir: '/content/docs' });
-  rewrite(tree, { path: '/content/docs/cli/main/index.mdx' } as VFile);
+  rewrite(tree, { path: '/content/docs/cli/develop/index.mdx' } as VFile);
   return tree;
 }
 
@@ -25,7 +25,7 @@ describe('remarkLinkRewrite', () => {
       children: [
         link('/core/concepts/overview/'),
         link('/core/'),
-        link('/core/main/concepts/overview/'),
+        link('/core/develop/concepts/overview/'),
         link('/core/v1-7/concepts/overview/'),
         link('/core/unknown/'),
         link('/cli/getting-started/installation/'),
@@ -37,11 +37,11 @@ describe('remarkLinkRewrite', () => {
     expect(urls).toEqual([
       '/core/v2-3/concepts/overview/',
       '/core/v2-3/',
-      '/core/main/concepts/overview/',
+      '/core/develop/concepts/overview/',
       '/core/v1-7/concepts/overview/',
       '/core/unknown/',
-      '/cli/main/getting-started/installation/',
-      '/cli/main/getting-started/installation/',
+      '/cli/develop/getting-started/installation/',
+      '/cli/develop/getting-started/installation/',
     ]);
   });
 

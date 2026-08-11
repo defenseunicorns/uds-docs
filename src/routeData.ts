@@ -76,7 +76,7 @@ const latestVersionsByRepo: Record<string, { slug: string; ref: string }> = (() 
         if (!latest) return [];
         const product = productByRepo.get(entry.repo);
         if (
-          product?.latestSource === 'main' &&
+          product?.latestSource &&
           !existsSync(`${CONTENT_DOCS_PATH}${product.contentDir}/${latest.slug}`)
         ) {
           return [];
@@ -104,7 +104,7 @@ export function latestReleaseHref(
   const routePrefix = `${product.contentDir}/${currentSlug}`;
   if (routeId !== routePrefix && !routeId.startsWith(`${routePrefix}/`)) return fallback;
 
-  const latestContentPrefix = product.latestSource === 'main'
+  const latestContentPrefix = product.latestSource
     ? `${CONTENT_DOCS_PATH}${product.contentDir}/${latestSlug}`
     : `${CONTENT_DOCS_PATH}${product.contentDir}`;
   const relativePath = routeId.slice(routePrefix.length).replace(/^\/+|\/+$/g, '');
@@ -116,9 +116,12 @@ export function latestReleaseHref(
     : [`${latestPath}/index.md`, `${latestPath}/index.mdx`];
   if (!latestFiles.some(fileExists)) return fallback;
 
-  return relativePath && relativePath !== 'index'
-    ? `${product.link}${relativePath}/`
+  const latestPrefix = product.latestSource
+    ? `${product.link}${latestSlug}/`
     : product.link;
+  return relativePath && relativePath !== 'index'
+    ? `${latestPrefix}${relativePath}/`
+    : latestPrefix;
 }
 
 export const onRequest = defineRouteMiddleware((context) => {
@@ -132,12 +135,9 @@ export const onRequest = defineRouteMiddleware((context) => {
   const product = prefixToProduct.get(contentDir);
   const entryData = route.entry.data as Record<string, unknown>;
   const latestSlug = product ? latestSlugsByRepo[product.repo] : undefined;
-  const latestPagefindVersion = product &&
-    (product.latestSource === 'main' || product.latestSource === undefined)
-    ? latestSlug
-    : undefined;
-  entryData.pagefindVersion = maybeVersion === 'main'
-    ? 'main'
+  const latestPagefindVersion = product ? latestSlug : undefined;
+  entryData.pagefindVersion = product?.latestSource && maybeVersion === product.latestSource
+    ? product.latestSource
     : maybeVersion === latestPagefindVersion
       ? 'latest'
       : VERSION_SLUG_RE.test(maybeVersion ?? '')
@@ -151,14 +151,20 @@ export const onRequest = defineRouteMiddleware((context) => {
       'data-pagefind-meta': `product:${product?.label ?? PRODUCTS[0]?.label ?? ''}`,
     },
   });
+  if (product?.latestSource) {
+    route.head.push({
+      tag: 'meta',
+      attrs: { 'data-product-channel': product.latestSource },
+    });
+  }
 
   // Inject an "older version" banner on all versioned pages.
   const versioned = versionedProduct(contentDir, maybeVersion);
-  if (product && maybeVersion === 'main') {
+  if (product?.latestSource && maybeVersion === product.latestSource) {
     if (latestSlug) {
       entryData.banner = {
-        text: "You're viewing unreleased documentation from main.",
-        linkHref: latestReleaseHref(product, latestSlug, 'main', route.id),
+        text: `You're viewing unreleased documentation from ${product.latestSource}.`,
+        linkHref: latestReleaseHref(product, latestSlug, product.latestSource, route.id),
         linkText: 'Go to the latest release',
       };
     }

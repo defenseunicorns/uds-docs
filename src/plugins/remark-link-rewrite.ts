@@ -13,6 +13,7 @@ import type { VFile } from 'vfile';
 
 interface ProductConfig {
   contentDir: string;
+  channel?: string;
   sections: string[];
   versionedSections?: Record<string, string[]>;
   latestPrefix: string;
@@ -33,6 +34,7 @@ export function remarkLinkRewrite(options: Options) {
   // Pre-build Sets for all section lookups so we don't re-create them per file.
   const sectionsByProduct = new Map(
     products.map(p => [p.contentDir, {
+      channel: p.channel,
       sections: new Set(p.sections),
       versionedSections: Object.fromEntries(
         Object.entries(p.versionedSections ?? {}).map(([k, v]) => [k, new Set(v)])
@@ -63,7 +65,7 @@ export function remarkLinkRewrite(options: Options) {
       const remainder = url.slice(productPrefix.length) || '/';
       const firstSegment = remainder.split('/')[1] ?? '';
       if (
-        firstSegment === 'main' ||
+        firstSegment === product.channel ||
         VERSION_SLUG_PATTERN.test(firstSegment) ||
         (firstSegment && !product.sections.includes(firstSegment))
       ) {
@@ -99,18 +101,18 @@ export function remarkLinkRewrite(options: Options) {
     const productData = sectionsByProduct.get(contentDir);
     if (!productData) return;
 
-    const mainChannel = segments[1] === 'main';
+    const channel = productData.channel && segments[1] === productData.channel;
     const versionSlug = VERSION_SLUG_PATTERN.test(segments[1] ?? '') ? segments[1] : null;
 
     // Use version-specific sections if available, otherwise fall back to current.
-    const sections = mainChannel
+    const sections = channel
       ? productData.sections
       : versionSlug
       ? productData.versionedSections[versionSlug] ?? productData.sections
       : productData.sections;
 
-    const prefix = mainChannel
-      ? `/${contentDir}/main`
+    const prefix = channel
+      ? `/${contentDir}/${productData.channel}`
       : versionSlug
       ? `/${contentDir}/${versionSlug}`
       : `/${contentDir}`;

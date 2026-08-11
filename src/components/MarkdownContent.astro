@@ -4,7 +4,7 @@ import ImageZoom from 'starlight-image-zoom/components/ImageZoom.astro';
 import { VERSION_SLUG_PATTERN } from '../productUtils';
 
 // Determine the pagefind version filter for this page. routeData distinguishes
-// the latest release root, MAIN, and older versioned pages.
+// the latest release root, configured channels, and older versioned pages.
 const routeData = Astro.locals.starlightRoute?.entry?.data as Record<string, unknown> | undefined;
 const version = typeof routeData?.pagefindVersion === 'string'
   ? routeData.pagefindVersion

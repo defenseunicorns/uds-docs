@@ -101,8 +101,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
    *    hides results, including auto-loading all pages to get an accurate total.
    */
   import {
-    detectMainPath,
-    productHasMain,
+    detectChannelPath,
     products as configuredProducts,
     productLatestVersions,
     VERSION_SLUG_PATTERN,
@@ -134,15 +133,14 @@ import Default from '@astrojs/starlight/components/Search.astro';
   let autoLoadingForCount = false;
 
   // Detect the version the user is currently viewing from the page URL.
-  // MAIN pages use "main"; all latest release pages share "latest" so the
+  // Configured channel pages use their branch name; all latest release pages share "latest" so the
   // search scope works across products with different release numbers.
   // Non-product pages use the latest release scope as well.
   function detectPageVersion(path: string): string {
     const product = configuredProducts.find(p => path.startsWith(p.link));
     if (!product) return 'latest';
-    if (detectMainPath(path, product)) return 'main';
-    const hasMain = productHasMain[product.id] === true;
-    const usesLatestRelease = hasMain || product.latestSource === null;
+    if (detectChannelPath(path, product)) return product.latestSource!;
+    const usesLatestRelease = Boolean(productLatestVersions[product.id]);
     const segs = path.split('/');
     for (const seg of segs) {
       if (VERSION_SLUG_PATTERN.test(seg)) {

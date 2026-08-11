@@ -37,7 +37,7 @@ const productVersions = Object.fromEntries(
 function latestVersionForProduct(product) {
   const latest = latestVersionFor(versionsByRepo[product.repo] ?? {});
   if (!latest) return null;
-  if (product.latestSource === 'main' && !existsSync(`./src/content/docs/${product.contentDir}/${latest.slug}`)) {
+  if (product.latestSource && !existsSync(`./src/content/docs/${product.contentDir}/${latest.slug}`)) {
     return null;
   }
   return latest;
@@ -49,20 +49,17 @@ const productLatestVersions = Object.fromEntries(
     return latest ? [[p.id, latest]] : [];
   })
 );
-const productHasMain = Object.fromEntries(
-  PRODUCTS.map(p => [p.id, p.latestSource === 'main'])
-);
-
 // Build remark-link-rewrite options from product configs.
 // versionedSections provides per-version overrides for archived docs whose
 // sidebarOrder differs from the current product config.
 const linkRewriteProducts = PRODUCTS.map(p => ({
   contentDir: p.contentDir,
+  channel: p.latestSource,
   sections: p.sidebarOrder.map(e => typeof e === 'string' ? e : e.dir),
-  latestPrefix: p.latestSource === 'main'
+  latestPrefix: p.latestSource
     ? productLatestVersions[p.id]
       ? `/${p.contentDir}/${productLatestVersions[p.id].slug}`
-      : `/${p.contentDir}/main`
+      : `/${p.contentDir}/${p.latestSource}`
     : `/${p.contentDir}`,
   versionedSections: Object.fromEntries(
     (productVersions[p.id] ?? []).map(v => {
@@ -101,16 +98,16 @@ function loadVersionSidebarOrder(repo, verSlug) {
   }
 }
 
-// One sidebar topic per product. Products with MAIN docs use the latest
+// One sidebar topic per product. Products with a configured channel use the latest
 // release content for their sidebar, while the topic link stays at the
 // product root so the dropdown can distinguish it from version topics.
 const productTopics = PRODUCTS.map(product => {
   const latest = productLatestVersions[product.id];
-  const useVersionedLatest = product.latestSource === 'main' && latest;
+  const useVersionedLatest = Boolean(product.latestSource && latest);
   const prefix = useVersionedLatest
     ? `${product.contentDir}/${latest.slug}`
-    : product.latestSource === 'main'
-      ? `${product.contentDir}/main`
+    : product.latestSource
+      ? `${product.contentDir}/${product.latestSource}`
       : product.contentDir;
   const sidebarOrder = useVersionedLatest
     ? loadVersionSidebarOrder(product.repo, latest.slug) ?? product.sidebarOrder
@@ -124,22 +121,22 @@ const productTopics = PRODUCTS.map(product => {
   };
 });
 
-const mainTopics = PRODUCTS
-  .filter(product => product.latestSource === 'main')
+const channelTopics = PRODUCTS
+  .filter(product => product.latestSource)
   .map(product => ({
-    id: `${product.id}-main`,
-    label: product.label,
-    link: `${product.link}main/`,
-    items: makeSidebarItems(`${product.contentDir}/main`, product.sidebarOrder),
+    id: `${product.id}-${product.latestSource}`,
+    label: product.latestSource,
+    link: `${product.link}${product.latestSource}/`,
+    items: makeSidebarItems(`${product.contentDir}/${product.latestSource}`, product.sidebarOrder),
   }));
 
 function productContentPrefixes(product) {
-  const prefixes = product.latestSource === 'main'
+  const prefixes = product.latestSource
     ? [
       productLatestVersions[product.id]
         ? `${product.contentDir}/${productLatestVersions[product.id].slug}`
-        : `${product.contentDir}/main`,
-      `${product.contentDir}/main`,
+        : `${product.contentDir}/${product.latestSource}`,
+      `${product.contentDir}/${product.latestSource}`,
     ]
     : [product.contentDir];
 
@@ -150,10 +147,10 @@ function productContentPrefixes(product) {
 }
 
 function productLatestContentPrefix(product) {
-  if (product.latestSource === 'main') {
+  if (product.latestSource) {
     return productLatestVersions[product.id]
       ? `${product.contentDir}/${productLatestVersions[product.id].slug}`
-      : `${product.contentDir}/main`;
+      : `${product.contentDir}/${product.latestSource}`;
   }
   return product.contentDir;
 }
@@ -178,9 +175,11 @@ const versionedTopics = PRODUCTS.flatMap(product => {
 const topicsOption = Object.fromEntries([
   ...PRODUCTS.map((p, i) => {
     const latest = productLatestVersions[p.id];
-    const productRoot = p.latestSource === 'main' && latest
+    const productRoot = p.latestSource && latest
       ? `/${p.contentDir}/${latest.slug}`
-      : `/${p.contentDir}`;
+      : p.latestSource
+        ? `/${p.contentDir}/${p.latestSource}`
+        : `/${p.contentDir}`;
     const paths = new Set([productRoot, `${productRoot}/404`, `/${p.contentDir}/404`]);
     return [
       p.id,
@@ -188,10 +187,10 @@ const topicsOption = Object.fromEntries([
     ];
   }),
   ...PRODUCTS
-    .filter(product => product.latestSource === 'main')
+    .filter(product => product.latestSource)
     .map(product => [
-      `${product.id}-main`,
-      [`/${product.contentDir}/main`, `/${product.contentDir}/main/404`],
+      `${product.id}-${product.latestSource}`,
+      [`/${product.contentDir}/${product.latestSource}`, `/${product.contentDir}/${product.latestSource}/404`],
     ]),
   ...PRODUCTS.flatMap(product => {
     const versions = productVersions[product.id] ?? [];
@@ -271,7 +270,7 @@ export default defineConfig({
         }),
         starlightSidebarTopics([
           ...productTopics,
-          ...mainTopics,
+          ...channelTopics,
           ...versionedTopics,
         ], { topics: topicsOption }),
       ],
@@ -339,9 +338,8 @@ export default defineConfig({
           ])
         )
       ),
-      // Latest release metadata and MAIN availability for VersionPicker
+      // Latest release metadata for VersionPicker
       __PRODUCT_LATEST_VERSIONS__: JSON.stringify(productLatestVersions),
-      __PRODUCT_HAS_MAIN__: JSON.stringify(productHasMain),
       // Product registry for client-side components (VersionPicker, Search)
       __PRODUCTS__: JSON.stringify(PRODUCTS.map(({ id, label, link, repo, latestSource }) => ({
         id,
