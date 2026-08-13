@@ -24,6 +24,7 @@ describe('remarkLinkRewrite', () => {
       type: 'root',
       children: [
         link('/core/concepts/overview/'),
+        link('/core/concepts/configuration-and-packaging/bundles/'),
         link('/core/'),
         link('/core/develop/concepts/overview/'),
         link('/core/v1-7/concepts/overview/'),
@@ -36,6 +37,7 @@ describe('remarkLinkRewrite', () => {
     const urls = tree.children.map(child => (child as Link).url);
     expect(urls).toEqual([
       '/core/v2-3/concepts/overview/',
+      '/core/v2-3/concepts/configuration--packaging/bundles/',
       '/core/v2-3/',
       '/core/develop/concepts/overview/',
       '/core/v1-7/concepts/overview/',

@@ -33,6 +33,9 @@ const dirRenames: Record<string, string> = (() => {
     return {};
   }
 })();
+const sourceDirsBySlug = Object.fromEntries(
+  Object.entries(dirRenames).map(([sourceDir, slug]) => [slug, sourceDir]),
+);
 
 // Version-specific product configs written by the integration build pipeline.
 // Maps "{repoName}.{versionSlug}" → config object with `ref` field.
@@ -104,10 +107,15 @@ export function latestReleaseHref(
     ? `${CONTENT_DOCS_PATH}${product.contentDir}/${latestSlug}`
     : `${CONTENT_DOCS_PATH}${product.contentDir}`;
   const relativePath = routeId.slice(routePrefix.length).replace(/^\/+|\/+$/g, '');
-  const latestPath = relativePath && relativePath !== 'index'
-    ? `${latestContentPrefix}/${relativePath}`
+  const sourceRelativePath = relativePath && relativePath !== 'index'
+    ? relativePath.split('/').map((segment, index, segments) =>
+      index < segments.length - 1 ? (sourceDirsBySlug[segment] ?? segment) : segment,
+    ).join('/')
+    : relativePath;
+  const latestPath = sourceRelativePath && sourceRelativePath !== 'index'
+    ? `${latestContentPrefix}/${sourceRelativePath}`
     : latestContentPrefix;
-  const latestFiles = relativePath && relativePath !== 'index'
+  const latestFiles = sourceRelativePath && sourceRelativePath !== 'index'
     ? [`${latestPath}.md`, `${latestPath}.mdx`, `${latestPath}/index.md`, `${latestPath}/index.mdx`]
     : [`${latestPath}/index.md`, `${latestPath}/index.mdx`];
   if (!latestFiles.some(fileExists)) return fallback;

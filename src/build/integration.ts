@@ -413,7 +413,7 @@ export function writeChannelRedirects(
       if (stem === '404') continue;
 
       const oldDirs = segments.map(segment => dirRenames[segment] ?? segment);
-      const targetDirs = oldDirs.map(toUrlSlug);
+      const targetDirs = oldDirs.map(toDirectoryUrlSlug);
       const oldParts = [...oldDirs];
       const targetParts = [...targetDirs];
       if (stem !== 'index') {
@@ -439,6 +439,10 @@ export function writeChannelRedirects(
 
 function toUrlSlug(segment: string): string {
   return segment.replace(/ & /g, '--').replace(/\s+/g, '-').toLowerCase();
+}
+
+function toDirectoryUrlSlug(segment: string): string {
+  return toUrlSlug(segment.replaceAll('-and-', '--'));
 }
 
 /** Remove version-slug directories at maxdepth 1 inside `dir`. */
@@ -488,7 +492,8 @@ function fatalMissingConfig(location: string): never {
 
 /**
  * Collect depth-3+ directories in post-order (deepest first).
- * Skips dot-directories and version directories.
+ * Skips dot-directories and treats version directories as transparent URL
+ * prefixes so their archived content receives the same renames as latest.
  */
 export function collectDirsDeepestFirst(targetDir: string, channelNames = new Set<string>()): string[] {
   const result: string[] = [];
@@ -504,12 +509,16 @@ export function collectDirsDeepestFirst(targetDir: string, channelNames = new Se
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       if (entry.name.startsWith('.')) continue;
-      if (VERSION_SLUG_RE.test(entry.name)) continue;
 
       const fullPath = join(dir, entry.name);
       if (channelNames.has(entry.name)) {
         // Configured channels are URL prefixes, not content sections. Keep their children at
         // the same depth as the product's regular sections.
+        walk(fullPath, depth);
+        continue;
+      }
+      if (VERSION_SLUG_RE.test(entry.name)) {
+        // A version directory is part of the URL, not the content hierarchy.
         walk(fullPath, depth);
         continue;
       }
@@ -529,7 +538,7 @@ export function collectDirsDeepestFirst(targetDir: string, channelNames = new Se
 // Markdown file collection
 // ---------------------------------------------------------------------------
 
-/** Collect all .md/.mdx files under `targetDir`, excluding version directories. */
+/** Collect all .md/.mdx files under `targetDir`, including archived versions. */
 export function collectMarkdownFiles(targetDir: string): string[] {
   const result: string[] = [];
 
@@ -545,7 +554,6 @@ export function collectMarkdownFiles(targetDir: string): string[] {
       const fullPath = join(dir, entry.name);
 
       if (entry.isDirectory()) {
-        if (VERSION_SLUG_RE.test(entry.name)) continue;
         walk(fullPath);
       } else if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) {
         result.push(fullPath);

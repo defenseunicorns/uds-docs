@@ -22,6 +22,7 @@ test.describe('Version Picker', () => {
 
     await select.selectOption('main');
     await expect(page).toHaveURL('/core/main/');
+    await expect(page.locator(selectors.productDropdownButton)).toHaveText('Core');
 
     await select.selectOption(olderValue as string);
     await expect(page).toHaveURL(new RegExp(`/core/${olderValue}/`));

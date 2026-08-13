@@ -9,7 +9,7 @@ const product = {
 
 describe('latestReleaseHref', () => {
   it('keeps the current page path when it exists in the latest release', () => {
-    const latestFile = 'src/content/docs/core/v1-10/concepts/core-features/networking.mdx';
+    const latestFile = 'src/content/docs/core/v1-10/concepts/Core Features/networking.mdx';
 
     expect(
       latestReleaseHref(
@@ -54,7 +54,7 @@ describe('latestReleaseHref', () => {
   });
 
   it('resolves latest files from the normalized route path', () => {
-    const latestFile = 'src/content/docs/core/v1-10/concepts/core-features/networking.mdx';
+    const latestFile = 'src/content/docs/core/v1-10/concepts/Core Features/networking.mdx';
 
     expect(
       latestReleaseHref(

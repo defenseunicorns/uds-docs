@@ -22,11 +22,12 @@ test.describe('Sidebar', () => {
 
     await page.locator(selectors.productDropdownButton).click();
     const menu = page.locator(selectors.productDropdownMenu);
-    await expect(menu.locator(`${selectors.productDropdownItem}[href="/core/"]`)).toBeVisible();
-    await expect(menu.locator(`${selectors.productDropdownItem}[href="/cli/"]`)).toBeVisible();
+    await expect(menu.locator(`${selectors.productDropdownItem}[href="/core/v1-10/"]`)).toBeVisible();
+    await expect(menu.locator(`${selectors.productDropdownItem}[href="/cli/v0-35/"]`)).toBeVisible();
+    await expect(menu.locator(selectors.productDropdownItem)).toHaveCount(2);
 
     // Navigate to CLI and verify sidebar context switched
-    await menu.locator(`${selectors.productDropdownItem}[href="/cli/"]`).click();
+    await menu.locator(`${selectors.productDropdownItem}[href="/cli/v0-35/"]`).click();
     await expect(page).toHaveURL(/\/cli\/v\d+-\d+\//);
     await expect(page.locator(selectors.productDropdownButton)).toContainText('CLI');
   });

@@ -55,9 +55,12 @@ describe('collectDirsDeepestFirst', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('excludes version directories and their contents', () => {
+  it('traverses version directories without collecting the version directory itself', () => {
     mkdir('core', 'v0-61', 'getting-started', 'local-demo');
-    expect(collectDirsDeepestFirst(tmpDir)).toHaveLength(0);
+    const result = collectDirsDeepestFirst(tmpDir);
+    expect(result).toHaveLength(1);
+    expect(result.every(path => !path.endsWith('v0-61'))).toBe(true);
+    expect(result.some(path => path.endsWith('local-demo'))).toBe(true);
   });
 
   it('does not exclude non-version dirs that start with "v"', () => {
@@ -93,12 +96,13 @@ describe('collectMarkdownFiles', () => {
     expect(collectMarkdownFiles(tmpDir)).toHaveLength(2);
   });
 
-  it('excludes files inside version directories', () => {
+  it('includes files inside version directories', () => {
     touch('core/getting-started/overview.md');
     touch('core/v0-61/getting-started/overview.md');
     const result = collectMarkdownFiles(tmpDir);
-    expect(result).toHaveLength(1);
-    expect(result[0]).not.toContain('v0-61');
+    expect(result).toHaveLength(2);
+    expect(result.some(path => path.includes('v0-61'))).toBe(true);
+    expect(result.some(path => !path.includes('v0-61'))).toBe(true);
   });
 
   it('collects from nested dirs and root', () => {
@@ -194,13 +198,13 @@ describe('writeChannelRedirects', () => {
 
     const redirects = JSON.parse(readFileSync(join(configDir, 'redirects.json'), 'utf8')) as Record<string, string>;
     expect(redirects['/core/configuration-and-packaging/overview']).toBe(
-      '/core/v1-10/configuration-and-packaging/overview/',
+      '/core/v1-10/configuration--packaging/overview/',
     );
     expect(redirects['/core/configuration--packaging/overview']).toBe(
-      '/core/v1-10/configuration-and-packaging/overview/',
+      '/core/v1-10/configuration--packaging/overview/',
     );
     expect(redirects['/core/configuration--packaging/some-and-page']).toBe(
-      '/core/v1-10/configuration-and-packaging/some-and-page/',
+      '/core/v1-10/configuration--packaging/some-and-page/',
     );
     expect(redirects['/core/configuration--packaging/some--page']).toBeUndefined();
   });

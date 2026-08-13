@@ -107,7 +107,7 @@ const productTopics = PRODUCTS.map(product => {
   return {
     id: product.id,
     label: product.label,
-    link: product.link,
+    link: useVersionedLatest ? `/${prefix}/` : product.link,
     items: makeSidebarItems(prefix, sidebarOrder),
   };
 });
@@ -116,7 +116,7 @@ const channelTopics = PRODUCTS
   .filter(product => product.latestSource)
   .map(product => ({
     id: `${product.id}-${product.latestSource}`,
-    label: product.latestSource,
+    label: product.label,
     link: `${product.link}${product.latestSource}/`,
     items: makeSidebarItems(`${product.contentDir}/${product.latestSource}`, product.sidebarOrder),
   }));

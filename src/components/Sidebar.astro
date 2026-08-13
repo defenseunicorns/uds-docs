@@ -74,17 +74,25 @@ const channelNames = PRODUCTS.flatMap(product => product.latestSource ? [product
 </style>
 
 <script is:inline data-astro-rerun data-channel-names={JSON.stringify(channelNames)}>
-  // Remove configured channel and versioned topics from the product dropdown. The VersionPicker handles them.
+  // Keep only the first topic for each product. Product topics come first and may
+  // point directly at the latest version to avoid an intermediate redirect page.
   // Runs immediately so there's no flash of versioned items in the dropdown.
   // Note: channel/version patterns must match productUtils.ts
   // and VERSION_SEGMENT_RE in 404.md.
   (() => {
     const channelNames = new Set(JSON.parse(document.currentScript?.dataset.channelNames ?? '[]'));
     const versionPattern = /\/v\d+-\d+(?:\/|$)/;
+    const productLabels = new Set();
     document.querySelectorAll('.starlight-sidebar-topics-dropdown-menu a').forEach(a => {
       const href = a.getAttribute('href') || '';
       const channel = href.split('/')[2];
-      if (versionPattern.test(href) || channelNames.has(channel)) {
+      const label = a.querySelector('.starlight-sidebar-topics-dropdown-label')?.textContent?.trim();
+      const isVersionedTopic = versionPattern.test(href) || channelNames.has(channel);
+      if (label && !productLabels.has(label)) {
+        productLabels.add(label);
+        return;
+      }
+      if (label || isVersionedTopic) {
         a.remove();
       }
     });

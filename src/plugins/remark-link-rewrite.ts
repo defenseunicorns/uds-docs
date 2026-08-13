@@ -75,9 +75,16 @@ export function remarkLinkRewrite(options: Options) {
       const targetPrefix = product.contentDir === currentContentDir
         ? currentPrefix
         : product.latestPrefix;
-      return `${targetPrefix}${remainder}`;
+      return `${targetPrefix}${normalizeDirectorySlugs(remainder)}`;
     }
     return url;
+  }
+
+  function normalizeDirectorySlugs(url: string): string {
+    const [pathPart, suffix = ''] = url.split(/([?#].*)/, 2);
+    const segments = pathPart.split('/');
+    if (segments.length < 3) return url;
+    return `${segments.slice(0, -1).map(segment => segment.replaceAll('-and-', '--')).join('/')}/${segments.at(-1)}${suffix}`;
   }
 
   function rewriteInternalUrl(
