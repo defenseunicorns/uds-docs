@@ -2,9 +2,9 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Card, CardGrid } from '@astrojs/starlight/components';
 import '@fontsource/teko/index.css';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { PRODUCTS } from '../products';
-import { latestVersionFor } from '../versionUtils';
+import { latestProductVersion, latestVersionFor } from '../versionUtils';
 
 type VersionsFile = Record<string, Parameters<typeof latestVersionFor>[0]>;
 let versionsByRepo: VersionsFile = {};
@@ -19,10 +19,8 @@ function productHref(contentDir: string): string {
     if (!product) return `/${contentDir}/`;
     if (!product.latestSource) return product.link;
 
-    const latest = latestVersionFor(versionsByRepo[product.repo] ?? {});
-    const target = latest && existsSync(`src/content/docs/${contentDir}/${latest.slug}`)
-        ? latest.slug
-        : product.latestSource;
+    const latest = latestProductVersion(product, versionsByRepo);
+    const target = latest?.slug ?? product.latestSource;
     return `${product.link}${target}/`;
 }
 

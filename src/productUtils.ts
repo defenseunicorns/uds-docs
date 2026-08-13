@@ -13,7 +13,7 @@ export interface ClientVersion {
   ref: string;
 }
 
-export interface ClientProduct {
+interface ClientProduct {
   id: string;
   label: string;
   link: string;

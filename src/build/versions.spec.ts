@@ -11,7 +11,7 @@ import {
   parseOverrides,
   toArchivedVersion,
 } from './versions';
-import { latestVersionFor } from '../versionUtils';
+import { latestProductVersion, latestVersionFor } from '../versionUtils';
 
 describe('minorKey', () => {
   it('strips patch version', () => {
@@ -35,6 +35,32 @@ describe('latestVersionFor', () => {
       display: 'v1.2',
       slug: 'v1-2',
     });
+  });
+});
+
+describe('latestProductVersion', () => {
+  const product = {
+    repo: 'defenseunicorns/uds-core',
+    contentDir: 'core',
+    latestSource: 'main',
+  };
+  const versions = {
+    'defenseunicorns/uds-core': {
+      latestTag: 'v1.2.3',
+      versions: [{ ref: 'release/1.2', display: 'v1.2', slug: 'v1-2' }],
+    },
+  };
+
+  it('returns the latest release when generated content exists', () => {
+    expect(latestProductVersion(product, versions, path => path.endsWith('/v1-2'))).toEqual({
+      ref: 'release/1.2',
+      display: 'v1.2',
+      slug: 'v1-2',
+    });
+  });
+
+  it('skips the latest release when channel content is missing', () => {
+    expect(latestProductVersion(product, versions, () => false)).toBeNull();
   });
 });
 

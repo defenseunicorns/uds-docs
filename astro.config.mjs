@@ -13,7 +13,7 @@ import starlightImageZoom from 'starlight-image-zoom';
 import starlightGitHubAlerts from 'starlight-github-alerts';
 import { fileURLToPath } from 'node:url';
 import { remarkLinkRewrite } from './src/plugins/remark-link-rewrite.ts';
-import { latestVersionFor } from './src/versionUtils.ts';
+import { latestProductVersion } from './src/versionUtils.ts';
 
 // Read per-product versions from .versions JSON (written by src/build/integration.ts).
 // Format: { "owner/repo": { "repo": "...", "branch": "...", "versions": [...], "latestTag": "..." } }
@@ -34,18 +34,9 @@ const productVersions = Object.fromEntries(
     return [p.id, available];
   })
 );
-function latestVersionForProduct(product) {
-  const latest = latestVersionFor(versionsByRepo[product.repo] ?? {});
-  if (!latest) return null;
-  if (product.latestSource && !existsSync(`./src/content/docs/${product.contentDir}/${latest.slug}`)) {
-    return null;
-  }
-  return latest;
-}
-
 const productLatestVersions = Object.fromEntries(
   PRODUCTS.flatMap(p => {
-    const latest = latestVersionForProduct(p);
+    const latest = latestProductVersion(p, versionsByRepo);
     return latest ? [[p.id, latest]] : [];
   })
 );

@@ -2,7 +2,7 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { existsSync, readdirSync, readFileSync } from 'fs';
 import { PRODUCTS, DIR_RENAMES_FILENAME, type ProductConfig } from './products';
-import { latestVersionFor } from './versionUtils';
+import { latestProductVersion, latestVersionFor } from './versionUtils';
 
 // Build a map from contentDir prefix → product at module load time.
 // Route ids look like "core/getting-started/foo" or "cli/reference/overview".
@@ -72,15 +72,11 @@ const latestVersionsByRepo: Record<string, { slug: string; ref: string }> = (() 
     return Object.fromEntries(
       Object.values(versions).flatMap(entry => {
         if (!entry.repo) return [];
-        const latest = latestVersionFor(entry);
-        if (!latest) return [];
         const product = productByRepo.get(entry.repo);
-        if (
-          product?.latestSource &&
-          !existsSync(`${CONTENT_DOCS_PATH}${product.contentDir}/${latest.slug}`)
-        ) {
-          return [];
-        }
+        const latest = product
+          ? latestProductVersion(product, versions)
+          : latestVersionFor(entry);
+        if (!latest) return [];
         return [[entry.repo, { slug: latest.slug, ref: latest.ref }]];
       }),
     );
@@ -135,14 +131,13 @@ export const onRequest = defineRouteMiddleware((context) => {
   const product = prefixToProduct.get(contentDir);
   const entryData = route.entry.data as Record<string, unknown>;
   const latestSlug = product ? latestSlugsByRepo[product.repo] : undefined;
-  const latestPagefindVersion = product ? latestSlug : undefined;
   entryData.pagefindVersion = product?.latestSource && maybeVersion === product.latestSource
     ? product.latestSource
-    : maybeVersion === latestPagefindVersion
+    : maybeVersion === latestSlug
       ? 'latest'
       : VERSION_SLUG_RE.test(maybeVersion ?? '')
         ? maybeVersion
-        : latestPagefindVersion ?? 'current';
+        : latestSlug ?? 'current';
 
   // Pagefind supports inline metadata "key:value" in <head>.
   route.head.push({
@@ -180,7 +175,7 @@ export const onRequest = defineRouteMiddleware((context) => {
             i < parts.length - 1 ? (dirRenames[seg] ?? seg) : seg
           );
           route.editUrl = new URL(
-            `https://github.com/${product.repo}/blob/${product.latestSource ?? 'main'}/docs/${upstream.join('/')}`
+            `https://github.com/${product.repo}/blob/${product.latestSource}/docs/${upstream.join('/')}`
           );
         }
       }
