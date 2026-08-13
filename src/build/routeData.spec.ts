@@ -18,6 +18,7 @@ describe('latestReleaseHref', () => {
         'v1-8',
         'core/v1-8/concepts/core-features/networking',
         path => path === latestFile,
+        { 'core-features': 'Core Features' },
       ),
     ).toBe('/core/v1-10/concepts/core-features/networking/');
   });
@@ -63,6 +64,7 @@ describe('latestReleaseHref', () => {
         'develop',
         'core/develop/concepts/core-features/networking',
         path => path === latestFile,
+        { 'core-features': 'Core Features' },
       ),
     ).toBe('/core/v1-10/concepts/core-features/networking/');
   });

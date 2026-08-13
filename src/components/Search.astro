@@ -336,7 +336,9 @@ import Default from '@astrojs/starlight/components/Search.astro';
     const dropdown = document.querySelector('.starlight-sidebar-topics-dropdown-menu');
     const visibleOther = otherProducts.filter(p => {
       if (!dropdown) return true;
-      return dropdown.querySelector(`a[href="${p.link}"]`) !== null;
+      return Array.from(dropdown.querySelectorAll('a[href]')).some(a =>
+        a.getAttribute('href')?.startsWith(p.link),
+      );
     });
 
     if (visibleOther.length === 0) return [];

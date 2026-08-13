@@ -98,6 +98,7 @@ export function latestReleaseHref(
   currentSlug: string,
   routeId: string,
   fileExists: (path: string) => boolean = existsSync,
+  sourceDirs: Record<string, string> = sourceDirsBySlug,
 ): string {
   const fallback = product.link;
   const routePrefix = `${product.contentDir}/${currentSlug}`;
@@ -109,7 +110,7 @@ export function latestReleaseHref(
   const relativePath = routeId.slice(routePrefix.length).replace(/^\/+|\/+$/g, '');
   const sourceRelativePath = relativePath && relativePath !== 'index'
     ? relativePath.split('/').map((segment, index, segments) =>
-      index < segments.length - 1 ? (sourceDirsBySlug[segment] ?? segment) : segment,
+      index < segments.length - 1 ? (sourceDirs[segment] ?? segment) : segment,
     ).join('/')
     : relativePath;
   const latestPath = sourceRelativePath && sourceRelativePath !== 'index'
