@@ -5,11 +5,13 @@ import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
 import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
 import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 import VersionPicker from './VersionPicker.astro';
+import { PRODUCTS } from '../products';
 
 const isRoot = Astro.url.pathname === '/';
+const productChannels = [...new Set(PRODUCTS.flatMap(product => product.latestSource ? [product.latestSource] : []))];
 ---
 
-<div class="header">
+<div class="header" data-product-channels={JSON.stringify(productChannels)}>
   <div class="title-wrapper sl-flex">
     <SiteTitle />
   </div>

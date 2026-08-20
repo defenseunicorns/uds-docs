@@ -30,4 +30,28 @@ test.describe('404 Pages', () => {
     await homeLink.click();
     await expect(page).toHaveURL(/\/cli\/v\d+-\d+\//);
   });
+
+  test('versioned Core 404 preserves the selected release in the home link', async ({ page }) => {
+    await page.goto('/core/v1-8/this-page-does-not-exist/');
+
+    await expect(page.locator(selectors.productDropdownButton)).toContainText('Core');
+
+    const homeLink = page.locator('a[data-product-home]');
+    await expect(homeLink).toHaveAttribute('href', '/core/v1-8/');
+
+    await homeLink.click();
+    await expect(page).toHaveURL('/core/v1-8/');
+  });
+
+  test('channel Core 404 preserves the unreleased channel in the home link', async ({ page }) => {
+    await page.goto('/core/main/this-page-does-not-exist/');
+
+    await expect(page.locator(selectors.productDropdownButton)).toContainText('Core');
+
+    const homeLink = page.locator('a[data-product-home]');
+    await expect(homeLink).toHaveAttribute('href', '/core/main/');
+
+    await homeLink.click();
+    await expect(page).toHaveURL('/core/main/');
+  });
 });
