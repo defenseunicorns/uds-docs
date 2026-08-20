@@ -32,15 +32,19 @@ test.describe('404 Pages', () => {
   });
 
   test('versioned Core 404 preserves the selected release in the home link', async ({ page }) => {
-    await page.goto('/core/v1-8/this-page-does-not-exist/');
+    await page.goto('/core/');
+    const archivedVersion = await page.locator(`${selectors.versionSelect} option[value^="v"]`).first().getAttribute('value');
+    expect(archivedVersion).toBeTruthy();
+
+    await page.goto(`/core/${archivedVersion}/this-page-does-not-exist/`);
 
     await expect(page.locator(selectors.productDropdownButton)).toContainText('Core');
 
     const homeLink = page.locator('a[data-product-home]');
-    await expect(homeLink).toHaveAttribute('href', '/core/v1-8/');
+    await expect(homeLink).toHaveAttribute('href', `/core/${archivedVersion}/`);
 
     await homeLink.click();
-    await expect(page).toHaveURL('/core/v1-8/');
+    await expect(page).toHaveURL(`/core/${archivedVersion}/`);
   });
 
   test('channel Core 404 preserves the unreleased channel in the home link', async ({ page }) => {
@@ -50,6 +54,9 @@ test.describe('404 Pages', () => {
 
     const homeLink = page.locator('a[data-product-home]');
     await expect(homeLink).toHaveAttribute('href', '/core/main/');
+
+    await page.locator(selectors.productDropdownButton).click();
+    await expect(page.locator(selectors.productDropdownMenu).locator(selectors.productDropdownItem)).toHaveCount(2);
 
     await homeLink.click();
     await expect(page).toHaveURL('/core/main/');

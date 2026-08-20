@@ -33,8 +33,17 @@ const dirRenames: Record<string, string> = (() => {
     return {};
   }
 })();
+
+function toDirectoryUrlSlug(segment: string): string {
+  return segment
+    .replace(/ & /g, '--')
+    .replace(/\s+/g, '-')
+    .replaceAll('-and-', '--')
+    .toLowerCase();
+}
+
 const sourceDirsBySlug = Object.fromEntries(
-  Object.entries(dirRenames).map(([sourceDir, slug]) => [slug, sourceDir]),
+  Object.entries(dirRenames).map(([sourceDir]) => [toDirectoryUrlSlug(sourceDir), sourceDir]),
 );
 
 // Version-specific product configs written by the integration build pipeline.
@@ -100,7 +109,10 @@ export function latestReleaseHref(
   fileExists: (path: string) => boolean = existsSync,
   sourceDirs: Record<string, string> = sourceDirsBySlug,
 ): string {
-  const fallback = product.link;
+  const latestPrefix = product.latestSource
+    ? `${product.link}${latestSlug}/`
+    : product.link;
+  const fallback = latestPrefix;
   const routePrefix = `${product.contentDir}/${currentSlug}`;
   if (routeId !== routePrefix && !routeId.startsWith(`${routePrefix}/`)) return fallback;
 
@@ -121,9 +133,6 @@ export function latestReleaseHref(
     : [`${latestPath}/index.md`, `${latestPath}/index.mdx`];
   if (!latestFiles.some(fileExists)) return fallback;
 
-  const latestPrefix = product.latestSource
-    ? `${product.link}${latestSlug}/`
-    : product.link;
   return relativePath && relativePath !== 'index'
     ? `${latestPrefix}${relativePath}/`
     : latestPrefix;

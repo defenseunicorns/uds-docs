@@ -32,7 +32,7 @@ describe('latestReleaseHref', () => {
         'core/v1-8/concepts/core-features/removed-page',
         () => false,
       ),
-    ).toBe('/core/');
+    ).toBe('/core/v1-10/');
   });
 
   it('checks the product root for products without a configured channel', () => {
@@ -67,5 +67,20 @@ describe('latestReleaseHref', () => {
         { 'core-features': 'Core Features' },
       ),
     ).toBe('/core/v1-10/concepts/core-features/networking/');
+  });
+
+  it('resolves URL slugs for directories renamed with an ampersand', () => {
+    const latestFile = 'src/content/docs/core/v1-10/concepts/Configuration & Packaging/networking.mdx';
+
+    expect(
+      latestReleaseHref(
+        product,
+        'v1-10',
+        'v1-8',
+        'core/v1-8/concepts/configuration--packaging/networking',
+        path => path === latestFile,
+        { 'configuration--packaging': 'Configuration & Packaging' },
+      ),
+    ).toBe('/core/v1-10/concepts/configuration--packaging/networking/');
   });
 });

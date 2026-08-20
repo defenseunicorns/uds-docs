@@ -13,7 +13,7 @@ test.describe('Page Navigation', () => {
     await expect(page.locator(selectors.productDropdownButton)).toContainText('Core');
 
     await page.locator(selectors.productDropdownButton).click();
-    await page.locator(`${selectors.productDropdownItem}[href="/cli/v0-35/"]`).click();
+    await page.locator(`${selectors.productDropdownItem}[href^="/cli/v"]`).first().click();
 
     await expect(page).toHaveURL(/\/cli\/v\d+-\d+\//);
     await expect(page.locator(selectors.productDropdownButton)).toContainText('CLI');
