@@ -13,6 +13,7 @@ import starlightImageZoom from 'starlight-image-zoom';
 import starlightGitHubAlerts from 'starlight-github-alerts';
 import { fileURLToPath } from 'node:url';
 import { remarkLinkRewrite } from './src/plugins/remark-link-rewrite.ts';
+import { latestProductVersion } from './src/versionUtils.ts';
 
 // Read per-product versions from .versions JSON (written by src/build/integration.ts).
 // Format: { "owner/repo": { "repo": "...", "branch": "...", "versions": [...], "latestTag": "..." } }
@@ -33,19 +34,24 @@ const productVersions = Object.fromEntries(
     return [p.id, available];
   })
 );
-const productLatestTags = Object.fromEntries(
+const productLatestVersions = Object.fromEntries(
   PRODUCTS.flatMap(p => {
-    const tag = versionsByRepo[p.repo]?.latestTag;
-    return tag ? [[p.id, tag]] : [];
+    const latest = latestProductVersion(p, versionsByRepo);
+    return latest ? [[p.id, latest]] : [];
   })
 );
-
 // Build remark-link-rewrite options from product configs.
 // versionedSections provides per-version overrides for archived docs whose
 // sidebarOrder differs from the current product config.
 const linkRewriteProducts = PRODUCTS.map(p => ({
   contentDir: p.contentDir,
+  channel: p.latestSource,
   sections: p.sidebarOrder.map(e => typeof e === 'string' ? e : e.dir),
+  latestPrefix: p.latestSource
+    ? productLatestVersions[p.id]
+      ? `/${p.contentDir}/${productLatestVersions[p.id].slug}`
+      : `/${p.contentDir}/${p.latestSource}`
+    : `/${p.contentDir}`,
   versionedSections: Object.fromEntries(
     (productVersions[p.id] ?? []).map(v => {
       const verSidebarOrder = loadVersionSidebarOrder(p.repo, v.slug) ?? p.sidebarOrder;
@@ -83,13 +89,62 @@ function loadVersionSidebarOrder(repo, verSlug) {
   }
 }
 
-// One sidebar topic per product (config loaded from .product-configs/).
-const productTopics = PRODUCTS.map((product) => ({
-  id: product.id,
-  label: product.label,
-  link: product.link,
-  items: makeSidebarItems(product.contentDir, product.sidebarOrder),
-}));
+// One sidebar topic per product. Products with a configured channel use the latest
+// release content for their sidebar, while the topic link stays at the
+// product root so the dropdown can distinguish it from version topics.
+const productTopics = PRODUCTS.map(product => {
+  const latest = productLatestVersions[product.id];
+  const useVersionedLatest = Boolean(product.latestSource && latest);
+  const prefix = useVersionedLatest
+    ? `${product.contentDir}/${latest.slug}`
+    : product.latestSource
+      ? `${product.contentDir}/${product.latestSource}`
+      : product.contentDir;
+  const sidebarOrder = useVersionedLatest
+    ? loadVersionSidebarOrder(product.repo, latest.slug) ?? product.sidebarOrder
+    : product.sidebarOrder;
+
+  return {
+    id: product.id,
+    label: product.label,
+    link: useVersionedLatest ? `/${prefix}/` : product.link,
+    items: makeSidebarItems(prefix, sidebarOrder),
+  };
+});
+
+const channelTopics = PRODUCTS
+  .filter(product => product.latestSource)
+  .map(product => ({
+    id: `${product.id}-${product.latestSource}`,
+    label: product.label,
+    link: `${product.link}${product.latestSource}/`,
+    items: makeSidebarItems(`${product.contentDir}/${product.latestSource}`, product.sidebarOrder),
+  }));
+
+function productContentPrefixes(product) {
+  const prefixes = product.latestSource
+    ? [
+      productLatestVersions[product.id]
+        ? `${product.contentDir}/${productLatestVersions[product.id].slug}`
+        : `${product.contentDir}/${product.latestSource}`,
+      `${product.contentDir}/${product.latestSource}`,
+    ]
+    : [product.contentDir];
+
+  return [...new Set([
+    ...prefixes,
+    ...(productVersions[product.id] ?? []).map(version => `${product.contentDir}/${version.slug}`),
+  ])];
+}
+
+function productLatestContentPrefix(product) {
+  if (product.latestSource) {
+    return productLatestVersions[product.id]
+      ? `${product.contentDir}/${productLatestVersions[product.id].slug}`
+      : `${product.contentDir}/${product.latestSource}`;
+  }
+  return product.contentDir;
+}
 
 // One sidebar topic per archived version of each product.
 const versionedTopics = PRODUCTS.flatMap(product => {
@@ -109,10 +164,25 @@ const versionedTopics = PRODUCTS.flatMap(product => {
 // sidebar section (product root/index pages, 404 pages, versioned 404 pages).
 // Computed automatically from products; no manual unlistedPaths needed.
 const topicsOption = Object.fromEntries([
-  ...PRODUCTS.map((p, i) => [
-    p.id,
-    [`/${p.contentDir}`, `/${p.contentDir}/404`, ...(i === 0 ? ['/404'] : [])],
-  ]),
+  ...PRODUCTS.map((p, i) => {
+    const latest = productLatestVersions[p.id];
+    const productRoot = p.latestSource && latest
+      ? `/${p.contentDir}/${latest.slug}`
+      : p.latestSource
+        ? `/${p.contentDir}/${p.latestSource}`
+        : `/${p.contentDir}`;
+    const paths = new Set([productRoot, `${productRoot}/404`, `/${p.contentDir}/404`]);
+    return [
+      p.id,
+      [...paths, ...(i === 0 ? ['/404'] : [])],
+    ];
+  }),
+  ...PRODUCTS
+    .filter(product => product.latestSource)
+    .map(product => [
+      `${product.id}-${product.latestSource}`,
+      [`/${product.contentDir}/${product.latestSource}`, `/${product.contentDir}/${product.latestSource}/404`],
+    ]),
   ...PRODUCTS.flatMap(product => {
     const versions = productVersions[product.id] ?? [];
     return versions.map(v => {
@@ -122,14 +192,19 @@ const topicsOption = Object.fromEntries([
   }),
 ]);
 
+let generatedRedirects = {};
+try {
+  generatedRedirects = JSON.parse(readFileSync('.product-configs/redirects.json', 'utf8'));
+} catch { /* not present in local dev */ }
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://docs.defenseunicorns.com/docs/',
   prefetch: true,
-  redirects:
-  {
+  redirects: {
     '/docs': '/',
     '/en': '/',
+    ...generatedRedirects,
   },
 
   integrations: [
@@ -164,7 +239,7 @@ export default defineConfig({
               const entry = typeof e === 'string' ? { dir: e, label: titleCase(e) } : e;
               return {
                 label: `${p.label} > ${entry.label}`,
-                paths: [`${p.contentDir}/${entry.dir}/**`],
+                paths: [`${productLatestContentPrefix(p)}/${entry.dir}/**`],
               };
             })
           ),
@@ -173,9 +248,11 @@ export default defineConfig({
           // Core is first in products.json, so Core pages sort before CLI pages in llms-full.txt.
           promote: [
             'index*',
-            ...PRODUCTS.map(p => `${p.contentDir}/index*`),
+            ...PRODUCTS.flatMap(p => productContentPrefixes(p).map(prefix => `${prefix}/index*`)),
             ...PRODUCTS.flatMap(p =>
-              p.sidebarOrder.map(e => `${p.contentDir}/${typeof e === 'string' ? e : e.dir}/**`)
+              productContentPrefixes(p).flatMap(prefix =>
+                p.sidebarOrder.map(e => `${prefix}/${typeof e === 'string' ? e : e.dir}/**`)
+              )
             ),
           ],
           minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
@@ -184,6 +261,7 @@ export default defineConfig({
         }),
         starlightSidebarTopics([
           ...productTopics,
+          ...channelTopics,
           ...versionedTopics,
         ], { topics: topicsOption }),
       ],
@@ -251,10 +329,16 @@ export default defineConfig({
           ])
         )
       ),
-      // Per-product latest release tags for VersionPicker label
-      __PRODUCT_LATEST_TAGS__: JSON.stringify(productLatestTags),
+      // Latest release metadata for VersionPicker
+      __PRODUCT_LATEST_VERSIONS__: JSON.stringify(productLatestVersions),
       // Product registry for client-side components (VersionPicker, Search)
-      __PRODUCTS__: JSON.stringify(PRODUCTS.map(({ id, label, link, repo }) => ({ id, label, link, githubRepo: repo ?? null }))),
+      __PRODUCTS__: JSON.stringify(PRODUCTS.map(({ id, label, link, repo, latestSource }) => ({
+        id,
+        label,
+        link,
+        githubRepo: repo ?? null,
+        latestSource: latestSource ?? null,
+      }))),
     },
     plugins: [
       tailwindcss(),

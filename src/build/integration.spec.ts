@@ -1,12 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import {
   collectDirsDeepestFirst,
   collectMarkdownFiles,
   removeStaleVersionDirs,
+  writeChannelRedirects,
 } from './integration';
+import type { DocsConfig } from './types';
 
 describe('collectDirsDeepestFirst', () => {
   let tmpDir: string;
@@ -53,9 +55,12 @@ describe('collectDirsDeepestFirst', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('excludes version directories and their contents', () => {
+  it('traverses version directories without collecting the version directory itself', () => {
     mkdir('core', 'v0-61', 'getting-started', 'local-demo');
-    expect(collectDirsDeepestFirst(tmpDir)).toHaveLength(0);
+    const result = collectDirsDeepestFirst(tmpDir);
+    expect(result).toHaveLength(1);
+    expect(result.every(path => !path.endsWith('v0-61'))).toBe(true);
+    expect(result.some(path => path.endsWith('local-demo'))).toBe(true);
   });
 
   it('does not exclude non-version dirs that start with "v"', () => {
@@ -91,12 +96,13 @@ describe('collectMarkdownFiles', () => {
     expect(collectMarkdownFiles(tmpDir)).toHaveLength(2);
   });
 
-  it('excludes files inside version directories', () => {
+  it('includes files inside version directories', () => {
     touch('core/getting-started/overview.md');
     touch('core/v0-61/getting-started/overview.md');
     const result = collectMarkdownFiles(tmpDir);
-    expect(result).toHaveLength(1);
-    expect(result[0]).not.toContain('v0-61');
+    expect(result).toHaveLength(2);
+    expect(result.some(path => path.includes('v0-61'))).toBe(true);
+    expect(result.some(path => !path.includes('v0-61'))).toBe(true);
   });
 
   it('collects from nested dirs and root', () => {
@@ -146,5 +152,76 @@ describe('removeStaleVersionDirs', () => {
   it('handles nonexistent and empty directories', () => {
     expect(() => removeStaleVersionDirs(join(tmpDir, 'nonexistent'))).not.toThrow();
     expect(() => removeStaleVersionDirs(tmpDir)).not.toThrow();
+  });
+});
+
+describe('writeChannelRedirects', () => {
+  let tmpDir: string;
+  let targetDir: string;
+  let configDir: string;
+
+  beforeEach(() => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'uds-channel-redirects-'));
+    targetDir = join(tmpDir, 'content');
+    configDir = join(tmpDir, 'config');
+    mkdirSync(join(targetDir, 'core', 'develop', 'Configuration & Packaging'), { recursive: true });
+    mkdirSync(join(targetDir, 'core', 'v1-10'), { recursive: true });
+    mkdirSync(configDir, { recursive: true });
+    writeFileSync(join(targetDir, 'core', 'develop', 'Configuration & Packaging', 'overview.md'), '');
+    writeFileSync(join(targetDir, 'core', 'develop', 'Configuration & Packaging', 'some-and-page.md'), '');
+  });
+
+  afterEach(() => {
+    rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  const versions = {
+    'defenseunicorns/uds-core': {
+      latestTag: 'v1.10.0',
+      versions: [{ display: 'v1.10', slug: 'v1-10' }],
+    },
+  };
+  const config = {
+    repo: 'defenseunicorns/uds-core',
+    contentDir: 'core',
+  } as DocsConfig & { repo: string };
+
+  it('writes current and legacy double-hyphen routes to the latest release', () => {
+    writeChannelRedirects(
+      versions,
+      new Map([['uds-core', config]]),
+      new Map([['uds-core', 'develop']]),
+      { 'Configuration & Packaging': 'configuration-and-packaging' },
+      targetDir,
+      configDir,
+    );
+
+    const redirects = JSON.parse(readFileSync(join(configDir, 'redirects.json'), 'utf8')) as Record<string, string>;
+    expect(redirects['/core/configuration-and-packaging/overview']).toBe(
+      '/core/v1-10/configuration--packaging/overview/',
+    );
+    expect(redirects['/core/configuration--packaging/overview']).toBe(
+      '/core/v1-10/configuration--packaging/overview/',
+    );
+    expect(redirects['/core/configuration--packaging/some-and-page']).toBe(
+      '/core/v1-10/configuration--packaging/some-and-page/',
+    );
+    expect(redirects['/core/configuration--packaging/some--page']).toBeUndefined();
+  });
+
+  it('keeps the root on the configured channel when the latest clone is unavailable', () => {
+    rmSync(join(targetDir, 'core', 'v1-10'), { recursive: true, force: true });
+
+    writeChannelRedirects(
+      versions,
+      new Map([['uds-core', config]]),
+      new Map([['uds-core', 'develop']]),
+      {},
+      targetDir,
+      configDir,
+    );
+
+    const redirects = JSON.parse(readFileSync(join(configDir, 'redirects.json'), 'utf8')) as Record<string, string>;
+    expect(redirects['/core']).toBe('/core/develop/');
   });
 });

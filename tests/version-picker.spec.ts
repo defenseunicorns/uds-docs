@@ -1,18 +1,30 @@
 import { test, expect, selectors } from './fixtures';
 
-// TODO: Enable once Core has archived versions and the version picker is active
-test.describe.skip('Version Picker', () => {
-  test('user selects an older version and navigates to versioned docs', async ({ page }) => {
+test.describe('Version Picker', () => {
+  test('latest release is selected by default and the configured channel appears last', async ({ page }) => {
+    await page.goto('/core/');
+    const select = page.locator(selectors.versionSelect);
+    await expect(select).toBeVisible();
+    await expect(select.locator('option').nth(0)).toHaveText(/^Latest \(\d+\.\d+\)$/);
+    await expect(select.locator('option').last()).toHaveText('main');
+    await expect(select).toHaveValue('latest');
+  });
+
+  test('user can switch to the configured channel and an older release', async ({ page }) => {
     await page.goto('/core/');
     const select = page.locator(selectors.versionSelect);
     await expect(select).toBeVisible();
 
-    const options = select.locator('option');
-    const versionOption = options.nth(1);
-    const value = await versionOption.getAttribute('value');
-    expect(value).not.toBeNull();
-    await select.selectOption(value as string);
+    const releaseOptions = select.locator('option').filter({ hasText: /^v\d+\.\d+$/ });
+    const olderRelease = releaseOptions.nth(1);
+    const olderValue = await olderRelease.getAttribute('value');
+    expect(olderValue).not.toBeNull();
 
-    await expect(page).toHaveURL(/\/core\/v\d+-\d+\//);
+    await select.selectOption('main');
+    await expect(page).toHaveURL('/core/main/');
+    await expect(page.locator(selectors.productDropdownButton)).toHaveText('Core');
+
+    await select.selectOption(olderValue as string);
+    await expect(page).toHaveURL(new RegExp(`/core/${olderValue}/`));
   });
 });

@@ -11,12 +11,56 @@ import {
   parseOverrides,
   toArchivedVersion,
 } from './versions';
+import { latestProductVersion, latestVersionFor } from '../versionUtils';
 
 describe('minorKey', () => {
   it('strips patch version', () => {
     expect(minorKey('v0.61.1')).toBe('v0.61');
     expect(minorKey('v1.2.3')).toBe('v1.2');
     expect(minorKey('v10.100.999')).toBe('v10.100');
+  });
+});
+
+describe('latestVersionFor', () => {
+  it('normalizes the latest tag and preserves the discovered ref', () => {
+    expect(latestVersionFor({
+      latestTag: 'v1.2.3',
+      versions: [{ ref: 'v1.2.3', display: 'v1.2', slug: 'v1-2' }],
+    })).toEqual({ ref: 'v1.2.3', display: 'v1.2', slug: 'v1-2' });
+  });
+
+  it('derives a slug when the latest version is absent from the archive list', () => {
+    expect(latestVersionFor({ latestTag: 'v1.2.3' })).toEqual({
+      ref: 'v1.2.3',
+      display: 'v1.2',
+      slug: 'v1-2',
+    });
+  });
+});
+
+describe('latestProductVersion', () => {
+  const product = {
+    repo: 'defenseunicorns/uds-core',
+    contentDir: 'core',
+    latestSource: 'main',
+  };
+  const versions = {
+    'defenseunicorns/uds-core': {
+      latestTag: 'v1.2.3',
+      versions: [{ ref: 'release/1.2', display: 'v1.2', slug: 'v1-2' }],
+    },
+  };
+
+  it('returns the latest release when generated content exists', () => {
+    expect(latestProductVersion(product, versions, path => path.endsWith('/v1-2'))).toEqual({
+      ref: 'release/1.2',
+      display: 'v1.2',
+      slug: 'v1-2',
+    });
+  });
+
+  it('skips the latest release when channel content is missing', () => {
+    expect(latestProductVersion(product, versions, () => false)).toBeNull();
   });
 });
 
@@ -332,6 +376,86 @@ describe('discoverAllVersions with versionSource', () => {
     expect(calls.some(c => c.includes('matching-refs'))).toBe(true);
   });
 
+  it('includes the current release when latest docs use an explicit branch', async () => {
+    vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
+      const urlStr = url.toString();
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
+        return {
+          ok: true,
+          json: () => Promise.resolve({
+            id: 'core', label: 'Core', contentDir: 'core',
+            archiveCount: 2, versionSource: 'branch', sidebarOrder: [],
+          }),
+        } as Response;
+      }
+      if (urlStr.includes('matching-refs')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve([
+            { ref: 'refs/heads/release/1.0' },
+            { ref: 'refs/heads/release/0.63' },
+            { ref: 'refs/heads/release/0.62' },
+          ]),
+        } as Response;
+      }
+      if (urlStr.includes('/releases')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve([
+            { tag_name: 'v1.0.0', prerelease: false, draft: false },
+          ]),
+        } as Response;
+      }
+      return { ok: false, status: 404 } as Response;
+    });
+
+    const result = await discoverAllVersions(
+      [{ repo: 'defenseunicorns/uds-core', branch: 'main' }],
+      {},
+    );
+    const entry = result['defenseunicorns/uds-core'];
+    expect(entry.branch).toBe('main');
+    expect(entry.latestTag).toBe('v1.0.0');
+    expect(entry.versions).toEqual([
+      { ref: 'release/1.0', display: 'v1.0', slug: 'v1-0' },
+      { ref: 'release/0.63', display: 'v0.63', slug: 'v0-63' },
+      { ref: 'release/0.62', display: 'v0.62', slug: 'v0-62' },
+    ]);
+  });
+
+  it('includes the latest release when archiveCount is zero with an explicit branch', async () => {
+    vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
+      const urlStr = url.toString();
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
+        return {
+          ok: true,
+          json: () => Promise.resolve({
+            id: 'cli', label: 'CLI', contentDir: 'cli',
+            archiveCount: 0, sidebarOrder: [],
+          }),
+        } as Response;
+      }
+      if (urlStr.includes('/releases')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve([
+            { tag_name: 'v1.0.0', prerelease: false, draft: false },
+            { tag_name: 'v0.63.0', prerelease: false, draft: false },
+          ]),
+        } as Response;
+      }
+      return { ok: false, status: 404 } as Response;
+    });
+
+    const result = await discoverAllVersions(
+      [{ repo: 'defenseunicorns/uds-cli', branch: 'main' }],
+      {},
+    );
+    expect(result['defenseunicorns/uds-cli'].versions).toEqual([
+      { ref: 'v1.0.0', display: 'v1.0', slug: 'v1-0' },
+    ]);
+  });
+
   it('defaults to tag discovery when versionSource is not set', async () => {
     const calls: string[] = [];
     vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
@@ -370,6 +494,42 @@ describe('discoverAllVersions with versionSource', () => {
     expect(calls.some(c => c.includes('matching-refs'))).toBe(false);
   });
 
+  it('does not duplicate the latest tag when an explicit source matches it', async () => {
+    vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
+      const urlStr = url.toString();
+      if (new URL(urlStr).hostname === 'raw.githubusercontent.com') {
+        return {
+          ok: true,
+          json: () => Promise.resolve({
+            id: 'cli', label: 'CLI', contentDir: 'cli',
+            archiveCount: 2, versionSource: 'tag', sidebarOrder: [],
+          }),
+        } as Response;
+      }
+      if (urlStr.includes('/releases')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve([
+            { tag_name: 'v1.0.0', prerelease: false, draft: false },
+            { tag_name: 'v0.63.0', prerelease: false, draft: false },
+            { tag_name: 'v0.62.0', prerelease: false, draft: false },
+          ]),
+        } as Response;
+      }
+      return { ok: false, status: 404 } as Response;
+    });
+
+    const result = await discoverAllVersions(
+      [{ repo: 'defenseunicorns/uds-cli', branch: 'v1.0.0' }],
+      {},
+    );
+
+    expect(result['defenseunicorns/uds-cli'].versions).toEqual([
+      { ref: 'v0.63.0', display: 'v0.63', slug: 'v0-63' },
+      { ref: 'v0.62.0', display: 'v0.62', slug: 'v0-62' },
+    ]);
+  });
+
   it('excludes the branch matching the current release', async () => {
     vi.mocked(fetch).mockImplementation(async (url: string | URL | Request) => {
       const urlStr = url.toString();
@@ -405,7 +565,7 @@ describe('discoverAllVersions with versionSource', () => {
     });
 
     const result = await discoverAllVersions(
-      [{ repo: 'defenseunicorns/uds-core' }],
+      [{ repo: 'defenseunicorns/uds-core', branch: 'release/1.0' }],
       {},
     );
     const entry = result['defenseunicorns/uds-core'];

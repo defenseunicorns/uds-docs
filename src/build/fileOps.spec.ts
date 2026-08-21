@@ -173,4 +173,11 @@ describe('write404Page', () => {
     expect(content).toContain("doesn't exist in this version");
     expect(content).toContain('Version');
   });
+
+  it('latest versioned page identifies the latest release', () => {
+    write404Page(join(tmpDir, '404.md'), true, true);
+    const content = readFileSync(join(tmpDir, '404.md'), 'utf8');
+    expect(content).toContain("doesn't exist in the latest release");
+    expect(content).toContain('Version');
+  });
 });
