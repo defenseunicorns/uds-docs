@@ -8,15 +8,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import type { ArchivedVersion, DocsConfig, OverridesMap, VersionEntry, VersionsFile } from './types';
+import { latestVersionFor, minorKey } from '../versionUtils';
 
-// ---------------------------------------------------------------------------
-// Minor version key
-// ---------------------------------------------------------------------------
-
-/** Strip the patch version from a semver tag: `v0.61.1` → `v0.61`. */
-export function minorKey(tag: string): string {
-  return tag.replace(/\.\d+$/, '');
-}
+export { minorKey };
 
 // ---------------------------------------------------------------------------
 // Archived version normalization
@@ -54,6 +48,15 @@ export function toArchivedVersion(ref: string): ArchivedVersion {
     display: `v${majorMinor}`,
     slug: `v${majorMinor.replace(/\./g, '-')}`,
   };
+}
+
+function refsShareMinorVersion(first: string | undefined, second: string | null): boolean {
+  if (!first || !second) return false;
+  try {
+    return toArchivedVersion(first).display === toArchivedVersion(second).display;
+  } catch {
+    return false;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -277,31 +280,44 @@ export async function discoverAllVersions(
       const docsConfig = await fetchDocsConfig(repo, configBranch, localOverridePath);
       const archiveCount = docsConfig?.archiveCount ?? 0;
       const versionSource = docsConfig?.versionSource ?? 'tag';
+      const hasExplicitLatestSource = product.branch !== undefined;
 
       console.log(`${repo}: discovering versions (source: ${versionSource})...`);
 
       let versions: ArchivedVersion[];
       let latestTag: string | null;
-
       if (versionSource === 'branch') {
         // Branch-based: archived versions come from release/* branches,
-        // but latestTag still comes from the releases API.
-        // Request one extra in case we need to filter out the current release's branch.
+        // but latestTag still comes from the releases API. An explicit
+        // source gets the current release unless it is that release itself.
         const [candidates, releaseResult] = await Promise.all([
           discoverBranchVersions(repo, archiveCount + 1),
           discoverVersions(repo, 0),
         ]);
         latestTag = releaseResult.latestTag;
-        // Exclude the branch matching the current release (e.g. release/1.0 when latestTag is v1.0.x)
-        let latestDisplay: string | null = null;
-        if (latestTag) {
-          try { latestDisplay = toArchivedVersion(latestTag).display; } catch { /* unparseable tag */ }
-        }
-        versions = candidates.filter(v => v.display !== latestDisplay).slice(0, archiveCount);
+        const latestDocsUseCurrentRelease = refsShareMinorVersion(product.branch, latestTag);
+        const latestDisplay = latestTag ? latestVersionFor({ latestTag })?.display ?? null : null;
+        const includeLatestRelease = hasExplicitLatestSource && !latestDocsUseCurrentRelease;
+        versions = candidates
+          .filter(v => includeLatestRelease || v.display !== latestDisplay)
+          .slice(0, archiveCount + (includeLatestRelease ? 1 : 0));
       } else {
-        const result = await discoverVersions(repo, archiveCount);
+        const result = await discoverVersions(
+          repo,
+          archiveCount + (hasExplicitLatestSource ? 1 : 0),
+        );
         latestTag = result.latestTag;
-        versions = result.archived;
+        const latestDocsUseCurrentRelease = refsShareMinorVersion(product.branch, latestTag);
+        const includeLatestRelease = hasExplicitLatestSource && !latestDocsUseCurrentRelease;
+        if (includeLatestRelease && latestTag) {
+          try {
+            versions = [toArchivedVersion(latestTag), ...result.archived].slice(0, archiveCount + 1);
+          } catch {
+            versions = result.archived.slice(0, archiveCount);
+          }
+        } else {
+          versions = result.archived.slice(0, archiveCount);
+        }
       }
 
       console.log(

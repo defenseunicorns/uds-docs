@@ -21,6 +21,7 @@ export interface ProductConfig {
   link: string;
   contentDir: string;
   repo: string;
+  latestSource?: string;
   description?: string;
   sidebarOrder: (string | { dir: string; label: string })[];
 }
@@ -41,17 +42,24 @@ export function loadProductConfigs(): ProductConfig[] {
   // readdirSync order is filesystem-dependent and not reliable for determining
   // which product is "primary" (PRODUCTS[0]).
   let repoOrder: Map<string, number> = new Map();
+  let repoSources: Map<string, string | undefined> = new Map();
   try {
-    const productsJson: Array<{ repo: string }> = JSON.parse(
+    const productsJson: Array<{ repo: string; branch?: string }> = JSON.parse(
       readFileSync('src/products.json', 'utf8')
     );
     repoOrder = new Map(productsJson.map((p, i) => [p.repo, i]));
+    repoSources = new Map(productsJson.map(p => [p.repo, p.branch]));
   } catch {
     // Fall back to filesystem order if products.json can't be read.
   }
 
   return readdirSync(configDir)
-    .filter(f => f.endsWith('.json') && !/\.v\d+-\d+\.json$/.test(f) && f !== DIR_RENAMES_FILENAME)
+    .filter(f =>
+      f.endsWith('.json') &&
+      !/\.v\d+-\d+\.json$/.test(f) &&
+      f !== DIR_RENAMES_FILENAME &&
+      f !== 'redirects.json'
+    )
     .map(f => {
       const path = `${configDir}/${f}`;
       try {
@@ -65,6 +73,7 @@ export function loadProductConfigs(): ProductConfig[] {
           link: `/${data.contentDir}/`,
           contentDir: data.contentDir,
           repo: data.repo,
+          latestSource: repoSources.get(data.repo),
           description: data.description,
           sidebarOrder: data.sidebarOrder ?? [],
         };

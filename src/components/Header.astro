@@ -5,11 +5,13 @@ import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
 import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
 import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 import VersionPicker from './VersionPicker.astro';
+import { PRODUCTS } from '../products';
 
 const isRoot = Astro.url.pathname === '/';
+const productChannels = [...new Set(PRODUCTS.flatMap(product => product.latestSource ? [product.latestSource] : []))];
 ---
 
-<div class="header">
+<div class="header" data-product-channels={JSON.stringify(productChannels)}>
   <div class="title-wrapper sl-flex">
     <SiteTitle />
   </div>
@@ -29,7 +31,14 @@ const isRoot = Astro.url.pathname === '/';
 </div>
 
 <script>
-  import { products, productVersions, detectProduct, detectVersionSlug } from '../productUtils';
+  import {
+    productLatestVersions,
+    products,
+    productVersions,
+    detectChannelPath,
+    detectProduct,
+    detectVersionSlug,
+  } from '../productUtils';
 
   function updateGitHubLink() {
     const githubLink = document.querySelector('a[href*="github.com/defenseunicorns"]') as HTMLAnchorElement | null;
@@ -42,6 +51,11 @@ const isRoot = Astro.url.pathname === '/';
     const repo = productConfig?.githubRepo;
     if (!repo) return;
 
+    if (detectChannelPath(window.location.pathname, product) && productConfig?.latestSource) {
+      githubLink.href = `https://github.com/${repo}/tree/${productConfig.latestSource}`;
+      return;
+    }
+
     const currentVersionSlug = detectVersionSlug(window.location.pathname, product);
     if (currentVersionSlug) {
       const versions = productVersions[product.id] ?? [];
@@ -50,6 +64,12 @@ const isRoot = Astro.url.pathname === '/';
         githubLink.href = `https://github.com/${repo}/tree/${matched.ref}`;
         return;
       }
+    }
+
+    const latest = productLatestVersions[product.id];
+    if (latest) {
+      githubLink.href = `https://github.com/${repo}/tree/${latest.ref}`;
+      return;
     }
 
     githubLink.href = `https://github.com/${repo}`;

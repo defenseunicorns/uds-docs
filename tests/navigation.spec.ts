@@ -5,7 +5,7 @@ test.describe('Page Navigation', () => {
     await page.goto('/core/');
     const summary = page.locator('#starlight__sidebar ul.top-level > li > details > summary').filter({ hasText: 'Getting Started' });
     await summary.click();
-    await expect(page).toHaveURL('/core/getting-started/overview/');
+    await expect(page).toHaveURL(/\/core\/v\d+-\d+\/getting-started\/overview\//);
   });
 
   test('switching product via dropdown navigates to the other product and updates the dropdown label', async ({ page }) => {
@@ -13,9 +13,9 @@ test.describe('Page Navigation', () => {
     await expect(page.locator(selectors.productDropdownButton)).toContainText('Core');
 
     await page.locator(selectors.productDropdownButton).click();
-    await page.locator(`${selectors.productDropdownItem}[href="/cli/"]`).click();
+    await page.locator(`${selectors.productDropdownItem}[href^="/cli/v"]`).first().click();
 
-    await expect(page).toHaveURL('/cli/');
+    await expect(page).toHaveURL(/\/cli\/v\d+-\d+\//);
     await expect(page.locator(selectors.productDropdownButton)).toContainText('CLI');
   });
 });

@@ -1,8 +1,10 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import TopicsDropdown from 'starlight-sidebar-topics-dropdown/TopicsDropdown.astro';
+import { PRODUCTS } from '../products';
 
 const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? false;
+const channelNames = PRODUCTS.flatMap(product => product.latestSource ? [product.latestSource] : []);
 ---
 
 {/* Render the topics dropdown menu only when the page belongs to a topic. */}
@@ -71,15 +73,26 @@ const isPageWithTopic = Astro.locals.starlightSidebarTopics?.isPageWithTopic ?? 
 
 </style>
 
-<script is:inline data-astro-rerun>
-  // Remove versioned topics from the product dropdown — versions use the VersionPicker instead.
+<script is:inline data-astro-rerun data-channel-names={JSON.stringify(channelNames)}>
+  // Keep only the first topic for each product. Product topics come first and may
+  // point directly at the latest version to avoid an intermediate redirect page.
   // Runs immediately so there's no flash of versioned items in the dropdown.
-  // Note: version slug pattern must match VERSION_SLUG_PATTERN in productUtils.ts
+  // Note: channel/version patterns must match productUtils.ts
   // and VERSION_SEGMENT_RE in 404.md.
   (() => {
+    const channelNames = new Set(JSON.parse(document.currentScript?.dataset.channelNames ?? '[]'));
     const versionPattern = /\/v\d+-\d+(?:\/|$)/;
+    const productLabels = new Set();
     document.querySelectorAll('.starlight-sidebar-topics-dropdown-menu a').forEach(a => {
-      if (versionPattern.test(a.getAttribute('href') || '')) {
+      const href = a.getAttribute('href') || '';
+      const channel = href.split('/')[2];
+      const label = a.querySelector('.starlight-sidebar-topics-dropdown-label')?.textContent?.trim();
+      const isVersionedTopic = versionPattern.test(href) || channelNames.has(channel);
+      if (label && !productLabels.has(label)) {
+        productLabels.add(label);
+        return;
+      }
+      if (label || isVersionedTopic) {
         a.remove();
       }
     });

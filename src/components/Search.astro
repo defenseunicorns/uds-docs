@@ -94,14 +94,16 @@ import Default from '@astrojs/starlight/components/Search.astro';
    *
    * Layers on top of Pagefind's default search UI to provide:
    * 1. Product filter buttons (e.g. "All", "Core", "CLI") — filters results by URL prefix.
-   * 2. Version scoping — activates Pagefind's native filter so only results from the
-   *    current page's version are shown (latest vs archived).
+    * 2. Version scoping — hides results from other versions so only the current page's
+    *    version is shown (latest vs archived).
    * 3. Breadcrumb injection — adds section path above each result title for context.
    * 4. Result count correction — adjusts the displayed count when product filtering
    *    hides results, including auto-loading all pages to get an accurate total.
    */
   import {
+    detectChannelPath,
     products as configuredProducts,
+    productLatestVersions,
     VERSION_SLUG_PATTERN,
   } from '../productUtils';
 
@@ -131,13 +133,21 @@ import Default from '@astrojs/starlight/components/Search.astro';
   let autoLoadingForCount = false;
 
   // Detect the version the user is currently viewing from the page URL.
-  // Current docs have no version slug; archived pages have e.g. "v0-62".
+  // Configured channel pages use their branch name; all latest release pages share "latest" so the
+  // search scope works across products with different release numbers.
+  // Non-product pages use the latest release scope as well.
   function detectPageVersion(path: string): string {
+    const product = configuredProducts.find(p => path.startsWith(p.link));
+    if (!product) return 'latest';
+    if (detectChannelPath(path, product)) return product.latestSource!;
+    const usesLatestRelease = Boolean(productLatestVersions[product.id]);
     const segs = path.split('/');
     for (const seg of segs) {
-      if (VERSION_SLUG_PATTERN.test(seg)) return seg;
+      if (VERSION_SLUG_PATTERN.test(seg)) {
+        return usesLatestRelease && productLatestVersions[product.id]?.slug === seg ? 'latest' : seg;
+      }
     }
-    return 'current';
+    return usesLatestRelease && productLatestVersions[product.id] ? 'latest' : 'current';
   }
 
   let pageVersion = detectPageVersion(window.location.pathname);
@@ -326,7 +336,9 @@ import Default from '@astrojs/starlight/components/Search.astro';
     const dropdown = document.querySelector('.starlight-sidebar-topics-dropdown-menu');
     const visibleOther = otherProducts.filter(p => {
       if (!dropdown) return true;
-      return dropdown.querySelector(`a[href="${p.link}"]`) !== null;
+      return Array.from(dropdown.querySelectorAll('a[href]')).some(a =>
+        a.getAttribute('href')?.startsWith(p.link),
+      );
     });
 
     if (visibleOther.length === 0) return [];
@@ -367,18 +379,10 @@ import Default from '@astrojs/starlight/components/Search.astro';
       const delay = autoLoadingForCount ? 5 : 50;
       filterTimer = setTimeout(() => {
         isInjecting = true;
-        // Skip expensive per-result work (breadcrumbs, version filter) during auto-loading —
-        // only applyProductFilter matters at that point.
-        if (!autoLoadingForCount) {
-          injectBreadcrumbs();
-          // Activate the native pagefind version filter. If it wasn't already checked,
-          // pagefind re-runs the search — the next observer fire will show results.
-          const willRerun = activateVersionFilter(pagefindContainer);
-          if (willRerun) {
-            isInjecting = false;
-            return;
-          }
-        }
+        // Skip expensive breadcrumb work while exhausting result batches. Version and
+        // product scoping are applied locally from each result URL so they do not depend
+        // on Pagefind's hidden native filter panel.
+        if (!autoLoadingForCount) injectBreadcrumbs();
         applyProductFilter();
         const resultsEl = pagefindContainer.querySelector('.pagefind-ui__results') as HTMLElement | null;
         if (resultsEl) resultsEl.classList.remove('loading');
@@ -438,20 +442,30 @@ import Default from '@astrojs/starlight/components/Search.astro';
     });
   }
 
-  // Activate the native pagefind version filter for the current page's version.
-  // Returns true if the filter was just applied (pagefind will re-run the search);
-  // returns false if it was already active or the filter panel isn't available yet.
-  function activateVersionFilter(container: HTMLElement): boolean {
-    const input = container.querySelector(
-      `.pagefind-ui__filter-panel input[value="${pageVersion}"]`
-    ) as HTMLInputElement | null;
-    if (!input || input.checked) return false;
-    input.click();
-    return true;
+  function resultVersion(href: string): string {
+    const product = configuredProducts.find(p => href.startsWith(p.link));
+    if (!product) return 'current';
+
+    const firstSegment = href.slice(product.link.length).split('/').find(Boolean) ?? '';
+    if (product.latestSource && firstSegment === product.latestSource) return product.latestSource;
+    if (VERSION_SLUG_PATTERN.test(firstSegment)) {
+      return productLatestVersions[product.id]?.slug === firstSegment ? 'latest' : firstSegment;
+    }
+    return product.latestSource ?? 'current';
   }
 
-  // Apply the active product filter (Core/CLI buttons) via DOM hiding.
-  // Version filtering is handled natively by pagefind; this only handles product scope.
+  function isResultMatchingVersion(href: string): boolean {
+    const product = configuredProducts.find(p => href.startsWith(p.link));
+    if (!product) return pageVersion === 'current';
+
+    const version = resultVersion(href);
+    if (pageVersion === 'latest') {
+      return version === 'latest' || (!productLatestVersions[product.id] && version === 'current');
+    }
+    return version === pageVersion;
+  }
+
+  // Apply version and product scope by hiding non-matching Pagefind results.
   function applyProductFilter() {
     const results = document.querySelectorAll('.pagefind-ui__result');
     let visibleCount = 0;
@@ -460,13 +474,14 @@ import Default from '@astrojs/starlight/components/Search.astro';
       const link = result.querySelector('a');
       if (link) {
         const href = link.getAttribute('href') || '';
-        const visible = !currentFilter || isResultMatchingFilter(href, currentFilter);
+        const visible = isResultMatchingVersion(href)
+          && (!currentFilter || isResultMatchingFilter(href, currentFilter));
         (result as HTMLElement).style.display = visible ? '' : 'none';
         if (visible) visibleCount++;
       }
     });
 
-    if (!currentFilter) {
+    if (!currentFilter && pageVersion === 'current') {
       // "All" — restore the original Pagefind total count if we previously modified it.
       autoLoadingForCount = false;
       if (savedPagefindCount !== null && results.length > 0) {
