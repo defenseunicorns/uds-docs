@@ -44,6 +44,7 @@
     "vitest": "^4.1.2"
   },
   "overrides": {
-    "vite": "$vite"
+    "vite": "$vite",
+    "satteri": "0.10.5"
   }
 }
