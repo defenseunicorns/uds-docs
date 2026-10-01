@@ -22,15 +22,26 @@ test.describe('Sidebar', () => {
 
     await page.locator(selectors.productDropdownButton).click();
     const menu = page.locator(selectors.productDropdownMenu);
-    const coreLink = menu.locator(`${selectors.productDropdownItem}[href^="/core/v"]`).first();
-    const cliLink = menu.locator(`${selectors.productDropdownItem}[href^="/cli/v"]`).first();
+    const coreLink = menu.locator(`${selectors.productDropdownItem}[href^="/core/"]`).first();
+    const cliLink = menu.locator(`${selectors.productDropdownItem}[href^="/cli/"]`).first();
     await expect(coreLink).toBeVisible();
     await expect(cliLink).toBeVisible();
     await expect(menu.locator(selectors.productDropdownItem)).toHaveCount(2);
 
     // Navigate to CLI and verify sidebar context switched
     await cliLink.click();
-    await expect(page).toHaveURL(/\/cli\/v\d+-\d+\//);
-    await expect(page.locator(selectors.productDropdownButton)).toContainText('CLI');
+    await expect(page).toHaveURL(/\/cli\/(?:v\d+-\d+|main)\//);
+    const dropdownButton = page.locator(selectors.productDropdownButton);
+    await expect(dropdownButton).toContainText('CLI');
+
+    // The dropdown custom element is recreated during the Astro page swap.
+    // Verify its handlers are attached again and its expanded state stays in sync.
+    await dropdownButton.click();
+    await expect(dropdownButton).toHaveAttribute('aria-expanded', 'true');
+    await expect(menu).toBeVisible();
+
+    await page.locator('main').click({ position: { x: 5, y: 5 } });
+    await expect(dropdownButton).toHaveAttribute('aria-expanded', 'false');
+    await expect(menu).toBeHidden();
   });
 });

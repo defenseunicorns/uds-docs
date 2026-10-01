@@ -62,10 +62,13 @@ test.describe('Search', () => {
 
     const firstResult = page.locator(`${selectors.searchResult}:visible`).first();
     await expect(firstResult).toBeVisible({ timeout: 10_000 });
+    await waitForFilterToSettle(page);
 
     const href = await firstResult.locator('a').first().getAttribute('href');
     expect(href).toBeTruthy();
-    await firstResult.locator('a').first().click();
+    // Pin the click to the URL we inspected. The first visible result is a live
+    // locator and can resolve to a different result if filtering changes it.
+    await page.locator(`${selectors.searchResult} a[href="${href}"]`).first().click();
 
     await expect(page).toHaveURL(href as string);
     await expect(page.locator(selectors.searchDialog)).not.toBeVisible();
