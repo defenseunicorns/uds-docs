@@ -252,44 +252,15 @@ const channelNames = PRODUCTS.flatMap(product => product.latestSource ? [product
   const strip = (href: string) => href.split('#')[0].split('?')[0];
   const prefetchedOverviews = new Set<string>();
 
-  // Close the TopicsDropdown when clicking outside it. Queries elements fresh
-  // on each click so it always targets the current DOM after SPA swaps.
-  document.addEventListener('click', (e) => {
-    const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
-    const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
-    if (!menu || !button) return;
-    const target = e.target as Element | null;
-    if (target && !menu.contains(target) && !button.contains(target)) {
-      menu.hidden = true;
-    }
-  });
-
-  // Re-initialize the TopicsDropdown toggle on every page. Cloning the button
-  // strips all prior handlers (including any added by the plugin's is:inline
-  // script) so there is always exactly one toggle handler.
-  //
-  // stopPropagation is required because the plugin's closeDropdown closure
-  // captures the original button element — after a SPA swap that reference is
-  // stale, so it would immediately close the menu on every button click.
+  // Pre-warm product links on each page. The dropdown component owns its
+  // interaction handlers so its expanded state stays in sync for assistive tech.
   document.addEventListener('astro:page-load', () => {
-    const button = document.getElementById('starlight-sidebar-topics-dropdown-button');
-    const menu = document.getElementById('starlight-sidebar-topics-dropdown-menu');
-    if (!button || !menu) return;
-
-    const clone = button.cloneNode(true) as HTMLElement;
-    button.replaceWith(clone);
-
-    clone.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.hidden = !menu.hidden;
-    });
-
-    // Pre-warm the browser cache for all product links so dropdown navigation
-    // is instant even on first visit.
-    menu.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+    const productLinks = document.querySelectorAll<HTMLAnchorElement>(
+      '.starlight-sidebar-topics-dropdown-menu a[href]',
+    );
+    productLinks.forEach((a) => {
       fetch(a.href, { credentials: 'same-origin' }).catch(() => {});
     });
-
   });
 
   // Overview <a> elements are hidden (display:none), so Astro's hover-prefetch

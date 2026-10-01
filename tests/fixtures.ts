@@ -21,8 +21,8 @@ export const selectors = {
   sidebarSummary: '#starlight__sidebar details > summary',
   sidebarLink: '#starlight__sidebar a[href]',
   currentPage: '#starlight__sidebar [aria-current="page"]',
-  productDropdownButton: '#starlight-sidebar-topics-dropdown-button',
-  productDropdownMenu: '#starlight-sidebar-topics-dropdown-menu',
+  productDropdownButton: '.starlight-sidebar-topics-dropdown-button',
+  productDropdownMenu: '.starlight-sidebar-topics-dropdown-menu',
   productDropdownItem: '.starlight-sidebar-topics-dropdown-item',
 
   // Version Picker
