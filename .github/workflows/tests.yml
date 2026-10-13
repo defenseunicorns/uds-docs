@@ -20,6 +20,13 @@ jobs:
         with:
           node-version: 24
 
+      - uses: defenseunicorns/setup-uds@d6add59d4c2ca789ed7c92741e91bd340b4e950b # v1.0.2
+        with:
+          version: v0.38.0
+
+      - name: Validate Renovate configuration
+        run: uds run lint
+
       - name: Cache node_modules
         id: npm-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
