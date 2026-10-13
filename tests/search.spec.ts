@@ -1,15 +1,33 @@
 import { test, expect, selectors } from './fixtures';
 
 /**
- * Wait for the product filter to finish auto-loading all results.
- * The filter loads all pagefind batches before applying display:none,
- * so we wait until no load-more button remains and the spinner is gone.
+ * Wait for filtered search results to finish loading and stop changing.
  */
 async function waitForFilterToSettle(page: import('@playwright/test').Page) {
-  // Wait for auto-loading spinner to finish
-  await expect(page.locator('.search-loading')).not.toHaveClass(/visible/, { timeout: 15_000 });
-  // Wait for load-more button to disappear (all results loaded)
-  await expect(page.locator('.pagefind-ui__button')).toHaveCount(0, { timeout: 15_000 });
+  let previousSnapshot = '';
+  let stableSnapshots = 0;
+
+  // Pagefind can briefly remove the load-more button between result batches.
+  // Require the visible result set to stay unchanged across several polls once
+  // the spinner and load-more button are both gone.
+  await expect.poll(async () => {
+    const loading = await page
+      .locator('.search-loading')
+      .evaluate(el => el.classList.contains('visible'));
+    const hasMoreResults = await page.locator('.pagefind-ui__button').count() > 0;
+    const hrefs = await getVisibleResultHrefs(page);
+
+    if (loading || hasMoreResults || hrefs.length === 0) {
+      previousSnapshot = '';
+      stableSnapshots = 0;
+      return false;
+    }
+
+    const snapshot = JSON.stringify(hrefs);
+    stableSnapshots = snapshot === previousSnapshot ? stableSnapshots + 1 : 0;
+    previousSnapshot = snapshot;
+    return stableSnapshots >= 3;
+  }, { timeout: 15_000, intervals: [100] }).toBe(true);
 }
 
 /**
