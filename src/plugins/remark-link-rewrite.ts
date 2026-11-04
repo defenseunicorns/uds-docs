@@ -19,7 +19,7 @@ interface ProductConfig {
   latestPrefix: string;
 }
 
-interface Options {
+export interface LinkRewriteOptions {
   products: ProductConfig[];
   srcDir: string;
 }
@@ -28,7 +28,7 @@ interface Options {
  * @param options.products - Per-product section lists and optional version overrides
  * @param options.srcDir - Absolute path to src/content/docs/
  */
-export function remarkLinkRewrite(options: Options) {
+export function remarkLinkRewrite(options: LinkRewriteOptions) {
   const { products, srcDir } = options;
 
   // Pre-build Sets for all section lookups so we don't re-create them per file.
@@ -125,7 +125,7 @@ export function remarkLinkRewrite(options: Options) {
       : `/${contentDir}`;
 
     // Rewrite markdown links: [text](/section/...) → [text](/core/section/...)
-    visit(tree, 'link', (node) => {
+    visit(tree, ['link', 'definition'], (node: any) => {
       node.url = rewriteInternalUrl(node.url, prefix, sections, contentDir);
     });
 

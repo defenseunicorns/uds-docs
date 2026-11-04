@@ -16,11 +16,13 @@ import {
   rmSync,
   writeFileSync,
 } from 'fs';
-import { basename, dirname, join } from 'path';
+import { basename, dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { discoverAllVersions, minorKey, parseOverrides, readProductsJson } from './versions';
 import { computeSlugRename, toTitleCase } from './dirRename';
 import { rewriteLinks } from './linkRewrite';
+import { createRawLinkRewriter } from './rawLinkRewrite';
+import { latestProductVersion } from '../versionUtils';
 import { VERSION_SLUG_RE } from './cleanupDirs';
 import {
   bustAstroCache,
@@ -341,6 +343,34 @@ export async function main(): Promise<void> {
           }
         }
       }
+    }
+
+    // Normalize copied source too: raw LLM exports bypass the Remark pipeline.
+    const sections = (config: DocsConfig) => config.sidebarOrder.map(
+      entry => typeof entry === 'string' ? entry : entry.dir,
+    );
+    const versionsByRepo = Object.fromEntries(Object.values(versions).map(v => [v.repo, v]));
+    const rewriteRaw = createRawLinkRewriter({
+      srcDir: resolve(TARGET_DIR),
+      products: [...configCache.entries()].map(([repoName, config]) => {
+        const channel = productChannels.get(repoName);
+        const latest = latestProductVersion({ ...config, latestSource: channel }, versionsByRepo);
+        return {
+          contentDir: config.contentDir,
+          channel,
+          sections: sections(config),
+          latestPrefix: `/${config.contentDir}${channel ? `/${latest?.slug ?? channel}` : ''}`,
+          versionedSections: Object.fromEntries(versions[config.repo].versions.flatMap(version => {
+            const configPath = join(CONFIG_DIR, `${repoName}.${version.slug}.json`);
+            return existsSync(configPath) ? [[version.slug, sections(readDocsConfig(configPath))]] : [];
+          })),
+        };
+      }),
+    });
+    for (const file of collectMarkdownFiles(TARGET_DIR)) {
+      const original = readFileSync(file, 'utf8');
+      const rewritten = await rewriteRaw(original, resolve(file));
+      if (rewritten !== original) writeFileSync(file, rewritten);
     }
 
     // ------------------------------------------------------------------
