@@ -257,7 +257,6 @@ export default defineConfig({
           ],
           minify: { note: true, tip: true, caution: true, danger: true, details: true, whitespace: true },
           pageSeparator: '\n\n-----\n\n',
-          rawContent: true,
         }),
         starlightSidebarTopics([
           ...productTopics,
