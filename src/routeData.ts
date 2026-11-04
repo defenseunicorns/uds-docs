@@ -133,9 +133,31 @@ export function latestReleaseHref(
     : [`${latestPath}/index.md`, `${latestPath}/index.mdx`];
   if (!latestFiles.some(fileExists)) return fallback;
 
-  return relativePath && relativePath !== 'index'
-    ? `${latestPrefix}${relativePath}/`
-    : latestPrefix;
+  if (relativePath !== '' && relativePath !== 'index') {
+    // sub folder route breaking change reroute
+    if (currentSlug !== 'main' && latestSlug !== 'main') {
+      if (routeId.split('/')[0] === 'core') {
+        let current = currentSlug.replace(/^v/, '').split('-').map(Number);
+        let latest = latestSlug.replace(/^v/, '').split('-').map(Number);
+
+        // check if using affected versions
+        if ((current[0] === 1 && latest[0] === 1) && (current[1] <= 10 && latest[1] >= 11)) {
+          let splitPath = relativePath.split('/')
+          // check if on affected route
+          if (splitPath[0] === "how-to-guides" && splitPath[1] === "logging") {
+            splitPath[1] = "monitoring--observability"
+            let joinedPath = splitPath.join("/")
+
+            return `${latestPrefix}${joinedPath}/`
+          }
+        }
+      }
+    }
+
+    return `${latestPrefix}${relativePath}/`
+  } else {
+    return latestPrefix
+  }
 }
 
 export const onRequest = defineRouteMiddleware((context) => {
