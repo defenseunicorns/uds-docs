@@ -4,6 +4,11 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
+/* Center articles between the navigation sidebar and table of contents. */
+[data-has-sidebar][data-has-toc] .main-pane {
+    --sl-content-margin-inline: auto;
+}
+
 /* Dark mode colors (default) */
 :root {
     --sl-content-width: 50rem;
